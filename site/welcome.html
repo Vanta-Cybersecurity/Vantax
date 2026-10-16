@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Your Vantax API key</title>
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<!-- Base URL of the Vantax API (no trailing slash). Empty means this site's own
+     origin, for when the site and the API share a host (nginx proxies /api/). -->
+<meta name="vantax-api" content="https://api.vantax-cybersecurity.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f6;--surface:#fff;--ink:#0b1b33;--mute:#56657f;--line:#cfd7e4;--flag:#c2255c;--flagbg:#fde8ef;--ok:#0b7a7c;--okbg:#e2f4f4;--accent:#2b3cff;
+--sans:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1020;--surface:#111a30;--ink:#e8edf7;--mute:#8fa0bf;--line:#243252;--flag:#ff6b9a;--flagbg:#3a1526;--ok:#4fd1d3;--okbg:#0f2f33;--accent:#8a96ff}}
+:root[data-theme="dark"]{--bg:#0a1020;--surface:#111a30;--ink:#e8edf7;--mute:#8fa0bf;--line:#243252;--flag:#ff6b9a;--flagbg:#3a1526;--ok:#4fd1d3;--okbg:#0f2f33;--accent:#8a96ff}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}
+header{display:flex;align-items:center;justify-content:space-between;padding:20px 0}
+.logo{font-weight:800;font-size:22px;letter-spacing:-.02em;text-decoration:none}
+.logo b{color:var(--accent)}
+h1{font-size:clamp(34px,6vw,56px);line-height:1.04;letter-spacing:-.035em;font-weight:800;margin:36px 0 14px}
+.lede{font-size:clamp(17px,2.2vw,20px);color:var(--mute);margin:0 0 28px}
+.card{background:var(--surface);border:1.5px solid var(--ink);border-radius:16px;padding:22px}
+.card h2{font-size:20px;letter-spacing:-.01em;margin:0 0 10px}
+.key{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;margin:6px 0 14px}
+.key code{flex:1 1 320px;font:500 15px/1.5 var(--mono);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;word-break:break-all;user-select:all}
+.btn{display:inline-block;padding:12px 20px;border-radius:10px;font:600 16px var(--sans);text-decoration:none;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer}
+.btn.p{background:var(--ink);color:var(--bg)}
+.warn{border-left:4px solid var(--flag);background:var(--flagbg);padding:10px 14px;border-radius:0 8px 8px 0;margin:0 0 18px;font-size:15.5px}
+.ok{border-left:4px solid var(--ok);background:var(--okbg);padding:10px 14px;border-radius:0 8px 8px 0;margin:0 0 18px;font-size:15.5px}
+pre{font:400 14px/1.7 var(--mono);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;margin:8px 0 16px}
+.mute{color:var(--mute);font-size:15px}
+.links{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
+[hidden]{display:none!important}
+footer{padding:44px 0 56px;color:var(--mute);font-size:15px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><a class="logo" href="/">Vantax<b>.</b></a></header>
+<main>
+  <h1 id="title">Confirming your payment…</h1>
+  <p class="lede" id="lede">Stripe is telling us about your subscription. This usually takes a few seconds.</p>
+
+  <div class="card" id="done" hidden>
+    <h2>Your API key <span class="mute" id="plan"></span></h2>
+    <div class="key"><code id="key"></code><button class="btn p" id="copy" type="button">Copy</button></div>
+    <p class="warn"><b>This is the only time the key is shown.</b> Store it in a password manager or secret store now. We keep only a hash of it, so nobody can show it to you again.</p>
+    <h2>Scan your code</h2>
+    <pre id="cli">export VANTAX_API_KEY=vtx_…
+vantax scan . --fail-on high</pre>
+    <p class="mute">In CI, add the key as a secret named <code>VANTAX_API_KEY</code>. The README has a ready-made GitHub Actions workflow with SARIF upload. Lost or leaked the key? Rotate it with <code>POST /api/v1/account/key/rotate</code>: the old one stops at once.</p>
+    <div class="links">
+      <a class="btn" href="https://github.com/Vanta-Cybersecurity/Vantax#scanner-in-ci">Scanner in CI</a>
+      <a class="btn" id="portal" href="#" hidden>Manage subscription</a>
+    </div>
+  </div>
+
+  <div class="card" id="problem" hidden>
+    <h2 id="problem-title"></h2>
+    <p id="problem-text"></p>
+    <div class="links">
+      <a class="btn" href="/#pricing">Pricing</a>
+      <a class="btn" href="https://x.com/VantaxFounder">Contact @VantaxFounder</a>
+    </div>
+  </div>
+</main>
+<footer>Vantax. Post-quantum security, built to be verified.</footer>
+</div>
+<script>
+(function(){
+  var base=(document.querySelector('meta[name="vantax-api"]')||{}).content||"";
+  var $=function(id){return document.getElementById(id)};
+  var session=new URLSearchParams(location.search).get("session_id")||"";
+
+  function problem(title,text){
+    $("title").textContent=title;$("lede").textContent="";
+    $("problem-title").textContent=title;$("problem-text").textContent=text;
+    $("problem").hidden=false;
+  }
+  function forget(){
+    // Drop the session id from the address bar and history once it is used.
+    try{history.replaceState(null,"",location.pathname)}catch(e){}
+  }
+  function show(d){
+    forget();
+    $("title").textContent="You're in.";
+    $("lede").textContent="Your subscription is active"+(d.email?" for "+d.email:"")+". Here is your key.";
+    $("key").textContent=d.api_key;
+    $("plan").textContent="("+d.plan+")";
+    $("cli").textContent="export VANTAX_API_KEY="+d.api_key+"\nvantax scan . --fail-on high";
+    if(d.portal_url&&/^https:\/\//.test(d.portal_url)){$("portal").href=d.portal_url;$("portal").hidden=false}
+    $("done").hidden=false;
+  }
+  $("copy").addEventListener("click",function(){
+    var k=$("key").textContent,b=$("copy");
+    var done=function(){b.textContent="Copied";setTimeout(function(){b.textContent="Copy"},2000)};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(k).then(done,function(){})}
+    else{var r=document.createRange();r.selectNodeContents($("key"));var s=getSelection();s.removeAllRanges();s.addRange(r);try{document.execCommand("copy");done()}catch(e){}}
+  });
+
+  if(!/^cs_[A-Za-z0-9_]{7,253}$/.test(session)){
+    problem("Nothing to show here","This page shows your API key right after checkout. Choose a plan to get one.");
+    return;
+  }
+  var attempts=0,ref=session.slice(-8);
+  function claim(){
+    attempts++;
+    fetch(base+"/api/v1/billing/claim",{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({session_id:session})})
+    .then(function(r){return r.json().catch(function(){return {}}).then(function(d){return {s:r.status,d:d}})})
+    .then(function(x){
+      if(x.s===201){show(x.d);return}
+      if(x.s===202&&attempts<30){setTimeout(claim,Math.max(1,x.d.retry_after_seconds||2)*1000);return}
+      // Keep the session id for "refresh and retry" cases; drop it when it is spent.
+      if(x.s===409||x.s===402||x.s===400)forget();
+      if(x.s===202)problem("Still confirming","Stripe has not confirmed this payment yet. Refresh this page in a minute. If it keeps happening, contact us with reference "+ref+".");
+      else if(x.s===409)problem("Key already shown","The key for this purchase was shown once already (key id "+(x.d.key_id||"?")+"). If you lost it, contact us with that key id and we will replace it.");
+      else if(x.s===402)problem("Subscription not active","Stripe reports this subscription as "+(x.d.subscription_status||"inactive")+". Check your payment method in the customer portal or choose a plan again.");
+      else if(x.s===429)problem("Too many attempts","Wait a few seconds and refresh this page.");
+      else problem("Something went wrong","We could not fetch your key ("+x.s+"). Your payment is safe. Contact us with reference "+ref+".");
+    })
+    .catch(function(){
+      if(attempts<30){setTimeout(claim,3000);return}
+      problem("Cannot reach Vantax","Check your connection and refresh this page. Your payment is safe; reference "+ref+".");
+    });
+  }
+  claim();
+})();
+</script>
+</body>
+</html>

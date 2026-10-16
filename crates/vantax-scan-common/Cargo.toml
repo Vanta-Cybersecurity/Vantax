@@ -1,0 +1,15 @@
+[package]
+name = "vantax-scan-common"
+description = "Open types shared by the Vantax scanner and its clients: findings, severities, migration plans, SARIF output and source-file selection."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+keywords = ["post-quantum", "scanner", "sarif", "cryptography", "migration"]
+categories = ["cryptography", "development-tools"]
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true

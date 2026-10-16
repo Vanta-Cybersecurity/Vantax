@@ -1,157 +1,416 @@
 # Vantax
 
-**A post-quantum security platform. Not a library. Solana first.**
+**Post-quantum security, built to be verified.**
 
-Vantax is the cryptographic policy boundary for systems that have to stay trustworthy for decades, not just until the next quantum milestone. It verifies, scans, governs identity, detects, contains and bridges, all on NIST-standard post-quantum signatures, written in Rust.
+Vantax is a post-quantum security platform written in Rust, starting with
+Solana. It finds the keys and signatures a quantum computer breaks, adds NIST
+ML-DSA-87 around them, and enforces who is allowed to do what.
 
-> Crates, binaries and docs are named `vantax-*`.
+[Website](https://vantax-cybersecurity.com) ·
+[Whitepaper](docs/WHITEPAPER.md) ·
+[API reference](docs/API.md) ·
+[Pricing](https://vantax-cybersecurity.com/#pricing) ·
+[Security](SECURITY.md) ·
+[@VantaxFounder](https://x.com/VantaxFounder)
 
----
+> **Pre-release. Not yet audited.** Vantax has not had an independent
+> third-party audit. Do not use it to custody value until a review of your
+> specific deployment is complete.
 
-## Why it exists
+## Why Solana first
 
-Classical signatures (RSA, ECDSA, Ed25519) fall to a large quantum computer, and anything signed today can be harvested and forged later. Most teams have no idea where those primitives live in their stack, and no safe path off them.
+Every Solana transaction is authorized with Ed25519. Wallets, program upgrade
+authorities and validator keys all depend on a scheme that Shor's algorithm
+breaks on a large enough quantum computer, and every Solana address is itself
+an Ed25519 public key, so the keys an attacker would need are already public.
 
-Vantax gives you three things:
+Vantax cannot change Solana's base signatures. It works as a layer around them:
+it finds Ed25519 in Solana code (`Keypair`, `tweetnacl`, `ed25519-dalek`), binds
+ML-DSA-87 keys to accounts with commitments anchored by SPL Memo, signs
+canonical transaction intents next to the native signature, and records
+decisions in a hash-chained audit log. Bitcoin, Ethereum and other chains get
+commitments, anchors and intents through the same adapter trait.
 
-1. **Find** every classical primitive in your codebase (Migration Engine).
-2. **Replace** trust with PQ-signed, policy-enforced, auditable verification (Gateway, Identity).
-3. **Defend** it in production with detection, containment and evidence (Sentinel, Bridge).
+## The platform: eleven crates
 
----
+Each crate answers one question, so a flaw in one never carries the authority
+of another. The scanner, for example, never holds a signing key, so it has none
+to leak. Four crates are open source in this repository, two (the scanning
+engine and the API service) are proprietary and run as the hosted Vantax API,
+and five are designed (see the [whitepaper](docs/WHITEPAPER.md), section 8) and
+not published yet. A small support crate,
+[`vantax-scan-common`](crates/vantax-scan-common), holds the open parts of
+scanning (findings, file selection, SARIF) that the CLI and the engine share.
 
-## Platform
+| | Crate | What it does | Here |
+|---|---|---|---|
+| **Verify** | [`vantax-core`](crates/vantax-core) | ML-DSA-87 (FIPS 204) keys and signatures, the SHA3-512 → BLAKE3 → SHA3-512 hash cascade, domain-separated canonical encoding, version 1 key support | Yes |
+| | [`vantax-gateway`](crates/vantax-gateway) | The policy boundary: allowlist policy, hash-chained audit log, gateway-signed attestations, key rotation with history | Yes |
+| | `vantax-api` | The HTTP service: scanning, verification, commitments, intents and the gateway, with API keys, quotas, rate limits and Stripe billing | Hosted ([API](docs/API.md)); proprietary |
+| **Find** | `vantax-scanner` | The scanning engine: finds quantum-vulnerable cryptography in source code. Runs on the API for Pro and Enterprise | Hosted; proprietary |
+| | [`vantax-adapters`](crates/vantax-adapters) | Bitcoin, Ethereum, Solana and generic L1: key commitments, anchors, transaction intents, address validation | Yes |
+| **Govern** | `vantax-identity` | Credentials in four states, signed machine actions | Not yet |
+| | `vantax-sentinel` | Detection through containment and evidence | Not yet |
+| | `vantax-bridge` | Five-gate cross-chain authorization | Not yet |
+| **Build with** | [`vantax-cli`](crates/vantax-cli) | The `vantax` command: keys, signing, commitments, intents, Shamir vaults, and the scanner client that fails your CI | Yes |
+| | `vantax-wasm` | Signing in the browser | Not yet |
+| | `vantax-fairness` | Commit-reveal randomness anyone can verify | Not yet |
 
-| Crate | Role |
+## Quick start
+
+You need a stable Rust toolchain (built and tested with Rust 1.97 on Linux).
+
+```bash
+git clone https://github.com/Vanta-Cybersecurity/Vantax.git
+cd Vantax
+cargo test --workspace
+cargo install --path crates/vantax-cli      # installs the `vantax` command
+```
+
+### Keys and signatures
+
+```console
+$ vantax keygen -o treasury.json --chain solana
+Generated ML-DSA-87 key pair
+  Fingerprint  d2e31bac78942eefa0b1a70ef0db19484489818ac8b9c694ba60f416aeea89ef…
+  Secret key   treasury.json  (owner-only; back it up with `vantax vault create`)
+  Public key   treasury.pub.json
+
+Commitment for Solana (mainnet-beta)
+  Scheme       sha256
+  Commitment   2649457484ddcfc5006ccb1b9d7a4cdecabdd1ac95da8cdbe773899b96ded863
+  Anchor       SPL Memo (MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr)
+               vantax:pq:v1:2649457484ddcfc5006ccb1b9d7a4cdecabdd1ac95da8cdbe773899b96ded863
+  Post-quantum key commitment, not a payment address. Never send funds to this value.
+
+$ vantax sign -k treasury.json -m "rotate upgrade authority" -o sig.json
+$ vantax verify -k treasury.pub.json -s sig.json -m "rotate upgrade authority"
+✓ SIGNATURE VALID
+$ vantax verify -k treasury.pub.json -s sig.json -m "drain treasury"; echo "exit $?"
+✗ SIGNATURE INVALID
+  This signature was not made by this key over this message. Do not trust the data.
+exit 1
+```
+
+The key file is written owner-only and never overwritten without `--force`.
+Share the `.pub.json`; keep the other file secret. `sign` and `verify` also take
+`--file` (streamed, any size) and `--hex`.
+
+### Scan for quantum-vulnerable cryptography
+
+Scanning is part of the Pro and Enterprise plans ([pricing](#pricing-and-payments)).
+`vantax scan` picks the source files, sends them to the Vantax API over TLS
+with your key, and reports locally; the API scans in memory and stores no
+source. Each request carries up to 850 KB of source and counts as one call.
+
+```console
+$ export VANTAX_API_KEY=vtx_…
+$ vantax scan app/
+Scanned 1 file (12 lines). 5 findings: 5 critical, 0 high, 0 medium, 0 low. Score 50/100.
+
+CRITICAL app/src/treasury.ts:2:10  Ed25519 / EdDSA (Keypair)
+    import { Keypair } from "@solana/web3.js";
+    → Sign with ML-DSA-87 (NIST FIPS 204). Where the protocol still requires this signature, add an ML-DSA-87 attestation next to it (hybrid mode), then retire the classical path.
+
+CRITICAL app/src/treasury.ts:3:19  Ed25519 / EdDSA (tweetnacl)
+    import nacl from "tweetnacl";
+    → Sign with ML-DSA-87 (NIST FIPS 204). …
+…
+```
+
+The scanner covers 20 primitive families (`vantax scan --list-rules`): RSA,
+DSA, finite-field Diffie-Hellman, ElGamal, ECDSA, secp256k1, the NIST
+P-curves, Brainpool, SM2, Ed25519, Ed448, X25519/ECDH, X448, Schnorr/BIP-340,
+sr25519, pairing-based curves, AES-128, DES/3DES, RC4/RC2/Blowfish and
+MD5/SHA-1. It ignores comments, splits CamelCase identifiers (`RsaPrivateKey`
+matches, `parsable` does not), walks directories (skipping hidden files,
+lockfiles, binaries and symlinks), and writes text, JSON or SARIF.
+
+| Option | Effect |
 |---|---|
-| `vantax-core` | ML-DSA-87 signing, layered hash cascade, domain-separated canonical encoding |
-| `vantax-gateway` | PQ Security Gateway: policy boundary, key rotation with history, hash-chained audit |
-| `vantax-identity` | Identities, credentials, signed machine actions |
-| `vantax-sentinel` | Monitoring, correlation, graduated response, evidence |
-| `vantax-bridge` | m-of-n threshold authorization for cross-chain mints |
-| `vantax-scanner` | Migration Engine: finds classical crypto in code |
-| `vantax-adapters` | Chain adapters: Bitcoin, Ethereum, Solana, generic L1 |
-| `vantax-fairness` | Commit-reveal randomness with signed, verifiable outcomes |
-| `vantax-wasm` | Client-side signing in the browser |
-| `vantax-cli` | `vantax`: keys, signing, scanning, Shamir vaults |
-| `vantax-api` | HTTP service for verification, scanning and the gateway |
+| `--format text\|json\|sarif` | Output format; `-o FILE` writes it to a file |
+| `--fail-on critical\|high\|medium\|low\|none` | Exit 1 when anything at or above this severity is found (default `high`) |
+| `--migrate` | Print a migration plan |
+| `--exclude NAME` | Skip a file or directory (repeatable) |
+| `--api-key`, `--api-url` | Override `VANTAX_API_KEY` and `VANTAX_API_URL` (default `https://api.vantax-cybersecurity.com`) |
+| `vantax:ignore` in a comment | Suppresses findings on that line; `vantax:ignore-file` in the first ten lines suppresses the file |
 
-Eleven crates, each answering one question. The scanner never holds a signing key, so it has none to leak.
+`vantax account` shows your plan, usage and subscription. Behind a corporate
+proxy, `HTTPS_PROXY` and `NO_PROXY` are honoured, and `VANTAX_CA_BUNDLE` (or
+`SSL_CERT_FILE`) adds trusted roots for a TLS-inspecting proxy.
 
----
+It is a pattern scan: a starting point for manual review, not an audit, and
+blind to cryptography reached through opaque dependencies.
 
-## §1 PQ Security Gateway
+### Commitments and transaction intents
 
-Served by `vantax-api`, logic in `vantax-gateway`.
+Vantax never derives a "post-quantum address": no chain verifies ML-DSA at
+consensus today, so funds sent to such an address could never move. Instead,
+each adapter produces a **commitment** that binds an ML-DSA-87 key to the
+chain, a payload to **anchor** it on-chain, and a canonical **transaction
+intent** that your Vantax key signs next to the wallet's own signature
+(hybrid mode).
 
-| Method | Path | Access |
-|---|---|---|
-| POST | `/api/v1/gateway/verify` | public. Identity-bound verification, key resolved by timestamp |
-| POST | `/api/v1/gateway/policy/check` | public. ALLOW / DENY with policy id |
-| POST | `/api/v1/gateway/identity/register` | admin |
-| POST | `/api/v1/gateway/key/rotate` | admin. History kept, old signatures still verify |
-| POST | `/api/v1/gateway/sign` | admin. Gateway attestation with its own key |
-| GET | `/api/v1/gateway/audit` | public. Hash-chained audit log, integrity checked |
+```bash
+vantax chains                                        # bitcoin, ethereum, solana, testnets, generic
+vantax commitment -k treasury.pub.json ethereum      # keccak256, stored as bytes32
+vantax commitment -k treasury.pub.json bitcoin       # tagged SHA-256, OP_RETURN "VTX1" output
 
-**No signing oracle.** `sign` is deliberately narrow. A service that holds customer keys and signs whatever an authenticated caller sends is a signing oracle: one compromised token signs anything, forever. The gateway signs only its own attestations, from a closed set of kinds, under a fixed domain tag. Customer keys stay in customer custody.
-
-**Rotation that doesn't break history.** Keys resolve by timestamp, so blocks, attestations and audit entries signed years ago keep verifying after rotation.
-
-**Tamper-evident audit.** Each entry's hash feeds the next. Edit entry N and every entry after it fails verification.
-
----
-
-## §2 Migration Engine
-
-`vantax-scanner` covers 20 primitive families with identifier-boundary matching. It is CamelCase-aware, and comment- and string-literal-aware, so it flags real usage rather than noise. It walks directories and returns CI-friendly exit codes.
-
-```
-make scan        # report findings
-make scan-gate   # fail the build on findings
+vantax tx --chain solana --network devnet \
+  --from <sender> --to <recipient> --amount 5000 --nonce 7 \
+  --reference <recent blockhash> \
+  --sign-with treasury.json -o intent.json
 ```
 
----
+### Back up a key with a Shamir vault
 
-## §3 Identity · §4 Machine Security
+```bash
+vantax vault create -k treasury.json --label "treasury backup" -o vault   # 3-of-5 by default
+vantax vault recover --vault vault/vault.json \
+  --share vault/share-1-of-5.json --share vault/share-4-of-5.json --share vault/share-5-of-5.json \
+  -o recovered.json
+```
 
-`vantax-identity` manages identity and credential records in four states: `ACTIVE`, `SUSPENDED`, `REVOKED`, `EXPIRED`.
+`create` encrypts the file with AES-256-GCM, splits the key with Shamir secret
+sharing (2 to 16 shares), proves recovery with two different share sets before
+writing anything, and supports `--not-before` time-locks. The format is
+specified in [docs/VAULT-FORMAT.md](docs/VAULT-FORMAT.md) with a stand-alone
+Python recovery program, so a key can be recovered even without Vantax.
 
-- Expiry is **computed, never trusted from storage**.
-- Revoking an issuer **revokes every credential it signed**.
-- Machine actions are signed and replay-protected.
-- Verification and authorization are separate. **A valid signature is not authority.**
+### Version 1 keys
 
----
+Version 1 signed with Dilithium5, the 2023 draft of FIPS 204. Version 1 key and
+signature files load as they are, and a version 1 key keeps producing
+signatures that version 1 verifiers accept. To move a key to final FIPS 204
+ML-DSA-87:
 
-## §5 Sentinel
+```bash
+vantax upgrade-key -k old-key.json     # same key bytes, same fingerprint
+```
 
-`vantax-sentinel` runs the full response loop:
+Upgrade your verifiers first: a verifier that only knows Dilithium5 cannot
+check ML-DSA-87 signatures. Signatures made before the upgrade keep verifying.
 
-`detection → correlation → risk → policy → response → containment → recovery → evidence`
+## Scanner in CI
 
-- Reversible actions run automatically. Irreversible ones escalate to a human.
-- Protected identities are never contained automatically.
-- Evidence is preserved, with a digest, **before** containment.
+```yaml
+# .github/workflows/quantum-risk.yml
+name: Quantum-risk scan
+on: [push, pull_request]
+permissions:
+  contents: read
+  security-events: write
+jobs:
+  vantax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo install --git https://github.com/Vanta-Cybersecurity/Vantax vantax-cli
+      - run: vantax scan . --format sarif -o vantax.sarif --fail-on critical
+        env:
+          VANTAX_API_KEY: ${{ secrets.VANTAX_API_KEY }}   # a Pro or Enterprise key
+      - uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: vantax.sarif
+```
 
----
+Add the key as a repository secret named `VANTAX_API_KEY`. Findings appear in
+the repository's code scanning alerts. Exit codes: `0` clean, `1` findings at
+or above `--fail-on`, `2` usage, network or plan error (for example a key
+without the scanner).
 
-## Bridge
+## Pricing and payments
 
-`vantax-bridge` enforces five gates on every cross-chain event:
+| Plan | Calls | Requests / second (burst) | Scanner | How to get it |
+|---|---|---|---|---|
+| No key | 25 / day per IP | 1 (5) | No | Just call the API |
+| Free | 100 / month | 2 (10) | No | Issued by Vantax; also where a cancelled subscription lands |
+| Pro | 10,000 / month | 10 (30) | Yes | Subscribe on the site (Stripe) |
+| Enterprise | 250,000 / month | 50 (100) | Yes | Subscribe on the site (Stripe), or switch from Pro in the customer portal |
 
-1. Event verification
-2. Finality
-3. Replay protection
-4. Exposure limits
-5. Threshold authorization
+Current prices are on the [site](https://vantax-cybersecurity.com/#pricing) and
+at `GET /api/v1/plans`.
 
-Signers are deduplicated by fingerprint before counting. `threshold: 1` is refused in code. The circuit breaker trips on a reconciliation gap and **never self-heals**.
+How a purchase works:
 
----
+1. The customer picks a plan in the site's **Pricing** section and pays on a
+   Stripe-hosted payment link. Card details never reach Vantax.
+2. Stripe sends signed webhooks to `POST /api/v1/billing/webhook`. The API
+   checks the signature (HMAC-SHA256, five-minute window), ignores
+   redeliveries, and records the subscription.
+3. Stripe redirects the customer to `welcome.html?session_id=…`, which claims
+   the key once (`POST /api/v1/billing/claim`). Only a hash of the key is stored.
+4. Plan changes, failed payments and cancellations arrive as webhooks and move
+   the key: an upgrade to Enterprise raises the quota at once; when a
+   subscription ends the key drops to Free, which keeps the free endpoints but
+   not the scanner.
+5. Customers cancel, switch plan, update cards and download invoices in the
+   Stripe customer portal (linked from the site and from `vantax account`), and
+   rotate a leaked key with `POST /api/v1/account/key/rotate`.
 
-## §13 PQ Foundation
+The API server never holds a Stripe secret key, only the webhook signing
+secret, so a compromised server could not charge, refund or read anyone's card.
 
-`vantax-core`
+## The API
 
-- **Signatures:** ML-DSA-87 (Dilithium5, NIST FIPS 204). 2,592-byte public keys, about 4.6 KB signatures.
-- **Hashing:** SHA3-512 → BLAKE3 → SHA3-512. Defense in depth: a break in any single hash family is not immediately fatal.
+```bash
+curl -s https://api.vantax-cybersecurity.com/health
+curl -s https://api.vantax-cybersecurity.com/api/v1/plans
+curl -s -X POST https://api.vantax-cybersecurity.com/api/v1/scan \
+  -H "X-API-Key: $VANTAX_API_KEY" -H 'Content-Type: application/json' \
+  -d '{"source_code":"import { Keypair } from \"@solana/web3.js\"", "filename":"wallet.ts"}'
+```
 
----
+The API never accepts or holds customer secret keys: keys are made and used
+client-side with the CLI (or any FIPS 204 library).
 
-## Solana first
+| Endpoint | Does |
+|---|---|
+| `POST /api/v1/scan` | Quantum-risk scan with a migration plan (Pro and Enterprise; one snippet or up to 1,000 files per call) |
+| `POST /api/v1/verify` | Verify an ML-DSA-87 (or version 1 Dilithium5) signature |
+| `POST /api/v1/address/encode` | Post-quantum key commitment and anchor (not a payment address) |
+| `POST /api/v1/transaction/build` | Canonical transaction intent to sign client-side |
+| `POST /api/v1/gateway/verify` | Verify, write to the audit log, return a gateway attestation |
+| `POST /api/v1/gateway/policy/check` | Authorize an action: allowlists, a required post-quantum signature, hybrid sunset, value and rate limits |
+| `GET /health`, `/api/v1/stats`, `/chains`, `/plans`, `/scan/rules`, `/gateway/audit`, `/gateway/keys` | Free, not metered |
+| `POST /api/v1/billing/webhook`, `/billing/claim` | Stripe events in; a purchase's key out, once |
+| `GET /api/v1/account`, `POST /api/v1/account/key/rotate` | Plan, usage and subscription; a new key (the old one stops at once) |
 
-Solana signs every transaction with Ed25519, which a large quantum computer breaks with Shor's algorithm. That covers user wallets, program upgrade authorities and validator keys. Vantax works as a layer around Solana's signatures. It does not change them.
+Keys (`X-API-Key: vtx_…`) come from a Stripe purchase, or from Vantax directly.
+Every metered response carries `X-Quota-Limit`, `X-Quota-Remaining`,
+`X-Quota-Reset` and `X-Vantax-Plan`. Full reference, configuration and the
+audit and attestation formats: [docs/API.md](docs/API.md).
 
-In scope for the first release focus:
+## Hosting
 
-- Scanner rules for Solana codebases (`ed25519-dalek`, `solana_sdk` and `@solana/web3.js` Keypairs, `tweetnacl`). The browser demo on the site already flags several of these.
-- PQ-signed attestations and hash-chained audit trails that sit next to Solana programs.
-- Guidance on hybrid verification and reducing key exposure.
+The hosted API is `https://api.vantax-cybersecurity.com`. The API service and
+the scanning engine are proprietary and live in a private repository that
+builds on the open crates here. You do not need them to use the CLI, the
+libraries or the free endpoints.
 
-This is roadmap, not shipped. The status section below says what has and hasn't been reviewed.
+## How it works
 
-## Fairness and custody
+- **Signatures:** ML-DSA-87 from final NIST FIPS 204, security category 5,
+  through the PQClean implementation (`pqcrypto-mldsa`). Signatures
+  cross-verify with OpenSSL. Version 1's Dilithium5 (the FIPS 204 draft)
+  remains verifiable, and the algorithm is recorded with every key and
+  signature.
+- **Hashing:** messages are signed over SHA3-512 → BLAKE3 → SHA3-512,
+  unchanged since version 1. It is defense in depth, not a claim that the
+  cascade is provably stronger than its strongest layer.
+- **Canonical encoding:** every signed structure has a domain tag
+  (`vantax.tx.v1`, `VANTAX-GATEWAY-ATTESTATION-V1`, …) and length-prefixed
+  fields, so a signature for one kind of message can never be replayed as
+  another.
+- **Hybrid mode:** the chain's own signature stays; an ML-DSA-87 signature over
+  the canonical intent sits next to it. The gateway policy always refuses
+  classical-only requests, and can set a sunset date after which classical
+  signatures are refused even alongside a post-quantum one.
+- **Gateway:** an append-only, hash-chained audit log; attestations signed by
+  the gateway's own key over a closed set of four statement kinds; key
+  rotation that keeps history, so old attestations keep verifying.
 
-- **`vantax-fairness`**: operators commit to a hash of a server seed before a player acts and reveal it after. Anyone can recompute the commitment, replay the outcome (ChaCha20 with rejection sampling) and check the signature.
-- **`vantax vault`**: splits an AES-256-GCM key with Shamir Secret Sharing over GF(256), 3-of-5 or 2-of-3, with optional time-locks. Recovery is tested with two different share combinations before it finishes, and the format is documented so a key survives even if the software doesn't.
+## Rules the code enforces
 
-## Docs
+- **No signing oracle.** No endpoint signs bytes a caller sends. The gateway
+  signs only its own attestations, from a closed set, under a fixed domain
+  tag. Customer keys stay with the customer.
+- **A valid signature is not authority.** Verification and authorization are
+  separate checks; classical-only requests are refused.
+- **History survives rotation.** Keys resolve by timestamp, so old signatures
+  still verify; a retired key's secret is destroyed, so it cannot sign
+  anything new. Editing one audit entry breaks every entry after it.
+- **No unspendable addresses.** Adapters return commitments, labelled as such.
+- **Secrets stay put.** The API holds no customer keys; the CLI writes keys
+  owner-only and refuses to overwrite them.
+- **No payment secrets on the server.** Billing runs on Stripe-hosted
+  checkout and signed webhooks; the server never holds a Stripe secret key or
+  sees a card, and a purchase's API key is shown once and stored hashed.
 
-- [`VANTAX-WHITEPAPER.md`](VANTAX-WHITEPAPER.md): threat model, cryptographic design, platform architecture, limitations.
-- [`VANTAX-API.md`](VANTAX-API.md): HTTP API reference.
-
-## Design principles
-
-- Policy before power: nothing signs or acts unless policy allows it.
-- Customer keys never leave customer custody.
-- History is permanent: rotation and revocation never rewrite the past.
-- Humans own irreversible decisions.
-- Fail closed.
+Three more rules belong to crates not in this repository yet: humans own
+irreversible decisions (sentinel), a threshold of one is refused (bridge), and
+revoking an issuer revokes everything it signed (identity).
 
 ## Status
 
-Pre-release. Not independently audited. Do not use for production custody of value until a third-party review is complete.
+| | |
+|---|---|
+| 85 tests passing across the five crates in this repository, clippy and rustfmt clean (the server has its own 48) | Done |
+| Forgery regression tests (a real signature presented with a different message is rejected), through the library, the API and the CLI | Done |
+| ML-DSA-87 signatures cross-verified with OpenSSL 4.0.2, both directions | Done |
+| API run end to end in production mode: keys, quotas, gateway attestations, key rotation, restart with state kept | Done |
+| Stripe billing: purchase → key, upgrades, cancellations, redeliveries and out-of-order events, with signed webhooks generated in tests | Done |
+| Stripe billing against a real Stripe account (test mode) | In progress: products, payment links, portal and webhook set up; first test purchase next |
+| `vantax scan` over HTTPS through a TLS-inspecting proxy | Done |
+| Vault recovery checked with an independent Python implementation | Done |
+| Hosted API on `api.vantax-cybersecurity.com` | In progress |
+| Identity, sentinel, bridge, fairness and wasm crates | Not in this repository yet |
+| Independent third-party audit | Not done |
+| Live integration with any product | Not done |
+
+## Certification
+
+An integration is not certified because it imports Vantax. A "Vantax Verified"
+designation needs automated scanning, manual review of key generation, storage
+and signing paths, an independent third-party audit of that specific
+integration, and verification of hybrid-mode sunset handling
+([whitepaper](docs/WHITEPAPER.md), section 6). It applies to the reviewed
+integration, not to every project that uses the library.
+
+## We do not claim
+
+- that a cryptographically relevant quantum computer exists today;
+- that Vantax makes any blockchain "quantum-proof" by itself;
+- that the hash cascade has a formal proof of combined security;
+- that importing this library secures an application;
+- that written code is verified code;
+- that the scanner replaces an audit;
+- that any chain verifies ML-DSA signatures at consensus today.
+
+## Security
+
+Nothing here has been independently audited. Report vulnerabilities privately
+as described in [SECURITY.md](SECURITY.md), not in public issues.
+
+## Roadmap
+
+- [ ] Independent security review of `vantax-core` and `vantax-gateway`, with
+      the findings published in full
+- [ ] Publish `vantax-identity`, `vantax-sentinel`, `vantax-bridge`,
+      `vantax-fairness` and `vantax-wasm`
+- [ ] Solana: more scanner rules, attestations referencing on-chain state,
+      hybrid verification guidance
+- [ ] Compile and test the browser signing build
+- [ ] First live integration of `vantax-fairness`
+- [ ] Additional chain adapters
+- [ ] Enterprise migration tooling: cryptographic inventory and governance
+      dashboards
+
+## Repository layout
+
+```
+Vantax/
+├── crates/
+│   ├── vantax-core/        keys, signatures, hashing, canonical encoding
+│   ├── vantax-adapters/    Bitcoin, Ethereum, Solana, generic
+│   ├── vantax-scan-common/ open scan types, file selection, SARIF
+│   ├── vantax-gateway/     policy, audit log, attestations, key rotation
+│   └── vantax-cli/         command line (binary: vantax)
+├── docs/                   API.md, WHITEPAPER.md, VAULT-FORMAT.md
+├── site/                   vantax-cybersecurity.com: index.html, welcome.html
+├── .github/workflows/      CI: format, clippy, tests, cargo audit
+└── SECURITY.md
+```
 
 ## License
 
-TBD.
+Licensed under either of [Apache License 2.0](LICENSE-APACHE) or
+[MIT](LICENSE-MIT), at your option. The scanning engine and the API service are
+proprietary, are not part of this repository, and are used through the hosted
+Vantax API.
+
+---
+
+**Vantax.** Post-quantum security, built to be verified.

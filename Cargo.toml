@@ -1,0 +1,75 @@
+# ══════════════════════════════════════════════════════════════════════════
+# Vantax: post-quantum security, built to be verified.
+# Workspace root of the open crates. The scanning engine and the API server
+# are proprietary and live in a private repository; they depend on these
+# crates through this repository.
+# ══════════════════════════════════════════════════════════════════════════
+
+[workspace]
+members = [
+    "crates/vantax-core",
+    "crates/vantax-adapters",
+    "crates/vantax-scan-common",
+    "crates/vantax-gateway",
+    "crates/vantax-cli",
+]
+resolver = "2"
+
+[workspace.package]
+version = "2.0.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+authors = ["Vantax Cybersecurity"]
+repository = "https://github.com/Vanta-Cybersecurity/Vantax"
+homepage = "https://vantax-cybersecurity.com"
+
+[workspace.dependencies]
+# Internal crates
+vantax-core = { path = "crates/vantax-core", version = "2.0.0" }
+vantax-adapters = { path = "crates/vantax-adapters", version = "2.0.0" }
+vantax-scan-common = { path = "crates/vantax-scan-common", version = "2.0.0" }
+vantax-gateway = { path = "crates/vantax-gateway", version = "2.0.0" }
+
+# Post-quantum signatures
+# pqcrypto-mldsa: ML-DSA-87 as published in NIST FIPS 204 (new keys and signatures).
+# pqcrypto-dilithium 0.5: the FIPS 204 draft that version 1 signed with. Kept so
+# version 1 keys and signatures still load and verify.
+pqcrypto-mldsa = "0.1"
+pqcrypto-dilithium = "0.5"
+pqcrypto-traits = "0.3"
+
+# Hashing
+sha2 = "0.10"
+sha3 = "0.10"
+blake3 = "1.5"
+
+# Encoding
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+hex = "0.4"
+bs58 = "0.5"
+
+# Secrets and randomness
+zeroize = "1.7"
+getrandom = "0.3"
+aes-gcm = { version = "0.10", default-features = false, features = ["aes", "alloc", "zeroize"] }
+
+# HTTPS client for the CLI (ring provider, Mozilla root store; no OpenSSL)
+rustls = { version = "0.23", default-features = false, features = ["std", "ring", "tls12"] }
+webpki-roots = "1"
+
+# CLI
+clap = { version = "4.5", default-features = false, features = ["std", "derive", "help", "usage", "error-context"] }
+
+# The CLI tests run a small stand-in for the Vantax API in-process.
+axum = { version = "0.7", default-features = false, features = ["http1", "json", "query", "tokio"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "signal", "time", "sync"] }
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = true
+
+[profile.bench]
+inherits = "release"

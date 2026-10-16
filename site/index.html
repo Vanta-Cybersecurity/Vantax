@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Base URL of the Vantax API (no trailing slash). Empty means this site's own
+     origin, for when the site and the API share a host (nginx proxies /api/). -->
+<meta name="vantax-api" content="https://api.vantax-cybersecurity.com">
+<title>Vantax: post-quantum security for Solana</title>
+<meta name="description" content="Vantax is post-quantum security in Rust, starting with Solana: ML-DSA-87 signatures, a migration scanner, a policy gateway, identity, sentinel and bridge security.">
+<link rel="canonical" href="https://vantax-cybersecurity.com/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://vantax-cybersecurity.com/">
+<meta property="og:title" content="Vantax: post-quantum security for Solana">
+<meta property="og:description" content="Solana signs with Ed25519. Quantum computers break it. Vantax is post-quantum security in Rust, starting with Solana.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@VantaxFounder">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f6;--surface:#fff;--ink:#0b1b33;--mute:#56657f;--line:#cfd7e4;--flag:#c2255c;--flagbg:#fde8ef;--ok:#0b7a7c;--okbg:#e2f4f4;--accent:#2b3cff;
+--sans:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1020;--surface:#111a30;--ink:#e8edf7;--mute:#8fa0bf;--line:#243252;--flag:#ff6b9a;--flagbg:#3a1526;--ok:#4fd1d3;--okbg:#0f2f33;--accent:#8a96ff}}
+:root[data-theme="dark"]{--bg:#0a1020;--surface:#111a30;--ink:#e8edf7;--mute:#8fa0bf;--line:#243252;--flag:#ff6b9a;--flagbg:#3a1526;--ok:#4fd1d3;--okbg:#0f2f33;--accent:#8a96ff}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+header{display:flex;align-items:center;justify-content:space-between;padding:20px 0}
+.logo{font-weight:800;font-size:22px;letter-spacing:-.02em;text-decoration:none}
+.logo b{color:var(--accent)}
+nav a{margin-left:20px;font-size:15px;color:var(--mute);text-decoration:none}
+nav a:hover{color:var(--ink)}
+h1{font-size:clamp(38px,7vw,76px);line-height:1.02;letter-spacing:-.035em;font-weight:800;margin:44px 0 20px;max-width:17ch}
+.lede{font-size:clamp(18px,2.4vw,22px);color:var(--mute);max-width:56ch;margin:0 0 30px}
+.btns{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:56px}
+.btn{display:inline-block;padding:13px 22px;border-radius:10px;font-weight:600;text-decoration:none;border:1.5px solid var(--ink)}
+.btn.p{background:var(--ink);color:var(--bg)}
+.btn:hover{transform:translateY(-1px)}
+.demo{background:var(--surface);border:1.5px solid var(--ink);border-radius:16px;overflow:hidden}
+.demo-h{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 18px;border-bottom:1.5px solid var(--ink);font-weight:600;font-size:15px}
+.demo-h span{color:var(--mute);font-weight:400}
+.cols{display:grid;grid-template-columns:1fr 1fr}
+@media(max-width:760px){.cols{grid-template-columns:1fr}}
+.ed{position:relative;border-right:1.5px solid var(--line)}
+@media(max-width:760px){.ed{border-right:0;border-bottom:1.5px solid var(--line)}}
+.ed::after{content:"";position:absolute;left:0;right:0;top:0;height:46px;background:linear-gradient(var(--flagbg),transparent);opacity:0;pointer-events:none;animation:sweep 2.4s .5s ease-out 1}
+@keyframes sweep{0%{opacity:.9;transform:translateY(0)}100%{opacity:0;transform:translateY(260px)}}
+textarea{width:100%;min-height:290px;border:0;resize:vertical;padding:16px 18px;background:transparent;color:var(--ink);font:400 14px/1.7 var(--mono);display:block}
+.res{padding:16px 18px;min-height:290px;font-size:15px}
+.sum{font-weight:800;font-size:20px;margin:0 0 12px;letter-spacing:-.01em}
+.sum.ok{color:var(--ok)}.sum.bad{color:var(--flag)}
+.f{border-left:4px solid var(--flag);background:var(--flagbg);padding:9px 12px;margin:0 0 10px;border-radius:0 8px 8px 0}
+.f code{font:500 13px var(--mono)}
+.f small{display:block;color:var(--mute);font-size:13.5px;line-height:1.5}
+.f .fix{color:var(--ok);font-weight:600}
+.note{font-size:13.5px;color:var(--mute);margin:12px 4px 0}
+section{padding:72px 0 0}
+h2{font-size:clamp(28px,4.5vw,42px);letter-spacing:-.03em;line-height:1.1;margin:0 0 16px;max-width:20ch}
+p.big{max-width:62ch;color:var(--mute);margin:0 0 14px}
+dl{margin:28px 0 0;border-top:1.5px solid var(--ink)}
+.row{display:grid;grid-template-columns:200px 1fr;gap:6px 28px;padding:16px 0;border-bottom:1px solid var(--line)}
+@media(max-width:640px){.row{grid-template-columns:1fr}}
+dt{font-weight:800;font-size:18px;letter-spacing:-.01em}
+dd{margin:0;color:var(--mute)}
+dd code,.rules code{font:500 13px var(--mono);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+.rules{list-style:none;padding:0;margin:26px 0 0;display:grid;gap:12px}
+.rules li{background:var(--surface);border:1.5px solid var(--line);border-left:5px solid var(--ok);border-radius:10px;padding:14px 18px}
+.rules b{display:block;font-size:18px;letter-spacing:-.01em}
+.rules span{color:var(--mute);font-size:15.5px}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:28px 0 0}
+@media(max-width:860px){.plans{grid-template-columns:1fr}}
+.plan{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:22px 22px 24px;display:flex;flex-direction:column}
+.plan.hi{border:1.5px solid var(--ink)}
+.plan h3{margin:0;font-size:20px;letter-spacing:-.01em}
+.plan .price{font-size:34px;font-weight:800;letter-spacing:-.03em;margin:10px 0 2px;min-height:1.2em}
+.plan .per{color:var(--mute);font-size:14.5px;margin:0 0 14px}
+.plan ul{list-style:none;padding:0;margin:0 0 20px;display:grid;gap:7px;font-size:15.5px}
+.plan li::before{content:"✓";color:var(--ok);font-weight:800;margin-right:8px}
+.plan li.no::before{content:"–";color:var(--mute)}
+.plan li.no{color:var(--mute)}
+.plan .btn{margin-top:auto;text-align:center}
+.btn[aria-disabled="true"]{opacity:.55;pointer-events:none}
+.status{margin-top:72px;background:var(--ink);color:var(--bg);border-radius:16px;padding:30px 26px}
+.status h2{margin-bottom:10px}
+.status p{margin:0;max-width:62ch;opacity:.85}
+footer{padding:48px 0 56px;color:var(--mute);font-size:15px;display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
+@media(prefers-reduced-motion:reduce){.ed::after{animation:none}html{scroll-behavior:auto}.btn:hover{transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="logo" href="#top">Vantax<b>.</b></a>
+  <nav><a href="#platform">Platform</a><a href="#pricing">Pricing</a><a href="#rules">Design rules</a><a href="#status">Status</a><a href="https://x.com/VantaxFounder">@VantaxFounder</a></nav>
+</header>
+
+<main id="top">
+  <h1>Solana signs with Ed25519. Quantum computers break it.</h1>
+  <p class="lede">Vantax is a post-quantum security platform written in Rust, starting with Solana. It finds the keys and signatures a quantum computer breaks, adds NIST ML-DSA-87 around them, and enforces who is allowed to do what.</p>
+  <div class="btns">
+    <a class="btn p" href="https://x.com/VantaxFounder">Follow @VantaxFounder on X</a>
+    <a class="btn" href="https://github.com/Vanta-Cybersecurity/Vantax">View on GitHub</a>
+    <a class="btn" href="#try">Scan some code</a>
+    <a class="btn" href="#pricing">Pricing</a>
+  </div>
+
+  <div class="demo" id="try">
+    <div class="demo-h">Quantum-risk scanner <span>Edit the code. Findings update as you type.</span></div>
+    <div class="cols">
+      <div class="ed"><label class="sr" for="code" style="position:absolute;left:-9999px">Source code to scan</label>
+<textarea id="code" spellcheck="false">// treasury.ts
+import { Keypair } from "@solana/web3.js";
+import nacl from "tweetnacl";
+
+const authority = Keypair.generate();
+
+function signMessage(msg) {
+  return nacl.sign.detached(msg, authority.secretKey);
+}
+
+// ed25519 mentioned in a comment is ignored
+const scheme = "ed25519";</textarea></div>
+      <div class="res" id="res" aria-live="polite"></div>
+    </div>
+  </div>
+  <p class="note">Browser demo using pattern matching on a few common primitives, including ones Solana code relies on. Your code never leaves this page. The full scanner covers 20 primitive families, is CamelCase-aware and comment-aware, walks directories and sets CI exit codes; it runs on the Vantax API with a <a href="#pricing">Pro or Enterprise plan</a>.</p>
+
+  <section id="solana">
+    <h2>Why Solana first.</h2>
+    <p class="big">Every Solana transaction is authorized with Ed25519. Wallets, program upgrade authorities and validator keys all depend on a scheme that Shor's algorithm breaks on a large enough quantum computer.</p>
+    <p class="big">Vantax cannot change Solana's base signatures. It works as a layer around them, and this part is in progress: scanner rules for Solana codebases, PQ-signed attestations and audit trails that sit next to programs, and guidance on hybrid verification.</p>
+  </section>
+
+  <section id="platform">
+    <h2>Eleven crates. Each answers one question.</h2>
+    <p class="big">A flaw in one component never carries the authority of another. The scanner never holds a signing key, so it has none to leak.</p>
+    <dl>
+      <div class="row"><dt>Verify</dt><dd><code>vantax-core</code> ML-DSA-87 signing, SHA3-512 → BLAKE3 → SHA3-512 hashing, domain-separated encoding. <code>vantax-gateway</code> the policy boundary. <code>vantax-api</code> the HTTP service.</dd></div>
+      <div class="row"><dt>Find</dt><dd><code>vantax-scanner</code> locates classical crypto in your code and fails your CI (Pro and Enterprise). <code>vantax-adapters</code> Bitcoin, Ethereum, Solana and generic L1 integration.</dd></div>
+      <div class="row"><dt>Govern</dt><dd><code>vantax-identity</code> credentials in four states, signed machine actions. <code>vantax-sentinel</code> detection through containment and evidence. <code>vantax-bridge</code> five-gate cross-chain authorization.</dd></div>
+      <div class="row"><dt>Build with</dt><dd><code>vantax-cli</code> keys, signing, scanning and Shamir vaults. <code>vantax-wasm</code> signing in the browser. <code>vantax-fairness</code> commit-reveal randomness anyone can verify.</dd></div>
+    </dl>
+  </section>
+
+  <section id="pricing">
+    <h2>Pricing.</h2>
+    <p class="big">Verification, key commitments, transaction intents and the gateway are free to try. The scanner comes with Pro and Enterprise.</p>
+    <div class="plans">
+      <div class="plan">
+        <h3>Try it</h3>
+        <p class="price">Free</p>
+        <p class="per">No key needed</p>
+        <ul>
+          <li>25 calls a day</li>
+          <li>Verify ML-DSA-87 signatures</li>
+          <li>Key commitments and transaction intents</li>
+          <li>Gateway verification and policy checks</li>
+          <li class="no">Scanner not included</li>
+        </ul>
+        <a class="btn" href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/API.md">Read the API docs</a>
+      </div>
+      <div class="plan hi" data-plan="pro">
+        <h3>Pro</h3>
+        <p class="price" data-price>&nbsp;</p>
+        <p class="per">10,000 calls a month</p>
+        <ul>
+          <li>Everything in Try it</li>
+          <li>The full scanner: 20 primitive families</li>
+          <li>CI exit codes and SARIF for code scanning</li>
+          <li>10 requests a second</li>
+        </ul>
+        <a class="btn p" data-buy href="#pricing" aria-disabled="true">Subscribe</a>
+      </div>
+      <div class="plan" data-plan="enterprise">
+        <h3>Enterprise</h3>
+        <p class="price" data-price>&nbsp;</p>
+        <p class="per">250,000 calls a month</p>
+        <ul>
+          <li>Everything in Pro</li>
+          <li>25 times the Pro quota</li>
+          <li>50 requests a second</li>
+          <li>Switch from Pro at any time</li>
+        </ul>
+        <a class="btn p" data-buy href="#pricing" aria-disabled="true">Subscribe</a>
+      </div>
+    </div>
+    <p class="note" id="billing-note">Payments are handled by Stripe. Your API key appears once, on the page after checkout. Manage or cancel your subscription at any time.</p>
+  </section>
+
+  <section id="rules">
+    <h2>Rules the code enforces.</h2>
+    <p class="big">Each of these is refused in code, not left to configuration.</p>
+    <ul class="rules">
+      <li><b>No signing oracle.</b><span>The gateway signs only its own attestations, from a closed set, under a fixed domain tag. Customer keys stay with the customer.</span></li>
+      <li><b>A valid signature is not authority.</b><span>Verification and authorization are separate checks. Revoking an issuer revokes everything it signed.</span></li>
+      <li><b>Humans own irreversible decisions.</b><span>Sentinel suspends automatically. Revocation always escalates to a person, and protected identities are never contained automatically.</span></li>
+      <li><b>A threshold of one is refused.</b><span>Bridge signers are counted by distinct fingerprint, and the circuit breaker never resets itself.</span></li>
+      <li><b>History survives rotation.</b><span>Keys resolve by timestamp, so old signatures still verify. The audit log is hash-chained, so editing one entry breaks every entry after it.</span></li>
+    </ul>
+  </section>
+
+  <section class="status" id="status">
+    <h2>Pre-release. Not yet audited.</h2>
+    <p>Vantax has not had an independent third-party audit, and we say so up front. Do not use it to custody value until a review of your specific deployment is complete. The cryptography is NIST FIPS 204 ML-DSA-87, and the design, threat model and limits are written down in the whitepaper.</p>
+  </section>
+</main>
+
+<footer>
+  <span>Vantax. Post-quantum security, built to be verified.</span>
+  <span><a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub</a> &nbsp; <a href="https://x.com/VantaxFounder">@VantaxFounder</a></span>
+</footer>
+</div>
+
+<script>
+(function(){
+  var rules=[
+    {re:/secp256k1/i,n:"secp256k1 (ECDSA)",s:"Broken by Shor's algorithm",f:"Replace with ML-DSA-87 signatures"},
+    {re:/\bKeypair\b/,n:"Solana Keypair (Ed25519)",s:"Authority keys are exposed to Shor's algorithm",f:"Add PQ-signed attestations and reduce key exposure"},
+    {re:/tweetnacl|\bnacl\.sign/,n:"tweetnacl Ed25519 signing",s:"Broken by Shor's algorithm",f:"Wrap with ML-DSA-87 attestations"},
+    {re:/ed25519[_-]dalek|ed25519_consensus/i,n:"ed25519-dalek",s:"Broken by Shor's algorithm",f:"Wrap with ML-DSA-87 attestations"},
+    {re:/\bed25519\b/i,n:"Ed25519",s:"Broken by Shor's algorithm",f:"Replace with ML-DSA-87 signatures"},
+    {re:/\becdsa\b/i,n:"ECDSA",s:"Broken by Shor's algorithm",f:"Replace with ML-DSA-87 signatures"},
+    {re:/["'(\s.]rsa["')\s.,]|RSA[A-Z_]|\bRSA\b/,n:"RSA",s:"Broken by Shor's algorithm",f:"Replace with ML-DSA-87 (signing) or ML-KEM (key exchange)"},
+    {re:/\b(p-?256|prime256v1|secp256r1)\b/i,n:"P-256",s:"Broken by Shor's algorithm",f:"Replace with ML-DSA-87 signatures"},
+    {re:/\b(x25519|ecdh)\b/i,n:"ECDH / X25519",s:"Key exchange broken by Shor's algorithm",f:"Replace with ML-KEM"}
+  ];
+  var ta=document.getElementById("code"),res=document.getElementById("res");
+  function esc(s){return s.replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
+  function scan(){
+    var lines=ta.value.split("\n"),out=[],hits=0;
+    lines.forEach(function(l,i){
+      var t=l.trim();
+      if(!t||t.indexOf("//")===0||t.indexOf("#")===0||t.indexOf("*")===0)return;
+      var code=l.replace(/\/\/.*$/,"");
+      rules.forEach(function(r){
+        if(r.re.test(code)){
+          hits++;
+          out.push('<div class="f"><code>line '+(i+1)+': '+esc(t.slice(0,60))+'</code><small>'+r.n+'. '+r.s+'.</small><small class="fix">'+r.f+'</small></div>');
+        }
+      });
+    });
+    res.innerHTML=hits?'<p class="sum bad">'+hits+' quantum-vulnerable finding'+(hits>1?'s':'')+'</p>'+out.join(""):'<p class="sum ok">No findings in this snippet.</p><small>Nothing matched the demo patterns. Run the full scanner on your repository for real coverage.</small>';
+  }
+  ta.addEventListener("input",scan);scan();
+})();
+(function(){
+  // Prices and checkout links come from the API (GET /api/v1/plans), so they
+  // are set in one place: the server's VANTAX_PRICE_* and VANTAX_STRIPE_LINK_*.
+  var base=(document.querySelector('meta[name="vantax-api"]')||{}).content||"";
+  var note=document.getElementById("billing-note");
+  function contact(){
+    document.querySelectorAll("[data-buy]").forEach(function(a){
+      a.textContent="Contact us";a.href="https://x.com/VantaxFounder";a.removeAttribute("aria-disabled");
+    });
+  }
+  fetch(base+"/api/v1/plans",{headers:{"Accept":"application/json"}}).then(function(r){
+    if(!r.ok)throw new Error(r.status);return r.json();
+  }).then(function(d){
+    var ok=false;
+    (d.plans||[]).forEach(function(p){
+      var card=document.querySelector('[data-plan="'+p.plan+'"]');if(!card)return;
+      if(p.price)card.querySelector("[data-price]").textContent=p.price;
+      var a=card.querySelector("[data-buy]");
+      if(p.checkout_url&&/^https:\/\//.test(p.checkout_url)){a.href=p.checkout_url;a.removeAttribute("aria-disabled");ok=true}
+    });
+    if(!ok)contact();
+    if(d.billing&&d.billing.portal_url&&/^https:\/\//.test(d.billing.portal_url)){
+      var link=document.createElement("a");link.href=d.billing.portal_url;link.textContent="Manage your subscription";
+      note.appendChild(document.createTextNode(" "));note.appendChild(link);note.appendChild(document.createTextNode("."));
+    }
+  }).catch(contact);
+})();
+</script>
+</body>
+</html>

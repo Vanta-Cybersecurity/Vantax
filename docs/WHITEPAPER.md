@@ -2,7 +2,7 @@
 
 **Post-Quantum Cryptographic Protection for Distributed Ledger Systems and the Services Around Them**
 
-Version 2.0 (standalone platform edition) — October 2026
+Version 2.1 — October 2026
 
 ---
 
@@ -10,15 +10,15 @@ Version 2.0 (standalone platform edition) — October 2026
 
 Public-key cryptosystems currently securing the vast majority of deployed
 blockchains — ECDSA (secp256k1), EdDSA (ed25519), and RSA — derive their security
-from the presumed intractability of the integer factorization and discrete
-logarithm problems. Shor's algorithm, executable on a sufficiently large
-fault-tolerant quantum computer, solves both problems in polynomial time. This
-paper presents Vantax, a defense-in-depth cryptographic framework that replaces
-vulnerable elliptic-curve and RSA signatures with CRYSTALS-Dilithium (ML-DSA) at
-NIST Security Level 5, layers a triple-cascade hash construction over message
-digests, and provides chain-agnostic adapters enabling incremental,
-backward-compatible migration for Bitcoin, Ethereum, Solana, and custom Layer-1
-networks.
+from the presumed intractability of the integer factorization and discrete logarithm
+problems. Shor's algorithm, executable on a sufficiently large fault-tolerant
+quantum computer, solves both problems in polynomial time. This paper presents
+Vantax, a defense-in-depth cryptographic framework that replaces vulnerable
+elliptic-curve and RSA signatures with ML-DSA-87 (NIST FIPS 204, the standardized
+form of CRYSTALS-Dilithium) at NIST security category 5, layers a triple-cascade
+hash construction over message digests, and provides chain-agnostic adapters
+enabling incremental, backward-compatible migration for Bitcoin, Ethereum, Solana,
+and custom Layer-1 networks.
 
 We are not asserting that a cryptographically-relevant quantum computer (CRQC)
 exists today. We are asserting that the migration timeline for a global,
@@ -73,12 +73,16 @@ Vantax is built to close.
 
 ## 2. Cryptographic Design
 
-### 2.1 Signature Scheme: CRYSTALS-Dilithium (ML-DSA)
+### 2.1 Signature Scheme: ML-DSA-87 (FIPS 204)
 
-Vantax adopts Dilithium5, standardized by NIST as ML-DSA (Module-Lattice-Based
-Digital Signature Algorithm) in FIPS 204, at Security Category 5 — NIST's highest
-defined post-quantum security tier, targeting security equivalent to AES-256
-against both classical and quantum adversaries.
+Vantax signs with ML-DSA-87, the Module-Lattice-Based Digital Signature Algorithm
+that NIST published in FIPS 204 (August 2024) from CRYSTALS-Dilithium, at security
+category 5 — NIST's highest defined post-quantum security tier, targeting security
+equivalent to AES-256 against both classical and quantum adversaries. Messages are
+signed through the §2.2 hash cascade: the signature covers the 64-byte digest, with
+an empty FIPS 204 context string, so any conforming ML-DSA-87 implementation can
+verify it. Vantax signatures have been checked against OpenSSL's ML-DSA-87 in both
+directions.
 
 Why lattice-based, and why Dilithium specifically:
 
@@ -94,8 +98,16 @@ Why lattice-based, and why Dilithium specifically:
   practical balance of signature size, key size, and signing/verification speed
   suitable for high-throughput blockchain use.
 
-**Trade-offs acknowledged:** Dilithium5 public keys (~2.6 KB) and signatures
-(~4.6 KB) are substantially larger than ECDSA's 33-byte public keys and ~72-byte
+**Continuity with version 1.** Version 1 of the core signed with the 2023 initial
+public draft of the standard, as implemented by `pqcrypto-dilithium` 0.5 and
+labelled Dilithium5. Draft and final signatures are not interchangeable: a draft
+signature does not verify as ML-DSA-87. Vantax therefore verifies both, labelling
+each signature with its algorithm, and signs only with ML-DSA-87. The two share a
+key format, so a version 1 key can be relabelled ML-DSA-87 and keep its
+fingerprint; its earlier draft signatures remain verifiable.
+
+**Trade-offs acknowledged:** ML-DSA-87 public keys (2,592 bytes) and signatures
+(4,627 bytes) are substantially larger than ECDSA's 33-byte public keys and ~72-byte
 signatures. This is the primary engineering cost of post-quantum migration and
 directly informs Vantax's chain-adapter design (Section 4), which must
 accommodate larger witness data within each target chain's transaction format and
@@ -134,7 +146,7 @@ algorithm agility.
 
 For chains and applications migrating incrementally, Vantax supports hybrid
 signatures: a transaction or message is signed by both the legacy scheme
-(ECDSA/EdDSA) and Dilithium5, with verification logic requiring both signatures to
+(ECDSA/EdDSA) and ML-DSA-87, with verification logic requiring both signatures to
 validate during a defined transition period. This provides:
 
 - **Backward compatibility** with existing wallets, explorers, and infrastructure
@@ -181,7 +193,7 @@ one-time migration.
 ### 3.3 Trust Assumptions
 
 Vantax's on-chain guarantees are only as strong as (a) correct implementation of
-the underlying pqcrypto-dilithium reference bindings, (b) secure key generation and
+the underlying pqcrypto (PQClean) reference implementations, (b) secure key generation and
 storage practices by the end user or custodian, and (c) the integrity of the
 migration/audit process for any given chain integration. Vantax's open-source
 core is intended to allow independent verification of (a); it cannot control (b)
@@ -192,19 +204,29 @@ or, without an engagement, verify (c) for every downstream adopter.
 ## 4. Chain Integration Architecture
 
 Vantax's adapter layer translates between its chain-agnostic signature/hash core
-and each target blockchain's native transaction and address formats.
+and each target blockchain. For every chain it produces three things: a
+**commitment** that binds an ML-DSA-87 public key to the chain, a payload for
+**anchoring** that commitment on-chain, and a canonical **transaction intent**
+(domain `vantax.tx.v1`, bound to the chain by its CAIP-2 identifier) that a Vantax
+key signs next to the chain's own signature. Addresses in an intent are validated
+in each chain's native format. Adapters never derive addresses from post-quantum
+keys: no chain can authorize spending with ML-DSA today, so funds sent to such an
+address could never move.
 
-- **Bitcoin:** Adapter targets compatibility with the BIP-360 proposal path for
-  post-quantum witness programs, encoding Dilithium5 public keys into a
-  Taproot-style commitment structure sized to accommodate the larger key/signature
-  payload.
-- **Ethereum:** Adapter targets EIP-track proposals for post-quantum precompiles and
-  account abstraction (ERC-4337-style), allowing smart-contract wallets to verify
-  Dilithium5 signatures without requiring a base-layer protocol change.
-- **Solana:** Adapter integrates via custom program instructions and syscalls, given
-  Solana's on-chain program model.
+- **Bitcoin:** A BIP-340-style tagged SHA-256 commitment, anchored as a zero-value
+  `OP_RETURN` output. Script cannot hold a 2,592-byte key or recompute the hash, so
+  the anchor is a public, timestamped record for off-chain verifiers: evidence,
+  made before any quantum computer exists, that the holder of a Bitcoin key also
+  controls a post-quantum key. Proposals for post-quantum witness programs, such as
+  BIP-360, remain drafts; Vantax does not claim compatibility with them.
+- **Ethereum:** A keccak256 commitment stored as a `bytes32` in a smart account
+  (ERC-4337-style) or registry contract, which can check a full key supplied in
+  calldata cheaply. Verifying ML-DSA-87 itself on-chain needs a verifier contract
+  or a precompile, which Ethereum does not provide today.
+- **Solana:** A SHA-256 commitment (recomputable on-chain with the `sol_sha256`
+  syscall), anchored with a standard SPL Memo instruction.
 - **Generic/custom L1s:** The `ChainAdapter` trait exposes a minimal interface
-  (public key encoding, signature encoding, transaction construction) that any new
+  (commitment hash, anchor, address validation, transaction intent) that any new
   chain can implement directly against Vantax's core.
 
 We emphasize that base-layer protocol changes (Bitcoin BIPs, Ethereum EIPs) require
@@ -217,14 +239,23 @@ does not require waiting on base-layer governance.
 
 ## 5. Auto-Migration Tooling
 
-Vantax includes a static-analysis scanner that flags known-vulnerable
-cryptographic primitives in source code (references to `secp256k1`, `RSA`,
-`ed25519`, `P-256`, etc.) and generates a structured migration plan mapping each
-finding to its Dilithium5 replacement path. This tool is intentionally conservative
-— pattern-based detection of library and primitive names — and is a starting point
-for a manual security review, not a substitute for one. Automated scanning cannot
-detect every vulnerable usage (e.g., cryptography invoked through opaque
-third-party dependencies) and should not be treated as a certification in itself.
+Vantax includes a static-analysis scanner that flags known-vulnerable cryptographic
+primitives in source code across 20 primitive families (references to `secp256k1`,
+`RSA`, `ed25519`, `P-256`, X25519, BLS12-381 and others, plus classically broken
+MD5, SHA-1, DES and RC4) and generates a structured migration plan mapping each
+finding to its replacement: ML-DSA-87 for signatures, ML-KEM for key establishment.
+It ignores comments, matches CamelCase identifiers by their parts (so
+`RsaPrivateKey` matches and `parsable` does not), walks directories, writes text,
+JSON or SARIF, and sets CI exit codes. This tool is intentionally conservative —
+pattern-based detection of library and primitive names — and is a starting point for
+a manual security review, not a substitute for one. Automated scanning cannot detect
+every vulnerable usage (e.g., cryptography invoked through opaque third-party
+dependencies) and should not be treated as a certification in itself.
+
+The scanning engine runs as a service on the Vantax API for Pro and Enterprise
+subscribers. The open `vantax` CLI chooses the files, sends them over TLS, and
+renders the results and exit codes locally; source is scanned in memory and not
+stored.
 
 ---
 
@@ -252,7 +283,7 @@ Post-quantum migration for distributed ledgers is not a hypothetical future prob
 — it is a present-tense engineering and coordination problem with a long lead time,
 applied to an asset class where "wait and see" carries the specific risk of
 already-exposed keys being harvested today. Vantax's contribution is a
-NIST-standard signature scheme (Dilithium5/ML-DSA), a conservative defense-in-depth
+NIST-standard signature scheme (ML-DSA-87, FIPS 204), a conservative defense-in-depth
 hash construction, and a migration path designed to minimize disruption to existing
 chains and wallets. It is one component of a much larger, multi-year,
 ecosystem-wide migration effort — not a complete solution in isolation, and not a
@@ -264,7 +295,13 @@ substitute for base-layer protocol upgrades where those are ultimately required.
 
 Vantax is a platform, not a library: eleven Rust crates, each answering one
 question, so a flaw in one never carries the authority of another. The migration
-scanner, for example, never holds a signing key, so it has none to leak.
+scanner, for example, never holds a signing key, so it has none to leak. Six are
+built today. Four are open source under MIT or Apache-2.0 in the public
+repository (`vantax-core`, `vantax-gateway`, `vantax-adapters`, `vantax-cli`,
+with the shared scan types in `vantax-scan-common`); the scanning engine
+(`vantax-scanner`) and the HTTP service (`vantax-api`) are proprietary and run
+as the hosted Vantax API. Identity, sentinel, bridge, fairness and wasm are not
+yet published.
 
 | Crate | Role |
 |---|---|
@@ -273,7 +310,7 @@ scanner, for example, never holds a signing key, so it has none to leak.
 | `vantax-identity` | Identities, credentials, signed machine actions |
 | `vantax-sentinel` | Continuous monitoring, correlation, graduated response, evidence |
 | `vantax-bridge` | *m*-of-*n* threshold authorization for cross-chain mints |
-| `vantax-scanner` | The §5 migration scanner |
+| `vantax-scanner` | The §5 migration scanner (proprietary engine, offered as a service) |
 | `vantax-adapters` | The §4 chain adapters (Bitcoin, Ethereum, Solana, generic L1) |
 | `vantax-fairness` | Commit–reveal randomness with signed, verifiable outcomes |
 | `vantax-wasm` | Client-side signing in the browser |
@@ -297,18 +334,22 @@ replayed as another, and no field value can impersonate a boundary between field
 
 ### 8.3 PQ Security Gateway
 
-`POST /api/v1/gateway/verify`, `/policy/check`, `/identity/register`,
-`/key/rotate`, `/sign` and `GET /api/v1/gateway/audit`.
+`POST /api/v1/gateway/verify` and `/policy/check`; `GET /api/v1/gateway/audit`
+and `/keys`. Identity registration and customer key rotation belong to
+`vantax-identity`.
 
 - **Algorithm allowlists**, never denylists; per-identity value limits; per-identity
   rate limits, so one compromised credential spread across many IP addresses still
   hits its limit.
-- **`sign` is narrow by design.** The gateway signs only its own attestations — a
-  verification result, a policy decision, an identity registration, a key rotation
-  — under its own operational key. Customer keys stay in customer custody.
+- **Signing is narrow by design.** The gateway signs only its own attestations — a
+  verification result, a policy decision, an audit head, a key rotation — under its
+  own operational key and a fixed domain tag. No endpoint signs bytes a caller
+  supplies. Customer keys stay in customer custody.
 - **Key rotation keeps history.** Verification resolves the key that was current
   when a signature was made, so rotating a key never invalidates the historical
-  signatures that blocks, attestations and audit entries depend on.
+  signatures that blocks, attestations and audit entries depend on. The retiring
+  gateway key signs an attestation naming its successor; its secret half is then
+  destroyed, so it cannot sign anything dated inside its old window.
 - **The audit log is hash-chained.** Each entry commits to the one before it;
   altering any entry breaks every entry after it, detectable by anyone holding the
   head hash.
@@ -338,7 +379,7 @@ Cross-chain mints of wrapped assets to Ethereum require *m*-of-*n* independent s
 five gates: event verification, finality, replay protection, exposure limits and
 threshold authorization. Signers are counted by distinct fingerprint, a threshold of
 one is refused in code, and the circuit breaker trips on any reconciliation gap and
-does not reset itself. Each signer produces a Dilithium5 attestation — the
+does not reset itself. Each signer produces an ML-DSA-87 attestation — the
 post-quantum audit trail — and an EIP-712 ECDSA signature that the bridge
 contract verifies on-chain, requiring strictly ascending signer addresses. The
 coordinator holds no signing key; the submitter holds only a gas key.
@@ -353,18 +394,20 @@ against modulo bias) and check the signature — no trust in the operator requir
 ### 8.8 Custody
 
 `vantax vault` splits an AES-256-GCM key with Shamir Secret Sharing over GF(256)
-(3-of-5 or 2-of-3), with optional time-locks, and tests recovery with two different
-share combinations before it finishes. The format is specified in plain language so
-a key can be recovered even if the software no longer exists.
+(3-of-5 by default; any threshold from 2 up to 16 shares), with optional time-locks,
+and tests recovery with two different share combinations before it finishes. The
+format is specified in plain language so a key can be recovered even if the software
+no longer exists (`docs/VAULT-FORMAT.md` includes a stand-alone recovery program).
+The time-lock is enforced by the tool and authenticated, so it cannot be edited
+without breaking decryption, but it is not a cryptographic time-lock: holders of
+enough shares with a modified tool can recover early.
 
-### 8.9 Status and heritage
+### 8.9 Status
 
-Vantax is pre-release as a standalone product and has not had an independent
-third-party audit. Its components were extracted from a working multi-ledger
-system, where the same cryptographic core signs blocks and transactions on a
-custom Layer-1, attests escrow settlements, and authorizes bridge mints.
-Production use by one system is evidence the design runs; it is not a
-substitute for review of your own deployment (Section 6).
+Vantax is pre-release and has not had an independent third-party audit. Tests
+and internal review are evidence the design runs; they are not a substitute for
+review of your own deployment (Section 6). Version 1 key and signature files load
+unchanged (Section 2.1).
 
 ### 8.10 Solana focus
 
@@ -375,6 +418,19 @@ Vantax's first deployment focus is Solana. Solana authorizes transactions with E
 3. **Guidance.** Hybrid verification patterns and ways to reduce long-lived key exposure.
 
 These items are in progress and not yet independently reviewed. Section 6 applies in full.
+
+### 8.11 Changes in version 2.1
+
+- New signatures use final FIPS 204 ML-DSA-87; version 1's draft-standard
+  Dilithium5 signatures remain verifiable (§2.1).
+- Verification requires the signed digest to equal the digest of the message
+  being checked, so a valid signature can never be presented with a different
+  message.
+- Chain adapters produce commitments, anchors and transaction intents instead of
+  address-shaped values (§4).
+- The scanner covers 20 primitive families (§5) and runs as a service for Pro and
+  Enterprise subscribers. Subscriptions are paid through Stripe-hosted checkout and
+  confirmed by signed webhooks; the service holds no payment secrets.
 
 ---
 
