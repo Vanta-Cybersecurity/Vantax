@@ -1,0 +1,26 @@
+[package]
+name = "vantax-fairness"
+description = "Provably fair randomness anyone can verify: commit-reveal server seeds, ChaCha20 outcomes with rejection sampling, game outcome derivations and ML-DSA-87 signed bet receipts."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+keywords = ["provably-fair", "randomness", "commit-reveal", "ml-dsa", "gaming"]
+categories = ["cryptography", "game-development"]
+
+[features]
+default = ["signatures"]
+# ML-DSA-87 signing and verification of receipts and reveals (via vantax-core).
+# Without it, the crate is the outcome derivation, commitments and receipt
+# layout only, with no C code, so it builds for wasm32 (see vantax-wasm).
+signatures = ["dep:vantax-core"]
+
+[dependencies]
+vantax-core = { workspace = true, optional = true }
+serde.workspace = true
+serde_json.workspace = true
+hex.workspace = true
+sha2.workspace = true
+zeroize.workspace = true

@@ -45,6 +45,7 @@ h1{font-size:clamp(38px,7vw,76px);line-height:1.02;letter-spacing:-.035em;font-w
 .demo-h{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 18px;border-bottom:1.5px solid var(--ink);font-weight:600;font-size:15px}
 .demo-h span{color:var(--mute);font-weight:400}
 .cols{display:grid;grid-template-columns:1fr 1fr}
+.cols>*{min-width:0}
 @media(max-width:760px){.cols{grid-template-columns:1fr}}
 .ed{position:relative;border-right:1.5px solid var(--line)}
 @media(max-width:760px){.ed{border-right:0;border-bottom:1.5px solid var(--line)}}
@@ -55,7 +56,13 @@ textarea{width:100%;min-height:290px;border:0;resize:vertical;padding:16px 18px;
 .sum{font-weight:800;font-size:20px;margin:0 0 12px;letter-spacing:-.01em}
 .sum.ok{color:var(--ok)}.sum.bad{color:var(--flag)}
 .f{border-left:4px solid var(--flag);background:var(--flagbg);padding:9px 12px;margin:0 0 10px;border-radius:0 8px 8px 0}
-.f code{font:500 13px var(--mono)}
+.f code{font:500 13px var(--mono);overflow-wrap:anywhere}
+.mig{margin:16px 0 0;border-top:1.5px solid var(--line);padding-top:14px}
+.mig h3{margin:0 0 8px;font-size:18px;letter-spacing:-.01em}
+.mig ol{margin:0 0 14px;padding-left:20px;display:grid;gap:10px;font-size:15px}
+.mig li b{display:block;letter-spacing:-.005em}
+.mig li span{display:block;color:var(--mute);font-size:14.5px;line-height:1.5}
+.mig .go{display:inline-block;padding:10px 16px;border-radius:10px;background:var(--ink);color:var(--bg);font-weight:600;text-decoration:none}
 .f small{display:block;color:var(--mute);font-size:13.5px;line-height:1.5}
 .f .fix{color:var(--ok);font-weight:600}
 .note{font-size:13.5px;color:var(--mute);margin:12px 4px 0}
@@ -85,6 +92,33 @@ dd code,.rules code{font:500 13px var(--mono);color:var(--ink);background:var(--
 .plan li.no{color:var(--mute)}
 .plan .btn{margin-top:auto;text-align:center}
 .btn[aria-disabled="true"]{opacity:.55;pointer-events:none}
+.dfy{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px;margin:22px 0 0;padding:20px 22px;border:1.5px solid var(--ink);border-radius:16px;background:var(--surface);text-decoration:none}
+.dfy b{font-size:19px;letter-spacing:-.015em}
+.dfy span{color:var(--mute);flex:1 1 300px;font-size:15.5px}
+.dfy i{font-style:normal;font-weight:600;white-space:nowrap}
+.dfy:hover i{text-decoration:underline}
+.mp{margin:56px 0 0;scroll-margin-top:16px}
+.mp>h3{font-size:clamp(24px,3.4vw,32px);letter-spacing:-.025em;line-height:1.15;margin:0 0 10px}
+.mp>p{color:var(--mute);max-width:62ch;margin:0}
+.plans.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:1000px){.plans.four{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.plans.four{grid-template-columns:minmax(0,1fr)}}
+.four .plan{min-width:0}
+.four .for{font:500 11.5px var(--mono);color:var(--mute);text-transform:uppercase;letter-spacing:.07em;margin:0 0 6px}
+.four .price{font-size:30px}
+.four .price small{font-size:14px;font-weight:600;color:var(--mute);letter-spacing:0;margin-right:5px}
+.four .per{font:500 12.5px var(--mono);margin:2px 0 14px}
+.four ul{font-size:15px}
+.four .plan>h3{line-height:1.25}
+@media(min-width:1001px){.four .for{min-height:2.9em}.four .plan>h3{min-height:2.5em}}
+.token{padding-top:64px;scroll-margin-top:16px}
+.token h2{margin-bottom:12px}
+.ca{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:18px 0 0;padding:14px 16px;background:var(--surface);border:1.5px solid var(--ink);border-radius:12px}
+.ca-label{font-weight:800;font-size:15px;flex:none}
+.ca code{flex:1 1 320px;min-width:0;font:500 15px/1.5 var(--mono);overflow-wrap:anywhere;user-select:all}
+.ca button{flex:none;font:600 14px var(--sans);padding:9px 16px;border-radius:9px;border:1.5px solid var(--ink);background:var(--ink);color:var(--bg);cursor:pointer}
+.ca a{flex:none;font-size:14.5px;font-weight:600}
+.token .note{margin:12px 2px 0;max-width:80ch}
 .status{margin-top:72px;background:var(--ink);color:var(--bg);border-radius:16px;padding:30px 26px}
 .status h2{margin-bottom:10px}
 .status p{margin:0;max-width:62ch;opacity:.85}
@@ -96,7 +130,7 @@ footer{padding:48px 0 56px;color:var(--mute);font-size:15px;display:flex;flex-wr
 <div class="wrap">
 <header>
   <a class="logo" href="#top">Vantax<b>.</b></a>
-  <nav><a href="#platform">Platform</a><a href="#pricing">Pricing</a><a href="#rules">Design rules</a><a href="#status">Status</a><a href="https://x.com/VantaxFounder">@VantaxFounder</a></nav>
+  <nav><a href="#platform">Platform</a><a href="migrate.html">Migrate</a><a href="verify.html">Verify a bet</a><a href="#pricing">Pricing</a><a href="#rules">Design rules</a><a href="#status">Status</a><a href="https://x.com/VantaxFounder">@VantaxFounder</a></nav>
 </header>
 
 <main id="top">
@@ -106,6 +140,8 @@ footer{padding:48px 0 56px;color:var(--mute);font-size:15px;display:flex;flex-wr
     <a class="btn p" href="https://x.com/VantaxFounder">Follow @VantaxFounder on X</a>
     <a class="btn" href="https://github.com/Vanta-Cybersecurity/Vantax">View on GitHub</a>
     <a class="btn" href="#try">Scan some code</a>
+    <a class="btn" href="migrate.html">Start migrating</a>
+    <a class="btn" href="verify.html">Verify a bet</a>
     <a class="btn" href="#pricing">Pricing</a>
   </div>
 
@@ -143,7 +179,7 @@ const scheme = "ed25519";</textarea></div>
       <div class="row"><dt>Verify</dt><dd><code>vantax-core</code> ML-DSA-87 signing, SHA3-512 → BLAKE3 → SHA3-512 hashing, domain-separated encoding. <code>vantax-gateway</code> the policy boundary. <code>vantax-api</code> the HTTP service.</dd></div>
       <div class="row"><dt>Find</dt><dd><code>vantax-scanner</code> locates classical crypto in your code and fails your CI (Pro and Enterprise). <code>vantax-adapters</code> Bitcoin, Ethereum, Solana and generic L1 integration.</dd></div>
       <div class="row"><dt>Govern</dt><dd><code>vantax-identity</code> credentials in four states, signed machine actions. <code>vantax-sentinel</code> detection through containment and evidence. <code>vantax-bridge</code> five-gate cross-chain authorization.</dd></div>
-      <div class="row"><dt>Build with</dt><dd><code>vantax-cli</code> keys, signing, scanning and Shamir vaults. <code>vantax-wasm</code> signing in the browser. <code>vantax-fairness</code> commit-reveal randomness anyone can verify.</dd></div>
+      <div class="row"><dt>Build with</dt><dd><code>vantax-cli</code> keys, signing, scanning, Shamir vaults and fairness checks. <code>vantax-wasm</code> ML-DSA-87 and the fairness verifier in the browser. <code>vantax-fairness</code> provably fair outcomes with post-quantum signed receipts: <a href="verify.html">verify a bet yourself</a>.</dd></div>
     </dl>
   </section>
 
@@ -160,6 +196,7 @@ const scheme = "ed25519";</textarea></div>
           <li>Verify ML-DSA-87 signatures</li>
           <li>Key commitments and transaction intents</li>
           <li>Gateway verification and policy checks</li>
+          <li>Provably fair receipt checks</li>
           <li class="no">Scanner not included</li>
         </ul>
         <a class="btn" href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/API.md">Read the API docs</a>
@@ -190,6 +227,61 @@ const scheme = "ed25519";</textarea></div>
       </div>
     </div>
     <p class="note" id="billing-note">Payments are handled by Stripe. Your API key appears once, on the page after checkout. Manage or cancel your subscription at any time.</p>
+    <div class="mp" id="mig-pricing">
+      <h3>Migration packages.</h3>
+      <p>We do the migration for you, for blockchains, protocols and the teams that run them. Priced in USDC; pay in USDC or the SOL equivalent.</p>
+      <div class="plans four">
+        <div class="plan">
+          <p class="for">Any team on Ed25519 or ECDSA</p>
+          <h3>Quantum Risk Assessment</h3>
+          <p class="price">$4,950</p>
+          <p class="per">USDC · <span data-usd="4950">or the SOL equivalent</span></p>
+          <ul>
+            <li>Hand-reviewed scan of up to 3 repos</li>
+            <li>Every exposed key inventoried</li>
+            <li>Signed migration plan and a call</li>
+          </ul>
+          <a class="btn" href="migrate.html#packages">What's included</a>
+        </div>
+        <div class="plan">
+          <p class="for">Treasuries, multisigs, authorities</p>
+          <h3>Treasury Migration</h3>
+          <p class="price">$19,500</p>
+          <p class="per">USDC · <span data-usd="19500">or the SOL equivalent</span></p>
+          <ul>
+            <li>Key ceremony for up to 5 accounts</li>
+            <li>Commitments anchored on-chain</li>
+            <li>Hybrid signing and gateway policy</li>
+          </ul>
+          <a class="btn" href="migrate.html#packages">What's included</a>
+        </div>
+        <div class="plan hi">
+          <p class="for">DeFi protocols, DAOs, dApps</p>
+          <h3>Protocol Migration</h3>
+          <p class="price">$49,500</p>
+          <p class="per">USDC · <span data-usd="49500">or the SOL equivalent</span></p>
+          <ul>
+            <li>Admin, upgrade, keeper and bot paths</li>
+            <li>Sentinel monitoring</li>
+            <li>12 months of the Enterprise API</li>
+          </ul>
+          <a class="btn p" href="migrate.html#packages">What's included</a>
+        </div>
+        <div class="plan">
+          <p class="for">L1/L2 chains, foundations, bridges</p>
+          <h3>Chain Integration</h3>
+          <p class="price"><small>from</small>$150,000</p>
+          <p class="per">USDC · <span data-usd="150000">or the SOL equivalent</span></p>
+          <ul>
+            <li>A Vantax adapter for your chain</li>
+            <li>Foundation key migration</li>
+            <li>Bridge security, m-of-n</li>
+          </ul>
+          <a class="btn" href="migrate.html#packages">What's included</a>
+        </div>
+      </div>
+      <p class="note">Engineering and integration work, not a security audit. Half to start, half on delivery. Your secret keys never leave your machines.</p>
+    </div>
   </section>
 
   <section id="rules">
@@ -208,31 +300,89 @@ const scheme = "ed25519";</textarea></div>
     <h2>Pre-release. Not yet audited.</h2>
     <p>Vantax has not had an independent third-party audit, and we say so up front. Do not use it to custody value until a review of your specific deployment is complete. The cryptography is NIST FIPS 204 ML-DSA-87, and the design, threat model and limits are written down in the whitepaper.</p>
   </section>
+
+  <section class="token" id="token" aria-labelledby="token-title">
+    <h2 id="token-title">Official token address.</h2>
+    <p class="big">$VANTAX is the Vantax token on Solana. This is its only official contract address. Any other token using the Vantax name is not ours.</p>
+    <div class="ca">
+      <span class="ca-label">CA</span>
+      <code id="ca">DjWckUixq3we6r9SqNoFS5MeppBt146TkJAkBxxFpump</code>
+      <button type="button" id="copy-ca">Copy</button>
+      <a href="https://solscan.io/token/DjWckUixq3we6r9SqNoFS5MeppBt146TkJAkBxxFpump" rel="noopener">Check on Solscan</a>
+    </div>
+    <p class="note">Check the address character by character wherever you paste it. Vantax will never ask for your seed phrase or private key, and never asks you to send tokens to claim anything. You don't need the token to use any Vantax product. This is not financial advice or an invitation to buy; cryptoassets are high risk and you can lose everything you put in.</p>
+  </section>
 </main>
 
 <footer>
   <span>Vantax. Post-quantum security, built to be verified.</span>
-  <span><a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub</a> &nbsp; <a href="https://x.com/VantaxFounder">@VantaxFounder</a></span>
+  <span><a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub</a> &nbsp; <a href="#token">Official CA</a> &nbsp; <a href="https://x.com/VantaxFounder">@VantaxFounder</a></span>
 </footer>
 </div>
+<script>
+(function(){
+  var b=document.getElementById("copy-ca"),c=document.getElementById("ca");
+  if(!b||!c)return;
+  b.addEventListener("click",function(){
+    var t=c.textContent.trim(),done=function(m){b.textContent=m;setTimeout(function(){b.textContent="Copy";},1500);};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){done("Copied");},function(){sel();});}else{sel();}
+    function sel(){var r=document.createRange();r.selectNodeContents(c);var s=getSelection();s.removeAllRanges();s.addRange(r);done("Selected");}
+  });
+})();
+(function(){
+  // SOL equivalents for the migration packages. USDC is the price; the line keeps its text if the rate can't load.
+  var lines=document.querySelectorAll("[data-usd]");if(!lines.length||!window.fetch)return;
+  var ctl=window.AbortController?new AbortController():null;if(ctl)setTimeout(function(){ctl.abort();},6000);
+  fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd",ctl?{signal:ctl.signal}:{}).then(function(r){return r.json();}).then(function(d){
+    var usd=Number(d&&d.solana&&d.solana.usd);if(!(usd>0))return;
+    lines.forEach(function(n){var s=Number(n.getAttribute("data-usd"))/usd;n.textContent="≈ "+s.toLocaleString("en-US",{maximumFractionDigits:s<100?1:0})+" SOL today";});
+  }).catch(function(){});
+})();
+</script>
 
 <script>
 (function(){
   var rules=[
-    {re:/secp256k1/i,n:"secp256k1 (ECDSA)",s:"Broken by Shor's algorithm",f:"Replace with ML-DSA-87 signatures"},
-    {re:/\bKeypair\b/,n:"Solana Keypair (Ed25519)",s:"Authority keys are exposed to Shor's algorithm",f:"Add PQ-signed attestations and reduce key exposure"},
-    {re:/tweetnacl|\bnacl\.sign/,n:"tweetnacl Ed25519 signing",s:"Broken by Shor's algorithm",f:"Wrap with ML-DSA-87 attestations"},
-    {re:/ed25519[_-]dalek|ed25519_consensus/i,n:"ed25519-dalek",s:"Broken by Shor's algorithm",f:"Wrap with ML-DSA-87 attestations"},
-    {re:/\bed25519\b/i,n:"Ed25519",s:"Broken by Shor's algorithm",f:"Replace with ML-DSA-87 signatures"},
-    {re:/\becdsa\b/i,n:"ECDSA",s:"Broken by Shor's algorithm",f:"Replace with ML-DSA-87 signatures"},
-    {re:/["'(\s.]rsa["')\s.,]|RSA[A-Z_]|\bRSA\b/,n:"RSA",s:"Broken by Shor's algorithm",f:"Replace with ML-DSA-87 (signing) or ML-KEM (key exchange)"},
-    {re:/\b(p-?256|prime256v1|secp256r1)\b/i,n:"P-256",s:"Broken by Shor's algorithm",f:"Replace with ML-DSA-87 signatures"},
-    {re:/\b(x25519|ecdh)\b/i,n:"ECDH / X25519",s:"Key exchange broken by Shor's algorithm",f:"Replace with ML-KEM"}
+    {re:/secp256k1/i,n:"secp256k1 (ECDSA)",s:"Broken by Shor's algorithm",f:"Replace with ML-DSA-87 signatures",fam:"ecdsa"},
+    {re:/\bKeypair\b/,n:"Solana Keypair (Ed25519)",s:"Authority keys are exposed to Shor's algorithm",f:"Add PQ-signed attestations and reduce key exposure",fam:"ed25519"},
+    {re:/tweetnacl|\bnacl\.sign/,n:"tweetnacl Ed25519 signing",s:"Broken by Shor's algorithm",f:"Wrap with ML-DSA-87 attestations",fam:"ed25519"},
+    {re:/ed25519[_-]dalek|ed25519_consensus/i,n:"ed25519-dalek",s:"Broken by Shor's algorithm",f:"Wrap with ML-DSA-87 attestations",fam:"ed25519"},
+    {re:/\bed25519\b/i,n:"Ed25519",s:"Broken by Shor's algorithm",f:"Replace with ML-DSA-87 signatures",fam:"ed25519"},
+    {re:/\becdsa\b/i,n:"ECDSA",s:"Broken by Shor's algorithm",f:"Replace with ML-DSA-87 signatures",fam:"ecdsa"},
+    {re:/["'(\s.]rsa["')\s.,]|RSA[A-Z_]|\bRSA\b/,n:"RSA",s:"Broken by Shor's algorithm",f:"Replace with ML-DSA-87 (signing) or ML-KEM (key exchange)",fam:"rsa"},
+    {re:/\b(p-?256|prime256v1|secp256r1)\b/i,n:"P-256",s:"Broken by Shor's algorithm",f:"Replace with ML-DSA-87 signatures",fam:"ecdsa"},
+    {re:/\b(x25519|ecdh)\b/i,n:"ECDH / X25519",s:"Key exchange broken by Shor's algorithm",f:"Replace with ML-KEM",fam:"kex"}
   ];
+  // What to do about each family, most urgent first (signatures before key exchange).
+  var families={
+    ed25519:{n:"Ed25519 signing",d:"Keep Ed25519 where the chain needs it. Add an ML-DSA-87 key next to it, bind it to the account with an on-chain commitment, and sign every transaction intent with both."},
+    ecdsa:{n:"ECDSA (secp256k1, P-256)",d:"Keep ECDSA where the chain needs it. Add an ML-DSA-87 key, bind it with a commitment (bytes32 on Ethereum, OP_RETURN on Bitcoin), and sign intents with both."},
+    rsa:{n:"RSA",d:"Signatures: move to ML-DSA-87. Encryption and key exchange: move to ML-KEM (FIPS 203), hybrid while you transition."},
+    kex:{n:"ECDH / X25519 key exchange",d:"Move to hybrid X25519 + ML-KEM-768, as TLS 1.3 now does. Vantax signs; use a FIPS 203 library for key exchange."}
+  };
+  var famOrder=["ed25519","ecdsa","rsa","kex"];
+  function guessChain(text,fams){
+    if(/bitcoin|\bbtc\b|ripemd|bech32|p2wpkh|p2tr|psbt|satoshi/i.test(text))return "bitcoin";
+    if(/solidity|ethers|\bviem\b|web3\.eth|ethereum|ecrecover|ECDSA\.sol|\bwei\b/i.test(text))return "ethereum";
+    if(fams.ed25519)return "solana";
+    if(fams.ecdsa)return "ethereum";
+    return "solana";
+  }
+  var chainNames={solana:"Solana",ethereum:"Ethereum",bitcoin:"Bitcoin"};
+  function plan(fams,text){
+    var steps=famOrder.filter(function(k){return fams[k]}).map(function(k){
+      var lines=fams[k].filter(function(v,i,a){return a.indexOf(v)===i}).sort(function(a,b){return a-b});
+      return '<li><b>'+families[k].n+' · '+fams[k].length+' finding'+(fams[k].length>1?'s':'')+' (line'+(lines.length>1?'s ':' ')+lines.join(", ")+')</b><span>'+families[k].d+'</span></li>';
+    });
+    var chain=guessChain(text,fams);
+    return '<div class="mig"><h3>Migration plan</h3><ol>'+steps.join("")+
+      '<li><b>Enforce it</b><span>Refuse any action without the post-quantum signature, set a sunset date for classical-only, and keep this scan in CI.</span></li></ol>'+
+      '<a class="go" href="migrate.html?chain='+chain+'">Start migrating: '+chainNames[chain]+' →</a></div>';
+  }
   var ta=document.getElementById("code"),res=document.getElementById("res");
   function esc(s){return s.replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
   function scan(){
-    var lines=ta.value.split("\n"),out=[],hits=0;
+    var lines=ta.value.split("\n"),out=[],hits=0,fams={};
     lines.forEach(function(l,i){
       var t=l.trim();
       if(!t||t.indexOf("//")===0||t.indexOf("#")===0||t.indexOf("*")===0)return;
@@ -240,11 +390,12 @@ const scheme = "ed25519";</textarea></div>
       rules.forEach(function(r){
         if(r.re.test(code)){
           hits++;
+          (fams[r.fam]=fams[r.fam]||[]).push(i+1);
           out.push('<div class="f"><code>line '+(i+1)+': '+esc(t.slice(0,60))+'</code><small>'+r.n+'. '+r.s+'.</small><small class="fix">'+r.f+'</small></div>');
         }
       });
     });
-    res.innerHTML=hits?'<p class="sum bad">'+hits+' quantum-vulnerable finding'+(hits>1?'s':'')+'</p>'+out.join(""):'<p class="sum ok">No findings in this snippet.</p><small>Nothing matched the demo patterns. Run the full scanner on your repository for real coverage.</small>';
+    res.innerHTML=hits?'<p class="sum bad">'+hits+' quantum-vulnerable finding'+(hits>1?'s':'')+'</p>'+out.join("")+plan(fams,ta.value):'<p class="sum ok">No findings in this snippet.</p><small>Nothing matched the demo patterns. Run the full scanner on your repository for real coverage.</small>';
   }
   ta.addEventListener("input",scan);scan();
 })();

@@ -1,0 +1,34 @@
+[package]
+name = "vantax-wasm"
+description = "Vantax in the browser: ML-DSA-87 keys, signing and verification compatible with vantax-core, the triple hash, and provably fair receipt verification, as one WebAssembly module with a small JSON interface."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+keywords = ["post-quantum", "wasm", "ml-dsa", "browser", "provably-fair"]
+categories = ["cryptography", "wasm"]
+
+[lib]
+# cdylib: the .wasm for browsers; rlib: native tests and Rust callers.
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# Pure Rust only: nothing here may need a C compiler or the operating system,
+# so the crate builds for wasm32-unknown-unknown. Randomness comes from the
+# caller (crypto.getRandomValues in the browser).
+vantax-fairness.workspace = true
+ml-dsa = { version = "0.1.1", default-features = false, features = ["alloc"] }
+sha2.workspace = true
+sha3.workspace = true
+blake3.workspace = true
+hex.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+# Interoperability tests against the native implementation.
+vantax-core.workspace = true
+vantax-adapters.workspace = true
+vantax-fairness = { workspace = true, features = ["signatures"] }

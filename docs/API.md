@@ -2,7 +2,8 @@
 
 Post-quantum security as an HTTP API: find the cryptography a quantum
 computer breaks, verify ML-DSA-87 signatures, commit post-quantum keys to
-chains, and authorize actions through the PQ Security Gateway.
+chains, authorize actions through the PQ Security Gateway, and check
+provably fair receipts.
 
 **Base URL:** `https://api.vantax-cybersecurity.com`
 
@@ -297,6 +298,44 @@ The default policy allows ML-DSA-87 plus Ed25519, ECDSA-secp256k1 and
 ECDSA-P256 in hybrid mode, 60 decisions per identity per minute, no value
 limits and no sunset. A self-hosted gateway sets its own with
 `VANTAX_POLICY_FILE` (format in `crates/vantax-gateway/src/policy.rs`).
+
+### `POST /api/v1/fairness/verify`: check a provably fair receipt
+
+Checks a bet receipt signed by a provably fair operator (the format is in
+[FAIRNESS.md](FAIRNESS.md)). Pass the revealed server seed once the operator
+has published it.
+
+```json
+{ "receipt": { "receipt": { "version": 1, "operator": "casino.example", … },
+               "signature": { "algorithm": "ML-DSA-87", … } },
+  "operator_key": { "algorithm": "ML-DSA-87", "public_key": "<hex>", "fingerprint": "<hex>" },
+  "server_seed": "<64 hex, optional>" }
+```
+
+```json
+{ "verdict": "fair", "signature_valid": true, "signer_matches": true,
+  "commitment_valid": true, "outcome_valid": true,
+  "recomputed": { "type": "crash", "multiplier_x100": 103 }, "problems": [] }
+```
+
+`verdict` is `fair`, `pending` (signature valid, seed not supplied yet),
+`unfair` (the operator signed it, but the seed does not open the commitment
+or the outcome does not recompute) or `invalid` (not signed by this key).
+
+### `POST /api/v1/fairness/derive`: recompute an outcome
+
+```json
+{ "game": { "game": "crash", "house_edge_bps": 100 },
+  "server_seed": "<64 hex>", "client_seed": "my seed", "nonce": 7 }
+```
+
+```json
+{ "outcome": { "type": "crash", "multiplier_x100": 103 }, "display": "1.03x",
+  "commitment": "<hex SHA-256 of the seed>" }
+```
+
+The same checks run with no network at all in the browser verifier, the
+`vantax fairness` command and the Python script in `docs/fairness/`.
 
 ---
 

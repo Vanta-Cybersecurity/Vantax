@@ -1,0 +1,730 @@
+{
+  "cases": [
+    {
+      "canonical": "dice:3719",
+      "game": {
+        "game": "dice"
+      },
+      "nonce": 0,
+      "outcome": {
+        "roll": 3719,
+        "type": "dice"
+      }
+    },
+    {
+      "canonical": "dice:8774",
+      "game": {
+        "game": "dice"
+      },
+      "nonce": 1,
+      "outcome": {
+        "roll": 8774,
+        "type": "dice"
+      }
+    },
+    {
+      "canonical": "dice:9819",
+      "game": {
+        "game": "dice"
+      },
+      "nonce": 7,
+      "outcome": {
+        "roll": 9819,
+        "type": "dice"
+      }
+    },
+    {
+      "canonical": "dice:3860",
+      "game": {
+        "game": "dice"
+      },
+      "nonce": 1000000,
+      "outcome": {
+        "roll": 3860,
+        "type": "dice"
+      }
+    },
+    {
+      "canonical": "coin:heads",
+      "game": {
+        "game": "coin"
+      },
+      "nonce": 1,
+      "outcome": {
+        "heads": true,
+        "type": "coin"
+      }
+    },
+    {
+      "canonical": "coin:tails",
+      "game": {
+        "game": "coin"
+      },
+      "nonce": 2,
+      "outcome": {
+        "heads": false,
+        "type": "coin"
+      }
+    },
+    {
+      "canonical": "coin:tails",
+      "game": {
+        "game": "coin"
+      },
+      "nonce": 8,
+      "outcome": {
+        "heads": false,
+        "type": "coin"
+      }
+    },
+    {
+      "canonical": "coin:heads",
+      "game": {
+        "game": "coin"
+      },
+      "nonce": 1000001,
+      "outcome": {
+        "heads": true,
+        "type": "coin"
+      }
+    },
+    {
+      "canonical": "range:954",
+      "game": {
+        "game": "range",
+        "max": 1000,
+        "min": -1000
+      },
+      "nonce": 2,
+      "outcome": {
+        "type": "range",
+        "value": 954
+      }
+    },
+    {
+      "canonical": "range:-270",
+      "game": {
+        "game": "range",
+        "max": 1000,
+        "min": -1000
+      },
+      "nonce": 3,
+      "outcome": {
+        "type": "range",
+        "value": -270
+      }
+    },
+    {
+      "canonical": "range:446",
+      "game": {
+        "game": "range",
+        "max": 1000,
+        "min": -1000
+      },
+      "nonce": 9,
+      "outcome": {
+        "type": "range",
+        "value": 446
+      }
+    },
+    {
+      "canonical": "range:-334",
+      "game": {
+        "game": "range",
+        "max": 1000,
+        "min": -1000
+      },
+      "nonce": 1000002,
+      "outcome": {
+        "type": "range",
+        "value": -334
+      }
+    },
+    {
+      "canonical": "crash:159",
+      "game": {
+        "game": "crash",
+        "house_edge_bps": 100
+      },
+      "nonce": 3,
+      "outcome": {
+        "multiplier_x100": 159,
+        "type": "crash"
+      }
+    },
+    {
+      "canonical": "crash:131",
+      "game": {
+        "game": "crash",
+        "house_edge_bps": 100
+      },
+      "nonce": 4,
+      "outcome": {
+        "multiplier_x100": 131,
+        "type": "crash"
+      }
+    },
+    {
+      "canonical": "crash:169",
+      "game": {
+        "game": "crash",
+        "house_edge_bps": 100
+      },
+      "nonce": 10,
+      "outcome": {
+        "multiplier_x100": 169,
+        "type": "crash"
+      }
+    },
+    {
+      "canonical": "crash:150",
+      "game": {
+        "game": "crash",
+        "house_edge_bps": 100
+      },
+      "nonce": 1000003,
+      "outcome": {
+        "multiplier_x100": 150,
+        "type": "crash"
+      }
+    },
+    {
+      "canonical": "wheel:9",
+      "game": {
+        "game": "wheel",
+        "segments": 37
+      },
+      "nonce": 4,
+      "outcome": {
+        "segment": 9,
+        "type": "wheel"
+      }
+    },
+    {
+      "canonical": "wheel:24",
+      "game": {
+        "game": "wheel",
+        "segments": 37
+      },
+      "nonce": 5,
+      "outcome": {
+        "segment": 24,
+        "type": "wheel"
+      }
+    },
+    {
+      "canonical": "wheel:13",
+      "game": {
+        "game": "wheel",
+        "segments": 37
+      },
+      "nonce": 11,
+      "outcome": {
+        "segment": 13,
+        "type": "wheel"
+      }
+    },
+    {
+      "canonical": "wheel:27",
+      "game": {
+        "game": "wheel",
+        "segments": 37
+      },
+      "nonce": 1000004,
+      "outcome": {
+        "segment": 27,
+        "type": "wheel"
+      }
+    },
+    {
+      "canonical": "plinko:RLRLLLLLRRRLRRLR:8",
+      "game": {
+        "game": "plinko",
+        "rows": 16
+      },
+      "nonce": 5,
+      "outcome": {
+        "bucket": 8,
+        "path": "RLRLLLLLRRRLRRLR",
+        "type": "plinko"
+      }
+    },
+    {
+      "canonical": "plinko:RLLLLRRLRRRLRLRL:8",
+      "game": {
+        "game": "plinko",
+        "rows": 16
+      },
+      "nonce": 6,
+      "outcome": {
+        "bucket": 8,
+        "path": "RLLLLRRLRRRLRLRL",
+        "type": "plinko"
+      }
+    },
+    {
+      "canonical": "plinko:LRLRLRRLRLRLRLLL:7",
+      "game": {
+        "game": "plinko",
+        "rows": 16
+      },
+      "nonce": 12,
+      "outcome": {
+        "bucket": 7,
+        "path": "LRLRLRRLRLRLRLLL",
+        "type": "plinko"
+      }
+    },
+    {
+      "canonical": "plinko:LRLRLLRRLLLLRLLR:6",
+      "game": {
+        "game": "plinko",
+        "rows": 16
+      },
+      "nonce": 1000005,
+      "outcome": {
+        "bucket": 6,
+        "path": "LRLRLLRRLLLLRLLR",
+        "type": "plinko"
+      }
+    },
+    {
+      "canonical": "mines:4,11,24",
+      "game": {
+        "game": "mines",
+        "mines": 3,
+        "tiles": 25
+      },
+      "nonce": 6,
+      "outcome": {
+        "positions": [
+          4,
+          11,
+          24
+        ],
+        "type": "mines"
+      }
+    },
+    {
+      "canonical": "mines:5,7,19",
+      "game": {
+        "game": "mines",
+        "mines": 3,
+        "tiles": 25
+      },
+      "nonce": 7,
+      "outcome": {
+        "positions": [
+          5,
+          7,
+          19
+        ],
+        "type": "mines"
+      }
+    },
+    {
+      "canonical": "mines:0,3,11",
+      "game": {
+        "game": "mines",
+        "mines": 3,
+        "tiles": 25
+      },
+      "nonce": 13,
+      "outcome": {
+        "positions": [
+          0,
+          3,
+          11
+        ],
+        "type": "mines"
+      }
+    },
+    {
+      "canonical": "mines:11,15,18",
+      "game": {
+        "game": "mines",
+        "mines": 3,
+        "tiles": 25
+      },
+      "nonce": 1000006,
+      "outcome": {
+        "positions": [
+          11,
+          15,
+          18
+        ],
+        "type": "mines"
+      }
+    },
+    {
+      "canonical": "keno:60,75,36,50,12,65,11,70,63,40",
+      "game": {
+        "draws": 10,
+        "game": "keno",
+        "pool": 80
+      },
+      "nonce": 7,
+      "outcome": {
+        "numbers": [
+          60,
+          75,
+          36,
+          50,
+          12,
+          65,
+          11,
+          70,
+          63,
+          40
+        ],
+        "type": "keno"
+      }
+    },
+    {
+      "canonical": "keno:16,6,23,52,39,41,68,48,62,38",
+      "game": {
+        "draws": 10,
+        "game": "keno",
+        "pool": 80
+      },
+      "nonce": 8,
+      "outcome": {
+        "numbers": [
+          16,
+          6,
+          23,
+          52,
+          39,
+          41,
+          68,
+          48,
+          62,
+          38
+        ],
+        "type": "keno"
+      }
+    },
+    {
+      "canonical": "keno:13,75,10,78,59,9,53,49,23,8",
+      "game": {
+        "draws": 10,
+        "game": "keno",
+        "pool": 80
+      },
+      "nonce": 14,
+      "outcome": {
+        "numbers": [
+          13,
+          75,
+          10,
+          78,
+          59,
+          9,
+          53,
+          49,
+          23,
+          8
+        ],
+        "type": "keno"
+      }
+    },
+    {
+      "canonical": "keno:25,6,20,9,59,52,27,19,32,64",
+      "game": {
+        "draws": 10,
+        "game": "keno",
+        "pool": 80
+      },
+      "nonce": 1000007,
+      "outcome": {
+        "numbers": [
+          25,
+          6,
+          20,
+          9,
+          59,
+          52,
+          27,
+          19,
+          32,
+          64
+        ],
+        "type": "keno"
+      }
+    },
+    {
+      "canonical": "shuffle:45,23,21,6,24,25,0,2,40,42,10,4,5,36,48,13,49,12,34,44,29,38,17,51,39,47,3,50,41,7,14,32,15,8,35,43,11,46,16,37,28,30,9,1,33,31,26,22,27,18,20,19",
+      "game": {
+        "cards": 52,
+        "game": "shuffle"
+      },
+      "nonce": 8,
+      "outcome": {
+        "order": [
+          45,
+          23,
+          21,
+          6,
+          24,
+          25,
+          0,
+          2,
+          40,
+          42,
+          10,
+          4,
+          5,
+          36,
+          48,
+          13,
+          49,
+          12,
+          34,
+          44,
+          29,
+          38,
+          17,
+          51,
+          39,
+          47,
+          3,
+          50,
+          41,
+          7,
+          14,
+          32,
+          15,
+          8,
+          35,
+          43,
+          11,
+          46,
+          16,
+          37,
+          28,
+          30,
+          9,
+          1,
+          33,
+          31,
+          26,
+          22,
+          27,
+          18,
+          20,
+          19
+        ],
+        "type": "shuffle"
+      }
+    },
+    {
+      "canonical": "shuffle:28,15,33,12,22,21,19,25,51,47,44,1,49,10,24,34,38,3,35,45,41,4,20,6,48,17,39,43,36,0,18,37,31,5,7,8,30,16,23,50,26,11,27,32,14,42,40,46,2,29,9,13",
+      "game": {
+        "cards": 52,
+        "game": "shuffle"
+      },
+      "nonce": 9,
+      "outcome": {
+        "order": [
+          28,
+          15,
+          33,
+          12,
+          22,
+          21,
+          19,
+          25,
+          51,
+          47,
+          44,
+          1,
+          49,
+          10,
+          24,
+          34,
+          38,
+          3,
+          35,
+          45,
+          41,
+          4,
+          20,
+          6,
+          48,
+          17,
+          39,
+          43,
+          36,
+          0,
+          18,
+          37,
+          31,
+          5,
+          7,
+          8,
+          30,
+          16,
+          23,
+          50,
+          26,
+          11,
+          27,
+          32,
+          14,
+          42,
+          40,
+          46,
+          2,
+          29,
+          9,
+          13
+        ],
+        "type": "shuffle"
+      }
+    },
+    {
+      "canonical": "shuffle:22,31,9,23,50,8,13,7,41,14,32,34,38,19,25,12,28,5,20,33,43,3,24,17,29,35,15,42,51,21,0,27,26,36,48,16,44,45,1,49,2,40,46,37,4,39,30,11,47,10,18,6",
+      "game": {
+        "cards": 52,
+        "game": "shuffle"
+      },
+      "nonce": 15,
+      "outcome": {
+        "order": [
+          22,
+          31,
+          9,
+          23,
+          50,
+          8,
+          13,
+          7,
+          41,
+          14,
+          32,
+          34,
+          38,
+          19,
+          25,
+          12,
+          28,
+          5,
+          20,
+          33,
+          43,
+          3,
+          24,
+          17,
+          29,
+          35,
+          15,
+          42,
+          51,
+          21,
+          0,
+          27,
+          26,
+          36,
+          48,
+          16,
+          44,
+          45,
+          1,
+          49,
+          2,
+          40,
+          46,
+          37,
+          4,
+          39,
+          30,
+          11,
+          47,
+          10,
+          18,
+          6
+        ],
+        "type": "shuffle"
+      }
+    },
+    {
+      "canonical": "shuffle:13,25,18,45,35,11,33,8,19,46,40,5,6,10,37,49,14,15,38,48,1,17,41,39,28,47,20,27,29,3,32,22,23,51,42,34,12,50,0,44,26,16,30,24,9,7,31,4,43,21,2,36",
+      "game": {
+        "cards": 52,
+        "game": "shuffle"
+      },
+      "nonce": 1000008,
+      "outcome": {
+        "order": [
+          13,
+          25,
+          18,
+          45,
+          35,
+          11,
+          33,
+          8,
+          19,
+          46,
+          40,
+          5,
+          6,
+          10,
+          37,
+          49,
+          14,
+          15,
+          38,
+          48,
+          1,
+          17,
+          41,
+          39,
+          28,
+          47,
+          20,
+          27,
+          29,
+          3,
+          32,
+          22,
+          23,
+          51,
+          42,
+          34,
+          12,
+          50,
+          0,
+          44,
+          26,
+          16,
+          30,
+          24,
+          9,
+          7,
+          31,
+          4,
+          43,
+          21,
+          2,
+          36
+        ],
+        "type": "shuffle"
+      }
+    }
+  ],
+  "client_seed": "vantax test vector",
+  "commitment": "630dcd2966c4336691125448bbb25b4ff412a49c732db2c8abc1b8581bd710dd",
+  "first_words_nonce_0": [
+    678873719,
+    631147230,
+    3559966019,
+    2679877185,
+    1028697326,
+    4144929577,
+    2828311412,
+    294047011
+  ],
+  "server_seed": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+  "stream_key_nonce_0": "a1388b7fde742cd786a2cffc3dfecfa55746d30021b1662ee6d78900a6ceab18"
+}

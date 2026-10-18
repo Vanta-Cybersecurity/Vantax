@@ -3,6 +3,7 @@
 //! Exit codes: 0 success; 1 a signature did not verify, or `scan` found
 //! something at or above `--fail-on`; 2 usage or I/O error.
 
+mod fairness;
 mod http;
 mod scan;
 mod term;
@@ -27,7 +28,7 @@ type Result<T> = std::result::Result<T, String>;
     name = "vantax",
     version,
     about = "Vantax: post-quantum security, built to be verified.",
-    long_about = "Vantax: post-quantum security, built to be verified.\n\nML-DSA-87 (NIST FIPS 204) keys and signatures, a quantum-risk scanner, post-quantum key commitments for Bitcoin, Ethereum and Solana, canonical transaction intents, and Shamir vaults.\n\nVersion 1 key and signature files load unchanged; `vantax upgrade-key` moves a version 1 key to ML-DSA-87."
+    long_about = "Vantax: post-quantum security, built to be verified.\n\nML-DSA-87 (NIST FIPS 204) keys and signatures, a quantum-risk scanner, post-quantum key commitments for Bitcoin, Ethereum and Solana, canonical transaction intents, Shamir vaults, and provably fair verification.\n\nVersion 1 key and signature files load unchanged; `vantax upgrade-key` moves a version 1 key to ML-DSA-87."
 )]
 struct Cli {
     /// Disable coloured output (NO_COLOR is honoured too)
@@ -213,6 +214,10 @@ enum Command {
     /// Shamir vaults: split a secret file across people or places
     #[command(subcommand)]
     Vault(VaultCommand),
+
+    /// Provably fair: verify receipts, reveals and seed chains, recompute outcomes
+    #[command(subcommand)]
+    Fairness(fairness::FairnessCommand),
 }
 
 /// Where the Vantax API is and which key to use.
@@ -451,6 +456,7 @@ fn run(command: Command) -> Result<Outcome> {
             output,
             force,
         }) => cmd_vault_recover(&vault, &shares, &output, force),
+        Command::Fairness(c) => fairness::run(c),
     }
 }
 

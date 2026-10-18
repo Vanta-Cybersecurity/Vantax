@@ -921,3 +921,211 @@ fn v1_key_upgrade_commitments_and_intents() {
     );
     fs::remove_dir_all(&d).unwrap();
 }
+
+#[test]
+fn fairness_verify_reveal_derive_and_chain() {
+    use vantax_core::VantaxKeyPair;
+    use vantax_fairness::{
+        commit, derive, BetReceipt, Game, SeedChain, SeedReveal, FORMAT_VERSION,
+    };
+
+    let d = workdir("fairness");
+    assert!(run(&d, &["keygen", "--output", "op.json"]).status.success());
+    let op = VantaxKeyPair::from_json(&fs::read_to_string(d.join("op.json")).unwrap()).unwrap();
+    let seed = [8u8; 32];
+    let game = Game::Crash {
+        house_edge_bps: 100,
+    };
+    let receipt = |nonce: u64, fair: bool| {
+        let mut outcome = derive(&game, &seed, "player", nonce).unwrap();
+        if !fair {
+            outcome = vantax_fairness::Outcome::Crash {
+                multiplier_x100: 100_000,
+            };
+        }
+        BetReceipt {
+            version: FORMAT_VERSION,
+            operator: "casino.example".into(),
+            operator_fingerprint: op.fingerprint.clone(),
+            bet_id: format!("b{nonce}"),
+            game: game.clone(),
+            commitment: commit(&seed),
+            client_seed: "player".into(),
+            nonce,
+            outcome,
+            issued_at: 1_800_000_000,
+        }
+        .sign(&op)
+        .unwrap()
+    };
+    fs::write(
+        d.join("fair.json"),
+        serde_json::to_string(&receipt(4, true)).unwrap(),
+    )
+    .unwrap();
+    fs::write(
+        d.join("unfair.json"),
+        serde_json::to_string(&receipt(5, false)).unwrap(),
+    )
+    .unwrap();
+    let reveal = SeedReveal {
+        version: FORMAT_VERSION,
+        operator: "casino.example".into(),
+        operator_fingerprint: op.fingerprint.clone(),
+        commitment: commit(&seed),
+        server_seed: hex::encode(seed),
+        bets: 6,
+        next_commitment: None,
+        revealed_at: 1_800_000_100,
+    }
+    .sign(&op)
+    .unwrap();
+    fs::write(
+        d.join("reveal.json"),
+        serde_json::to_string(&reveal).unwrap(),
+    )
+    .unwrap();
+    let seed_hex = hex::encode(seed);
+
+    // Before the reveal: pending, exit 0.
+    let o = run(
+        &d,
+        &["fairness", "verify", "-r", "fair.json", "-k", "op.pub.json"],
+    );
+    assert!(o.status.success(), "{o:?}");
+    assert!(stdout(&o).contains("PENDING"));
+    // With the reveal: fair.
+    let o = run(
+        &d,
+        &[
+            "fairness",
+            "verify",
+            "-r",
+            "fair.json",
+            "-k",
+            "op.pub.json",
+            "--reveal",
+            "reveal.json",
+        ],
+    );
+    assert!(o.status.success(), "{o:?}");
+    assert!(stdout(&o).contains("✓ FAIR"));
+    let o = run(
+        &d,
+        &[
+            "fairness",
+            "verify",
+            "-r",
+            "fair.json",
+            "-k",
+            "op.pub.json",
+            "--seed",
+            &seed_hex,
+            "--json",
+        ],
+    );
+    let report: serde_json::Value = serde_json::from_str(&stdout(&o)).unwrap();
+    assert_eq!(report["verdict"], "fair");
+    // A doctored outcome the operator signed: unfair, exit 1.
+    let o = run(
+        &d,
+        &[
+            "fairness",
+            "verify",
+            "-r",
+            "unfair.json",
+            "-k",
+            "op.pub.json",
+            "--seed",
+            &seed_hex,
+        ],
+    );
+    assert_eq!(o.status.code(), Some(1));
+    assert!(stdout(&o).contains("UNFAIR"));
+    // Another key: invalid, exit 1.
+    assert!(run(&d, &["keygen", "--output", "other.json"])
+        .status
+        .success());
+    let o = run(
+        &d,
+        &[
+            "fairness",
+            "verify",
+            "-r",
+            "fair.json",
+            "-k",
+            "other.pub.json",
+        ],
+    );
+    assert_eq!(o.status.code(), Some(1));
+    assert!(stdout(&o).contains("INVALID"));
+
+    let o = run(
+        &d,
+        &[
+            "fairness",
+            "reveal",
+            "-r",
+            "reveal.json",
+            "-k",
+            "op.pub.json",
+        ],
+    );
+    assert!(o.status.success());
+    assert!(stdout(&o).contains(&seed_hex));
+    assert_eq!(
+        run(
+            &d,
+            &[
+                "fairness",
+                "reveal",
+                "-r",
+                "reveal.json",
+                "-k",
+                "other.pub.json"
+            ]
+        )
+        .status
+        .code(),
+        Some(1)
+    );
+
+    let o = run(
+        &d,
+        &[
+            "fairness",
+            "derive",
+            "--game",
+            r#"{"game":"crash","house_edge_bps":100}"#,
+            "--seed",
+            &seed_hex,
+            "--client-seed",
+            "player",
+            "--nonce",
+            "4",
+        ],
+    );
+    assert!(o.status.success(), "{o:?}");
+    assert!(stdout(&o).contains(&derive(&game, &seed, "player", 4).unwrap().display()));
+
+    let chain = SeedChain::from_end([2u8; 32], 3).unwrap();
+    let mut args = vec![
+        "fairness".to_string(),
+        "chain".into(),
+        "--terminal".into(),
+        chain.terminal_commitment(),
+    ];
+    for k in 0..3 {
+        args.push("--seed".into());
+        args.push(hex::encode(chain.seed(k).unwrap()));
+    }
+    let refs: Vec<&str> = args.iter().map(String::as_str).collect();
+    assert!(run(&d, &refs).status.success());
+    // Out of order: broken.
+    let (a, b) = (refs[5], refs[7]);
+    let mut swapped = refs.clone();
+    swapped[5] = b;
+    swapped[7] = a;
+    assert_eq!(run(&d, &swapped).status.code(), Some(1));
+    let _ = fs::remove_dir_all(&d);
+}

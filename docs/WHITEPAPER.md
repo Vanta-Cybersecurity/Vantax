@@ -2,7 +2,7 @@
 
 **Post-Quantum Cryptographic Protection for Distributed Ledger Systems and the Services Around Them**
 
-Version 2.1 — October 2026
+Version 2.2 — October 2026
 
 ---
 
@@ -295,13 +295,14 @@ substitute for base-layer protocol upgrades where those are ultimately required.
 
 Vantax is a platform, not a library: eleven Rust crates, each answering one
 question, so a flaw in one never carries the authority of another. The migration
-scanner, for example, never holds a signing key, so it has none to leak. Six are
-built today. Four are open source under MIT or Apache-2.0 in the public
+scanner, for example, never holds a signing key, so it has none to leak. All
+eleven are built. Nine are open source under MIT or Apache-2.0 in the public
 repository (`vantax-core`, `vantax-gateway`, `vantax-adapters`, `vantax-cli`,
-with the shared scan types in `vantax-scan-common`); the scanning engine
-(`vantax-scanner`) and the HTTP service (`vantax-api`) are proprietary and run
-as the hosted Vantax API. Identity, sentinel, bridge, fairness and wasm are not
-yet published.
+`vantax-identity`, `vantax-sentinel`, `vantax-bridge`, `vantax-fairness` and
+`vantax-wasm`, with the shared scan types in `vantax-scan-common`); the scanning
+engine (`vantax-scanner`) and the HTTP service (`vantax-api`) are proprietary
+and run as the hosted Vantax API. The operator side of fairness, the Vantax
+Fairness Engine (§8.7), is proprietary and licensed to operators.
 
 | Crate | Role |
 |---|---|
@@ -312,10 +313,10 @@ yet published.
 | `vantax-bridge` | *m*-of-*n* threshold authorization for cross-chain mints |
 | `vantax-scanner` | The §5 migration scanner (proprietary engine, offered as a service) |
 | `vantax-adapters` | The §4 chain adapters (Bitcoin, Ethereum, Solana, generic L1) |
-| `vantax-fairness` | Commit–reveal randomness with signed, verifiable outcomes |
-| `vantax-wasm` | Client-side signing in the browser |
-| `vantax-cli` | `vantax` — keys, signing, scanning, Shamir vaults |
-| `vantax-api` | HTTP service for verification, scanning and the gateway |
+| `vantax-fairness` | Commit–reveal randomness: signed receipts and reveals, seed chains, an open specification |
+| `vantax-wasm` | The browser build: ML-DSA-87 keys and signatures interchangeable with the CLI, and the fairness verifier |
+| `vantax-cli` | `vantax` — keys, signing, scanning, Shamir vaults, fairness verification |
+| `vantax-api` | HTTP service for verification, scanning, the gateway and fairness checks |
 
 ### 8.1 One design rule
 
@@ -387,9 +388,28 @@ coordinator holds no signing key; the submitter holds only a gas key.
 ### 8.7 Fairness
 
 Operators commit to a hash of a server seed before a player acts and reveal it
-afterwards. Anyone can recompute the commitment, replay the outcome derivation
-(ChaCha20 seeded from server seed, client seed and nonce, with rejection sampling
-against modulo bias) and check the signature — no trust in the operator required.
+afterwards. Every bet returns a receipt the operator signs with ML-DSA-87 before
+the seed is revealed, binding the operator to the outcome; the reveal is signed
+too and names the next commitment. Anyone can recompute the commitment, replay
+the outcome derivation (ChaCha20 keyed from server seed, client seed and nonce,
+with rejection sampling against modulo bias, integer arithmetic only) and check
+both signatures — no trust in the operator required. A signed receipt that does
+not recompute is signed evidence against the operator. Round games commit to up
+to ten million rounds with one hash through a seed chain, salted with a value
+fixed afterwards from a public source such as a Solana blockhash.
+
+The algorithm is specified in `docs/FAIRNESS.md` with test vectors, and four
+implementations check each other: the Rust crate, the browser build, the CLI and
+a stand-alone Python script.
+
+The operator side is the proprietary Vantax Fairness Engine: per-player seeds
+derived from one master secret sealed with AES-256-GCM, a hash-chained audit log
+that holds no secrets and doubles as the write-ahead log (the engine answers only
+after the entry is stored, and rebuilds its exact state by replaying it), signed
+audit heads an operator can publish, and signed, reproducible RNG certification
+reports (chi-square distribution and independence tests, bit balance, return to
+player). A certification report is statistical evidence; it does not replace an
+accredited testing laboratory where a regulator requires one.
 
 ### 8.8 Custody
 
@@ -407,7 +427,11 @@ enough shares with a modified tool can recover early.
 Vantax is pre-release and has not had an independent third-party audit. Tests
 and internal review are evidence the design runs; they are not a substitute for
 review of your own deployment (Section 6). Version 1 key and signature files load
-unchanged (Section 2.1).
+unchanged (Section 2.1). All eleven crates are built and tested; cross-checks
+include ML-DSA-87 signatures verified with OpenSSL, the pure-Rust browser build
+against the PQClean build, the fairness algorithm against an independent Python
+implementation, ChaCha20 against RFC 8439 and EIP-712 digests against the
+specification's example.
 
 ### 8.10 Solana focus
 
@@ -432,6 +456,16 @@ These items are in progress and not yet independently reviewed. Section 6 applie
   Enterprise subscribers. Subscriptions are paid through Stripe-hosted checkout and
   confirmed by signed webhooks; the service holds no payment secrets.
 
+### 8.12 Changes in version 2.2
+
+- Identity, sentinel, bridge, fairness and the browser build are built and
+  published (§8.4–§8.7).
+- Fairness receipts and reveals are signed with ML-DSA-87; the algorithm is
+  specified with test vectors; the Vantax Fairness Engine for operators adds a
+  write-ahead audit log, a sealed master secret and certification reports (§8.7).
+- The API checks fairness receipts (`POST /api/v1/fairness/verify`) and
+  recomputes outcomes (`/fairness/derive`).
+
 ---
 
 ## References & Further Reading
@@ -441,6 +475,8 @@ These items are in progress and not yet independently reviewed. Section 6 applie
 - Shor, P. (1994). Algorithms for quantum computation: discrete logarithms and factoring
 - Grover, L. (1996). A fast quantum mechanical algorithm for database search
 - Bitcoin BIP-360 (draft): Post-quantum witness program proposal
+- RFC 8439: ChaCha20 and Poly1305 for IETF Protocols
+- EIP-712: Typed structured data hashing and signing
 
 ---
 

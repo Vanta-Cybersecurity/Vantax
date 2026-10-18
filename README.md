@@ -7,8 +7,11 @@ Solana. It finds the keys and signatures a quantum computer breaks, adds NIST
 ML-DSA-87 around them, and enforces who is allowed to do what.
 
 [Website](https://vantax-cybersecurity.com) ·
+[Migrate](https://vantax-cybersecurity.com/migrate.html) ·
+[Verify a bet](https://vantax-cybersecurity.com/verify.html) ·
 [Whitepaper](docs/WHITEPAPER.md) ·
 [API reference](docs/API.md) ·
+[Fairness spec](docs/FAIRNESS.md) ·
 [Pricing](https://vantax-cybersecurity.com/#pricing) ·
 [Security](SECURITY.md) ·
 [@VantaxFounder](https://x.com/VantaxFounder)
@@ -35,12 +38,12 @@ commitments, anchors and intents through the same adapter trait.
 
 Each crate answers one question, so a flaw in one never carries the authority
 of another. The scanner, for example, never holds a signing key, so it has none
-to leak. Four crates are open source in this repository, two (the scanning
-engine and the API service) are proprietary and run as the hosted Vantax API,
-and five are designed (see the [whitepaper](docs/WHITEPAPER.md), section 8) and
-not published yet. A small support crate,
+to leak. All eleven are built: nine are open source in this repository, and two
+(the scanning engine and the API service) are proprietary and run as the hosted
+Vantax API. A small support crate,
 [`vantax-scan-common`](crates/vantax-scan-common), holds the open parts of
 scanning (findings, file selection, SARIF) that the CLI and the engine share.
+The design is in the [whitepaper](docs/WHITEPAPER.md), section 8.
 
 | | Crate | What it does | Here |
 |---|---|---|---|
@@ -49,12 +52,12 @@ scanning (findings, file selection, SARIF) that the CLI and the engine share.
 | | `vantax-api` | The HTTP service: scanning, verification, commitments, intents and the gateway, with API keys, quotas, rate limits and Stripe billing | Hosted ([API](docs/API.md)); proprietary |
 | **Find** | `vantax-scanner` | The scanning engine: finds quantum-vulnerable cryptography in source code. Runs on the API for Pro and Enterprise | Hosted; proprietary |
 | | [`vantax-adapters`](crates/vantax-adapters) | Bitcoin, Ethereum, Solana and generic L1: key commitments, anchors, transaction intents, address validation | Yes |
-| **Govern** | `vantax-identity` | Credentials in four states, signed machine actions | Not yet |
-| | `vantax-sentinel` | Detection through containment and evidence | Not yet |
-| | `vantax-bridge` | Five-gate cross-chain authorization | Not yet |
-| **Build with** | [`vantax-cli`](crates/vantax-cli) | The `vantax` command: keys, signing, commitments, intents, Shamir vaults, and the scanner client that fails your CI | Yes |
-| | `vantax-wasm` | Signing in the browser | Not yet |
-| | `vantax-fairness` | Commit-reveal randomness anyone can verify | Not yet |
+| **Govern** | [`vantax-identity`](crates/vantax-identity) | Identities and credentials in four states (expiry computed at use), cascading revocation, bounded delegation, key rotation signed by both keys, signed machine actions with replay protection | Yes |
+| | [`vantax-sentinel`](crates/vantax-sentinel) | Signals to decaying risk to a graduated response; suspends automatically, escalates every revocation to a person; hash-chained, signed evidence sealed before containment | Yes |
+| | [`vantax-bridge`](crates/vantax-bridge) | Five-gate cross-chain mint authorization: event verification, finality, replay, exposure limits, *m*-of-*n* signers (ML-DSA-87 attestations plus EIP-712 ECDSA), a circuit breaker that never resets itself | Yes |
+| **Build with** | [`vantax-cli`](crates/vantax-cli) | The `vantax` command: keys, signing, commitments, intents, Shamir vaults, fairness checks, and the scanner client that fails your CI | Yes |
+| | [`vantax-wasm`](crates/vantax-wasm) | The browser build: ML-DSA-87 keys and signatures interchangeable with the CLI, and the fairness verifier, in one WebAssembly module with no imports | Yes |
+| | [`vantax-fairness`](crates/vantax-fairness) | Provably fair outcomes: committed seeds, ChaCha20 with rejection sampling, ML-DSA-87 signed receipts and reveals, seed chains for round games ([spec](docs/FAIRNESS.md)) | Yes |
 
 ## Quick start
 
@@ -160,6 +163,50 @@ vantax tx --chain solana --network devnet \
   --from <sender> --to <recipient> --amount 5000 --nonce 7 \
   --reference <recent blockhash> \
   --sign-with treasury.json -o intent.json
+```
+
+### Verify a provably fair bet
+
+An operator using Vantax fairness signs a receipt for every bet before it
+reveals the server seed. Anyone can check one, offline:
+
+```console
+$ vantax fairness verify -r receipt.json -k operator.pub.json
+… PENDING
+  Operator     demo-casino.example (733317ae71ac7d55…)
+  Bet          b2 · crash:100 · nonce 1
+  Outcome      1.03x
+  The signature is valid. Check again with --seed or --reveal once the operator reveals the seed.
+
+$ vantax fairness verify -r receipt.json -k operator.pub.json --reveal reveal.json
+✓ FAIR
+  …
+  The operator signed this outcome, the seed opens its commitment, and the outcome recomputes exactly.
+```
+
+`fairness derive` recomputes any outcome, `fairness reveal` checks a signed
+seed reveal and `fairness chain` checks round seeds against a seed chain. A
+receipt the operator signed that does not recompute is reported as `UNFAIR`
+(exit 1): signed evidence. The same checks run in the browser at
+[vantax-cybersecurity.com/verify.html](https://vantax-cybersecurity.com/verify.html)
+and in a stand-alone Python script ([docs/FAIRNESS.md](docs/FAIRNESS.md)).
+
+Operators run the proprietary **Vantax Fairness Engine** to issue receipts:
+per-player committed seeds from one sealed master secret, a hash-chained audit
+log that is also its write-ahead log, seed chains for crash-style games and
+signed RNG certification reports. It is licensed separately and is not part of
+this repository.
+
+### In the browser
+
+```js
+import { loadVantax } from "./vantax.js";              // crates/vantax-wasm/js, no dependencies
+const vx = await loadVantax("./vantax_wasm.wasm");     // cargo build -p vantax-wasm --release --target wasm32-unknown-unknown
+const key = vx.keygen();                               // ML-DSA-87, same JSON as `vantax keygen`
+const sig = vx.sign(key, "hello");
+vx.verify(vx.publicKey(key), sig, "hello").valid;      // true; the CLI verifies it too
+vx.commitment(vx.publicKey(key), "solana");          // same commitment and memo as `vantax commitment`
+vx.verifyReceipt(receipt, operatorKey, serverSeed);    // { verdict: "fair", … }
 ```
 
 ### Back up a key with a Shamir vault
@@ -274,6 +321,7 @@ client-side with the CLI (or any FIPS 204 library).
 | `POST /api/v1/transaction/build` | Canonical transaction intent to sign client-side |
 | `POST /api/v1/gateway/verify` | Verify, write to the audit log, return a gateway attestation |
 | `POST /api/v1/gateway/policy/check` | Authorize an action: allowlists, a required post-quantum signature, hybrid sunset, value and rate limits |
+| `POST /api/v1/fairness/verify`, `/fairness/derive` | Check a provably fair receipt (`fair`, `pending`, `unfair` or `invalid`); recompute an outcome |
 | `GET /health`, `/api/v1/stats`, `/chains`, `/plans`, `/scan/rules`, `/gateway/audit`, `/gateway/keys` | Free, not metered |
 | `POST /api/v1/billing/webhook`, `/billing/claim` | Stripe events in; a purchase's key out, once |
 | `GET /api/v1/account`, `POST /api/v1/account/key/rotate` | Plan, usage and subscription; a new key (the old one stops at once) |
@@ -328,16 +376,24 @@ libraries or the free endpoints.
 - **No payment secrets on the server.** Billing runs on Stripe-hosted
   checkout and signed webhooks; the server never holds a Stripe secret key or
   sees a card, and a purchase's API key is shown once and stored hashed.
-
-Three more rules belong to crates not in this repository yet: humans own
-irreversible decisions (sentinel), a threshold of one is refused (bridge), and
-revoking an issuer revokes everything it signed (identity).
+- **Humans own irreversible decisions.** Sentinel suspends automatically, but
+  its response type has no automatic revocation: revocation always escalates to
+  a person, and protected identities are never contained automatically.
+- **A threshold of one is refused.** A bridge configuration with fewer than two
+  required signers does not load; signers are counted by distinct fingerprint,
+  and the circuit breaker resets only with *m*-of-*n* signed approvals.
+- **Revoking an issuer revokes everything it signed.** A credential's state is
+  the worst of its own, its subject's, its issuer's and its issuing authority's,
+  computed at the moment of use.
+- **An operator cannot take back an outcome.** Fairness receipts are signed
+  before the seed is revealed; a receipt that does not recompute is signed
+  evidence against the operator.
 
 ## Status
 
 | | |
 |---|---|
-| 85 tests passing across the five crates in this repository, clippy and rustfmt clean (the server has its own 48) | Done |
+| 149 tests passing across the ten crates in this repository, clippy and rustfmt clean (the server has its own 75) | Done |
 | Forgery regression tests (a real signature presented with a different message is rejected), through the library, the API and the CLI | Done |
 | ML-DSA-87 signatures cross-verified with OpenSSL 4.0.2, both directions | Done |
 | API run end to end in production mode: keys, quotas, gateway attestations, key rotation, restart with state kept | Done |
@@ -345,8 +401,11 @@ revoking an issuer revokes everything it signed (identity).
 | Stripe billing against a real Stripe account (test mode) | In progress: products, payment links, portal and webhook set up; first test purchase next |
 | `vantax scan` over HTTPS through a TLS-inspecting proxy | Done |
 | Vault recovery checked with an independent Python implementation | Done |
+| Fairness algorithm checked against an independent Python implementation (36 test vectors, all nine games); ChaCha20 against RFC 8439; EIP-712 digests against the specification's example | Done |
+| Browser build: compiled to WebAssembly (no imports), ML-DSA-87 keys and signatures cross-verified with the CLI in both directions, fairness vectors and the verifier page tested in Chromium | Done |
 | Hosted API on `api.vantax-cybersecurity.com` | In progress |
-| Identity, sentinel, bridge, fairness and wasm crates | Not in this repository yet |
+| Identity, sentinel, bridge, fairness and wasm crates | Done |
+| Live integration of the fairness engine with an operator | Not done |
 | Independent third-party audit | Not done |
 | Live integration with any product | Not done |
 
@@ -378,12 +437,13 @@ as described in [SECURITY.md](SECURITY.md), not in public issues.
 
 - [ ] Independent security review of `vantax-core` and `vantax-gateway`, with
       the findings published in full
-- [ ] Publish `vantax-identity`, `vantax-sentinel`, `vantax-bridge`,
+- [x] Publish `vantax-identity`, `vantax-sentinel`, `vantax-bridge`,
       `vantax-fairness` and `vantax-wasm`
 - [ ] Solana: more scanner rules, attestations referencing on-chain state,
       hybrid verification guidance
-- [ ] Compile and test the browser signing build
+- [x] Compile and test the browser signing build
 - [ ] First live integration of `vantax-fairness`
+- [ ] Independent review of `vantax-fairness` and `vantax-wasm`
 - [ ] Additional chain adapters
 - [ ] Enterprise migration tooling: cryptographic inventory and governance
       dashboards
@@ -397,10 +457,15 @@ Vantax/
 │   ├── vantax-adapters/    Bitcoin, Ethereum, Solana, generic
 │   ├── vantax-scan-common/ open scan types, file selection, SARIF
 │   ├── vantax-gateway/     policy, audit log, attestations, key rotation
+│   ├── vantax-identity/    identities, credentials, machine actions
+│   ├── vantax-sentinel/    risk, graduated response, evidence
+│   ├── vantax-bridge/      five-gate mint authorization, EIP-712
+│   ├── vantax-fairness/    provably fair outcomes, receipts, seed chains
+│   ├── vantax-wasm/        the browser build and js/vantax.js
 │   └── vantax-cli/         command line (binary: vantax)
-├── docs/                   API.md, WHITEPAPER.md, VAULT-FORMAT.md
-├── site/                   vantax-cybersecurity.com: index.html, welcome.html
-├── .github/workflows/      CI: format, clippy, tests, cargo audit
+├── docs/                   API.md, WHITEPAPER.md, VAULT-FORMAT.md, FAIRNESS.md, fairness/
+├── site/                   vantax-cybersecurity.com: index.html, migrate.html, verify.html, welcome.html, wasm/
+├── .github/workflows/      CI: format, clippy, tests, cargo audit, WebAssembly build
 └── SECURITY.md
 ```
 
@@ -409,7 +474,8 @@ Vantax/
 Licensed under either of [Apache License 2.0](LICENSE-APACHE) or
 [MIT](LICENSE-MIT), at your option. The scanning engine and the API service are
 proprietary, are not part of this repository, and are used through the hosted
-Vantax API.
+Vantax API. The Vantax Fairness Engine for operators is proprietary and
+licensed separately.
 
 ---
 
