@@ -1,6 +1,6 @@
 # Security policy
 
-Vantax is pre-release and has **not** had an independent third-party audit.
+Vantax is live and has **not** yet had an independent third-party audit.
 Do not use it to custody value until a review of your specific deployment is
 complete.
 

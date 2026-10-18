@@ -424,7 +424,7 @@ enough shares with a modified tool can recover early.
 
 ### 8.9 Status
 
-Vantax is pre-release and has not had an independent third-party audit. Tests
+Vantax is live and has not yet had an independent third-party audit. Tests
 and internal review are evidence the design runs; they are not a substitute for
 review of your own deployment (Section 6). Version 1 key and signature files load
 unchanged (Section 2.1). All eleven crates are built and tested; cross-checks
