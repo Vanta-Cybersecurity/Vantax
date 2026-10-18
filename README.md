@@ -14,7 +14,25 @@ ML-DSA-87 around them, and enforces who is allowed to do what.
 [Fairness spec](docs/FAIRNESS.md) ·
 [Pricing](https://vantax-cybersecurity.com/#pricing) ·
 [Security](SECURITY.md) ·
+[Official CA](#official-token) ·
 [@VantaxFounder](https://x.com/VantaxFounder)
+
+## Official token
+
+$VANTAX is the Vantax token on Solana. This is its only official contract
+address. Any other token using the Vantax name is not ours.
+
+```
+DjWckUixq3we6r9SqNoFS5MeppBt146TkJAkBxxFpump
+```
+
+[Check on Solscan](https://solscan.io/token/DjWckUixq3we6r9SqNoFS5MeppBt146TkJAkBxxFpump) ·
+the same address is on the [website](https://vantax-cybersecurity.com/#token).
+
+Check the address character by character wherever you paste it. Vantax will
+never ask for your seed phrase or private key, and never asks you to send
+tokens to claim anything. You don't need the token to use any Vantax product.
+This is not financial advice or an invitation to buy.
 
 > **Pre-release. Not yet audited.** Vantax has not had an independent
 > third-party audit. Do not use it to custody value until a review of your
