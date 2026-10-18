@@ -34,9 +34,10 @@ never ask for your seed phrase or private key, and never asks you to send
 tokens to claim anything. You don't need the token to use any Vantax product.
 This is not financial advice or an invitation to buy.
 
-> **Pre-release. Not yet audited.** Vantax has not had an independent
-> third-party audit. Do not use it to custody value until a review of your
-> specific deployment is complete.
+> **Live, and open to inspection.** The hosted API is running and nine of the
+> eleven crates are open source in this repository. Vantax hasn't had an
+> independent third-party audit yet, so don't rely on it alone to custody value
+> until a review covers your deployment.
 
 ## Why Solana first
 
@@ -416,12 +417,12 @@ libraries or the free endpoints.
 | ML-DSA-87 signatures cross-verified with OpenSSL 4.0.2, both directions | Done |
 | API run end to end in production mode: keys, quotas, gateway attestations, key rotation, restart with state kept | Done |
 | Stripe billing: purchase → key, upgrades, cancellations, redeliveries and out-of-order events, with signed webhooks generated in tests | Done |
-| Stripe billing against a real Stripe account (test mode) | In progress: products, payment links, portal and webhook set up; first test purchase next |
+| Stripe billing against a real Stripe account (test mode) | In progress: products, payment links, portal and signed webhook connected to the hosted API; live payments next |
 | `vantax scan` over HTTPS through a TLS-inspecting proxy | Done |
 | Vault recovery checked with an independent Python implementation | Done |
 | Fairness algorithm checked against an independent Python implementation (36 test vectors, all nine games); ChaCha20 against RFC 8439; EIP-712 digests against the specification's example | Done |
 | Browser build: compiled to WebAssembly (no imports), ML-DSA-87 keys and signatures cross-verified with the CLI in both directions, fairness vectors and the verifier page tested in Chromium | Done |
-| Hosted API on `api.vantax-cybersecurity.com` | In progress |
+| Hosted API on `api.vantax-cybersecurity.com` | Done |
 | Identity, sentinel, bridge, fairness and wasm crates | Done |
 | Live integration of the fairness engine with an operator | Not done |
 | Independent third-party audit | Not done |
