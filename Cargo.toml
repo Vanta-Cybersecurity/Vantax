@@ -12,6 +12,11 @@ members = [
     "crates/vantax-scan-common",
     "crates/vantax-gateway",
     "crates/vantax-cli",
+    "crates/vantax-fairness",
+    "crates/vantax-identity",
+    "crates/vantax-sentinel",
+    "crates/vantax-bridge",
+    "crates/vantax-wasm",
 ]
 resolver = "2"
 
@@ -29,6 +34,12 @@ vantax-core = { path = "crates/vantax-core", version = "2.0.0" }
 vantax-adapters = { path = "crates/vantax-adapters", version = "2.0.0" }
 vantax-scan-common = { path = "crates/vantax-scan-common", version = "2.0.0" }
 vantax-gateway = { path = "crates/vantax-gateway", version = "2.0.0" }
+# default-features = false so the browser build can leave out signatures;
+# crates that sign enable features = ["signatures"].
+vantax-fairness = { path = "crates/vantax-fairness", version = "2.0.0", default-features = false }
+vantax-identity = { path = "crates/vantax-identity", version = "2.0.0" }
+vantax-sentinel = { path = "crates/vantax-sentinel", version = "2.0.0" }
+vantax-bridge = { path = "crates/vantax-bridge", version = "2.0.0" }
 
 # Post-quantum signatures
 # pqcrypto-mldsa: ML-DSA-87 as published in NIST FIPS 204 (new keys and signatures).

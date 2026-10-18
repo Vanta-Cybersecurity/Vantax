@@ -1,0 +1,18 @@
+[package]
+name = "vantax-sentinel"
+description = "Vantax Sentinel: detection, correlation, risk, graduated response and containment with sealed, hash-chained evidence. Suspension is automatic; revocation always goes to a person."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+keywords = ["post-quantum", "security-monitoring", "incident-response", "audit-log", "ml-dsa"]
+categories = ["cryptography", "authentication"]
+
+[dependencies]
+vantax-core.workspace = true
+vantax-identity.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+hex.workspace = true

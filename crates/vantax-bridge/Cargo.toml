@@ -1,0 +1,18 @@
+[package]
+name = "vantax-bridge"
+description = "Vantax bridge security: five gates (event verification, finality, replay, exposure, m-of-n threshold) before any cross-chain mint, ML-DSA-87 signer attestations, EIP-712 digests and a circuit breaker that never resets itself."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+keywords = ["post-quantum", "bridge", "threshold", "eip-712", "ml-dsa"]
+categories = ["cryptography", "cryptography::cryptocurrencies"]
+
+[dependencies]
+vantax-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+hex.workspace = true
+sha3.workspace = true

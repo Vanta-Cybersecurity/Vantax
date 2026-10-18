@@ -1,0 +1,17 @@
+[package]
+name = "vantax-identity"
+description = "Vantax identities and credentials: four lifecycle states, expiry computed at use, issuer revocation that cascades, key rotation with history, and signed, replay-protected machine actions."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+keywords = ["post-quantum", "identity", "credentials", "ml-dsa", "authorization"]
+categories = ["cryptography", "authentication"]
+
+[dependencies]
+vantax-core.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+hex.workspace = true

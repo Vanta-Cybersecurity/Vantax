@@ -18,6 +18,7 @@ path = "src/main.rs"
 vantax-core.workspace = true
 vantax-adapters.workspace = true
 vantax-scan-common.workspace = true
+vantax-fairness = { workspace = true, features = ["signatures"] }
 clap.workspace = true
 serde.workspace = true
 serde_json.workspace = true

@@ -37,6 +37,16 @@ jobs:
       - name: Tests without legacy Dilithium5 support
         run: cargo test -p vantax-core --no-default-features
 
+      - name: Fairness verifier without signatures (no C dependencies)
+        run: |
+          cargo test -p vantax-fairness --no-default-features
+          cargo clippy -p vantax-fairness --no-default-features --all-targets -- -D warnings
+
+      - name: Fairness vectors are current and match the Python verifier
+        run: |
+          cargo run -q -p vantax-fairness --example vectors | diff - docs/fairness/vectors.json
+          python3 docs/fairness/verify_fairness.py --vectors docs/fairness/vectors.json
+
       - name: Install cargo-audit
         uses: taiki-e/install-action@v2
         with:
@@ -44,3 +54,41 @@ jobs:
 
       - name: Dependency audit (RustSec)
         run: cargo audit
+
+  wasm:
+    name: Browser build (WebAssembly)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Build vantax_wasm.wasm
+        run: cargo build -p vantax-wasm --release --target wasm32-unknown-unknown
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: JavaScript loader tests
+        run: node --test crates/vantax-wasm/js/vantax.test.mjs
+
+      - name: Smoke test the real module from Node
+        run: node crates/vantax-wasm/js/smoke.mjs target/wasm32-unknown-unknown/release/vantax_wasm.wasm
+
+      # The site's verifier page (site/verify.html) ships a copy of both files.
+      - name: The site's copy is current and passes too
+        run: |
+          diff crates/vantax-wasm/js/vantax.js site/wasm/vantax.js
+          node crates/vantax-wasm/js/smoke.mjs site/wasm/vantax_wasm.wasm
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vantax-wasm
+          path: |
+            target/wasm32-unknown-unknown/release/vantax_wasm.wasm
+            crates/vantax-wasm/js/vantax.js

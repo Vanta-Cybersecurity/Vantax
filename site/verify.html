@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vantax Verifier: check any bet in your browser</title>
+<meta name="description" content="Check a provably fair bet yourself: the ML-DSA-87 signature, the seed commitment and the outcome, recomputed in WebAssembly. Nothing leaves your device.">
+<link rel="canonical" href="https://vantax-cybersecurity.com/verify.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://vantax-cybersecurity.com/verify.html">
+<meta property="og:title" content="Don't trust the casino. Check it.">
+<meta property="og:description" content="Post-quantum signed bet receipts, verified in your browser with WebAssembly. Nothing leaves your device.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@VantaxFounder">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f6;--surface:#fff;--ink:#0b1b33;--mute:#56657f;--line:#cfd7e4;--flag:#c2255c;--flagbg:#fde8ef;--ok:#0b7a7c;--okbg:#e2f4f4;--accent:#2b3cff;--accbg:#e7e9ff;
+--sans:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1020;--surface:#111a30;--ink:#e8edf7;--mute:#8fa0bf;--line:#243252;--flag:#ff6b9a;--flagbg:#3a1526;--ok:#4fd1d3;--okbg:#0f2f33;--accent:#8a96ff;--accbg:#1c2350}}
+:root[data-theme="dark"]{--bg:#0a1020;--surface:#111a30;--ink:#e8edf7;--mute:#8fa0bf;--line:#243252;--flag:#ff6b9a;--flagbg:#3a1526;--ok:#4fd1d3;--okbg:#0f2f33;--accent:#8a96ff;--accbg:#1c2350}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:20px 0}
+.logo{font-weight:800;font-size:22px;letter-spacing:-.02em;text-decoration:none}
+.logo b{color:var(--accent)}
+nav a{margin-left:20px;font-size:15px;color:var(--mute);text-decoration:none}
+nav a:first-child{margin-left:0}
+nav a:hover{color:var(--ink)}
+h1{font-size:clamp(36px,6.5vw,70px);line-height:1.02;letter-spacing:-.035em;font-weight:800;margin:40px 0 18px;max-width:16ch}
+.lede{font-size:clamp(18px,2.3vw,21px);color:var(--mute);max-width:60ch;margin:0 0 22px}
+.chip{display:inline-flex;align-items:center;gap:8px;font:500 13px var(--mono);border:1.5px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--surface);color:var(--mute)}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--mute);display:inline-block}
+.chip.ready{color:var(--ok);border-color:var(--ok)}.chip.ready i{background:var(--ok)}
+.chip.fail{color:var(--flag);border-color:var(--flag)}.chip.fail i{background:var(--flag)}
+section{padding:56px 0 0}
+h2{font-size:clamp(26px,4vw,38px);letter-spacing:-.03em;line-height:1.1;margin:0 0 10px}
+p.big{max-width:64ch;color:var(--mute);margin:0 0 18px}
+.card{background:var(--surface);border:1.5px solid var(--ink);border-radius:16px;overflow:hidden}
+.card-h{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 18px;border-bottom:1.5px solid var(--ink);font-weight:600;font-size:15px}
+.card-h span{color:var(--mute);font-weight:400}
+.cols{display:grid;grid-template-columns:1.1fr .9fr}
+@media(max-width:820px){.cols{grid-template-columns:1fr}}
+.in{padding:16px 18px;border-right:1.5px solid var(--line);display:grid;gap:12px;align-content:start}
+@media(max-width:820px){.in{border-right:0;border-bottom:1.5px solid var(--line)}}
+.out{padding:16px 18px;min-height:240px}
+label{display:block;font-weight:600;font-size:14px;margin:0 0 5px}
+label small{font-weight:400;color:var(--mute)}
+textarea,input,select{width:100%;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:400 13px/1.55 var(--mono);padding:10px 12px}
+textarea{min-height:120px;resize:vertical}
+textarea.tall{min-height:180px}
+select{font-family:var(--sans);font-size:15px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:560px){.grid2,.grid3{grid-template-columns:1fr}}
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+button,.btn{font:600 15px var(--sans);padding:11px 18px;border-radius:10px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;text-decoration:none;display:inline-block}
+button.p,.btn.p{background:var(--ink);color:var(--bg)}
+button:disabled{opacity:.5;cursor:not-allowed}
+button:not(:disabled):hover,.btn:hover{transform:translateY(-1px)}
+.verdict{font-weight:800;font-size:28px;letter-spacing:-.02em;margin:0 0 6px}
+.verdict.fair{color:var(--ok)}.verdict.pending{color:var(--accent)}.verdict.unfair,.verdict.invalid,.verdict.error{color:var(--flag)}
+.why{color:var(--mute);margin:0 0 14px;font-size:15.5px}
+.checks{list-style:none;padding:0;margin:0 0 12px;display:grid;gap:6px}
+.checks li{display:flex;gap:10px;align-items:baseline;font-size:15px}
+.checks li b{width:20px;flex:none;text-align:center}
+.checks .y b{color:var(--ok)}.checks .n b{color:var(--flag)}.checks .w b{color:var(--mute)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:14px;margin:0}
+.kv dt{color:var(--mute)}
+.kv dd{margin:0;font:500 13px var(--mono);word-break:break-all}
+.big-out{font-weight:800;font-size:40px;letter-spacing:-.03em;margin:4px 0 10px;word-break:break-word}
+.problems{margin:10px 0 0;padding:0;list-style:none}
+.problems li{border-left:4px solid var(--flag);background:var(--flagbg);padding:7px 11px;border-radius:0 8px 8px 0;margin:0 0 6px;font-size:14px}
+.hint{color:var(--mute);font-size:14.5px}
+.note{font-size:13.5px;color:var(--mute);margin:12px 4px 0}
+.ops{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:22px 0 0}
+@media(max-width:760px){.ops{grid-template-columns:1fr}}
+.op{background:var(--surface);border:1.5px solid var(--line);border-left:5px solid var(--ok);border-radius:10px;padding:14px 18px}
+.op b{display:block;font-size:18px;letter-spacing:-.01em}
+.op span{color:var(--mute);font-size:15.5px}
+.status{margin-top:64px;background:var(--ink);color:var(--bg);border-radius:16px;padding:28px 26px}
+.status h2{margin-bottom:8px}
+.status p{margin:0;max-width:64ch;opacity:.85}
+footer{padding:44px 0 56px;color:var(--mute);font-size:15px;display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
+.sr{position:absolute;left:-9999px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}button:hover,.btn:hover{transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="logo" href="index.html">Vantax<b>.</b></a>
+  <nav><a href="#verify">Verify a bet</a><a href="#recompute">Recompute</a><a href="#sign">Sign</a><a href="#operators">For operators</a><a href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/FAIRNESS.md">Spec</a></nav>
+</header>
+<main>
+  <h1>Don't trust the casino. Check it.</h1>
+  <p class="lede">Every bet settled with Vantax comes with a receipt the operator signs with ML-DSA-87, a post-quantum signature, before the server seed is revealed. Paste it here: this page checks the signature and recomputes the outcome itself, in WebAssembly. Nothing you paste leaves your device.</p>
+  <span class="chip" id="chip"><i></i><span id="chip-text">Loading the verifier…</span></span>
+
+  <section id="verify">
+    <h2>Verify a bet.</h2>
+    <p class="big">You need the receipt and the operator's public key. Add the server seed once the operator reveals it (when you rotate your seed), and the outcome is recomputed from scratch.</p>
+    <div class="card">
+      <div class="card-h">Receipt check <span>Signature, commitment and outcome</span></div>
+      <div class="cols">
+        <div class="in">
+          <div><label for="receipt">Receipt <small>(JSON from the operator)</small></label>
+            <textarea id="receipt" class="tall" spellcheck="false" placeholder='{"receipt":{"version":1,"operator":"…","game":{…},"outcome":{…},…},"signature":{…}}'></textarea></div>
+          <div><label for="opkey">Operator public key <small>(.pub.json)</small></label>
+            <textarea id="opkey" spellcheck="false" placeholder='{"algorithm":"ML-DSA-87","public_key":"…","fingerprint":"…"}'></textarea></div>
+          <div><label for="seed">Revealed server seed <small>(64 hex characters, or the signed reveal JSON; optional)</small></label>
+            <input id="seed" spellcheck="false" autocomplete="off" placeholder="leave empty until the seed is revealed"></div>
+          <div class="btns">
+            <button class="p" id="verify-btn" disabled>Verify</button>
+            <button id="demo-btn" disabled>Load a demo bet</button>
+            <button id="tamper-btn" disabled>Tamper with it</button>
+          </div>
+          <p class="hint" id="demo-actions" hidden>Demo operator: <a href="#" id="reveal-seed">reveal the seed</a> · <a href="#" id="paste-reveal">paste the signed reveal</a> · <a href="#" id="cheat">cheat (sign a lower crash point)</a></p>
+        </div>
+        <div class="out" id="verify-out" aria-live="polite">
+          <p class="hint">No receipt yet? <b>Load a demo bet</b>: this page plays the operator, signs a crash bet with a fresh ML-DSA-87 key and fills in the form. Verify it before and after adding the seed, then tamper with it and verify again.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="recompute">
+    <h2>Recompute any outcome.</h2>
+    <p class="big">The same integer-only algorithm the operator runs: a ChaCha20 stream keyed by the server seed, your client seed and the nonce, with rejection sampling so no result is more likely than another.</p>
+    <div class="card">
+      <div class="card-h">Outcome calculator <span>Nine games, one specification</span></div>
+      <div class="cols">
+        <div class="in">
+          <div class="grid2">
+            <div><label for="game">Game</label>
+              <select id="game">
+                <option value="crash">Crash</option><option value="dice">Dice</option><option value="coin">Coin flip</option>
+                <option value="range">Range</option><option value="wheel">Wheel</option><option value="plinko">Plinko</option>
+                <option value="mines">Mines</option><option value="keno">Keno</option><option value="shuffle">Card shuffle</option>
+              </select></div>
+            <div id="params"></div>
+          </div>
+          <div><label for="c-seed">Server seed <small>(hex)</small></label><input id="c-seed" spellcheck="false" autocomplete="off"></div>
+          <div class="grid2">
+            <div><label for="c-client">Client seed</label><input id="c-client" value="my lucky seed" spellcheck="false"></div>
+            <div><label for="c-nonce">Nonce</label><input id="c-nonce" type="number" min="0" step="1" value="0"></div>
+          </div>
+          <div class="btns"><button class="p" id="calc-btn" disabled>Recompute</button><button id="random-seed" disabled>Random seed</button></div>
+        </div>
+        <div class="out" id="calc-out" aria-live="polite"><p class="hint">Pick a game, give the seeds and the nonce, and press Recompute. Change the nonce to step through bets on the same seed.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="sign">
+    <h2>Post-quantum signatures, in your browser.</h2>
+    <p class="big">The same ML-DSA-87 (NIST FIPS 204) keys and signatures as the <code>vantax</code> command line, compiled to WebAssembly. A key made here verifies with the CLI and back.</p>
+    <div class="card">
+      <div class="card-h">ML-DSA-87 playground <span>Keys stay in this tab</span></div>
+      <div class="cols">
+        <div class="in">
+          <div class="btns"><button class="p" id="keygen-btn" disabled>Generate a key</button><button id="download-btn" disabled>Download public key</button></div>
+          <div><label for="msg">Message</label><textarea id="msg" spellcheck="false">Pay 1 SOL to alice</textarea></div>
+          <div class="btns"><button id="sign-btn" disabled>Sign</button><button id="check-btn" disabled>Verify this message</button></div>
+        </div>
+        <div class="out" id="sign-out" aria-live="polite"><p class="hint">Generate a key, sign the message, then edit one character and verify again.</p></div>
+      </div>
+    </div>
+    <p class="note">For demonstrations: a key made in a web page lives in that page's memory. Keep keys that guard value in the CLI, an HSM or a vault.</p>
+  </section>
+
+  <section id="operators">
+    <h2>For operators.</h2>
+    <p class="big">Casinos, sportsbooks, lotteries and game studios can settle every bet this way with the Vantax Fairness Engine, a licensed service that runs on your own servers.</p>
+    <div class="ops">
+      <div class="op"><b>Signed receipts on every bet</b><span>ML-DSA-87 signatures bind you to each outcome before the seed is revealed. Players verify with free tools, including this page.</span></div>
+      <div class="op"><b>Seeds you can't lose or reuse</b><span>Per-player committed seeds derived from one master secret, sealed with AES-256-GCM. Rotation publishes a signed reveal.</span></div>
+      <div class="op"><b>An audit log that restarts you exactly</b><span>Every state change is hash-chained and stored before the engine answers; replaying the log rebuilds its state after a crash.</span></div>
+      <div class="op"><b>Round games and RNG reports</b><span>Seed chains commit to millions of crash rounds with one hash. Signed, reproducible chi-square and RTP reports for every game.</span></div>
+    </div>
+    <div class="btns" style="margin-top:20px">
+      <a class="btn p" href="https://x.com/VantaxFounder">Talk to us on X</a>
+      <a class="btn" href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/FAIRNESS.md">Read the specification</a>
+    </div>
+  </section>
+
+  <section class="status">
+    <h2>Pre-release. Not yet audited.</h2>
+    <p>The fairness algorithm is specified in full, with test vectors, and four implementations check each other (Rust, this WebAssembly build, the CLI and a stand-alone Python script). None of it has had an independent third-party audit yet. A passing check proves the outcome followed the published rules; it says nothing about an operator's licence or solvency.</p>
+  </section>
+</main>
+<footer>
+  <span>Vantax. Post-quantum security, built to be verified.</span>
+  <span><a href="index.html">Home</a> &nbsp; <a href="migrate.html">Migrate</a> &nbsp; <a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub</a> &nbsp; <a href="index.html#token">Official CA</a> &nbsp; <a href="https://x.com/VantaxFounder">@VantaxFounder</a></span>
+</footer>
+</div>
+<script type="module">
+import { loadVantax } from "./wasm/vantax.js";
+
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+const short = (h, n = 16) => (h && h.length > n * 2 ? h.slice(0, n) + "…" + h.slice(-8) : h || "");
+const randomHex = (n) => Array.from(crypto.getRandomValues(new Uint8Array(n)), (b) => b.toString(16).padStart(2, "0")).join("");
+
+function chip(state, text) {
+  $("chip").className = "chip " + state;
+  $("chip-text").textContent = text;
+}
+
+let vx;
+try {
+  vx = await loadVantax(new URL("./wasm/vantax_wasm.wasm", import.meta.url));
+  chip("ready", vx.version() + " · ML-DSA-87 · running on your device");
+  document.querySelectorAll("button:disabled").forEach((b) => { if (b.id !== "tamper-btn" && b.id !== "download-btn" && b.id !== "sign-btn" && b.id !== "check-btn") b.disabled = false; });
+} catch (e) {
+  chip("fail", "Verifier failed to load");
+  $("verify-out").replaceChildren(el("p", "verdict error", "Could not load"), el("p", "why", String(e.message || e) + ". If you host this page, serve wasm/vantax_wasm.wasm next to it and allow 'wasm-unsafe-eval' in the Content-Security-Policy script-src."));
+  throw e;
+}
+
+// ── Verify a bet ──────────────────────────────────────────────────────────────
+const VERDICTS = {
+  fair: ["✓ Fair", "Signed by the operator, the seed opens its commitment, and the outcome recomputes exactly."],
+  pending: ["… Pending", "The signature is valid and binds the operator to this outcome. Add the server seed once it is revealed to recompute it."],
+  unfair: ["✗ Unfair", "The operator signed this receipt, but it does not match the revealed seed. Keep it: it is signed evidence."],
+  invalid: ["✗ Invalid", "The signature does not verify under this key. The receipt proves nothing either way."],
+};
+
+function display(o) {
+  switch (o.type) {
+    case "dice": return (o.roll / 100).toFixed(2);
+    case "coin": return o.heads ? "heads" : "tails";
+    case "range": return String(o.value);
+    case "crash": return Math.floor(o.multiplier_x100 / 100) + "." + String(o.multiplier_x100 % 100).padStart(2, "0") + "x";
+    case "wheel": return "segment " + o.segment;
+    case "plinko": return o.path + " → bucket " + o.bucket;
+    case "mines": return "mines at " + o.positions.join(", ");
+    case "keno": return o.numbers.join(", ");
+    case "shuffle": return o.order.join(", ");
+    default: return JSON.stringify(o);
+  }
+}
+
+function parseJSON(text, what) {
+  try { return JSON.parse(text); } catch { throw new Error(what + " is not valid JSON"); }
+}
+
+function check(li, ok, text) {
+  const cls = ok === true ? "y" : ok === false ? "n" : "w";
+  const mark = ok === true ? "✓" : ok === false ? "✗" : "–";
+  const row = el("li", cls); row.append(el("b", null, mark), el("span", null, text)); li.append(row);
+}
+
+function verifyNow() {
+  const out = $("verify-out");
+  try {
+    const signed = parseJSON($("receipt").value, "The receipt");
+    const key = parseJSON($("opkey").value, "The public key");
+    let seed = $("seed").value.trim() || null;
+    let revealNote = null;
+    if (seed && seed.startsWith("{")) {
+      const reveal = parseJSON(seed, "The reveal");
+      const opened = vx.verifyReveal(reveal, key);
+      seed = opened.server_seed;
+      revealNote = "Signed reveal verified (" + opened.bets + " bets on this seed)";
+    }
+    const r = vx.verifyReceipt(signed, key, seed);
+    const [title, why] = VERDICTS[r.verdict];
+    const rc = signed.receipt || {};
+    const list = el("ul", "checks");
+    check(list, r.signature_valid, "ML-DSA-87 signature verifies");
+    check(list, r.signer_matches, "Signed by the key you gave (" + short(key.fingerprint, 8) + ")");
+    if (revealNote) check(list, true, revealNote);
+    check(list, r.commitment_valid, r.commitment_valid == null ? "Seed commitment: waiting for the reveal" : "Server seed opens the commitment");
+    check(list, r.outcome_valid, r.outcome_valid == null ? "Outcome: recomputed once the seed is revealed" : "Outcome recomputes exactly");
+    const kv = el("dl", "kv");
+    const add = (k, v) => { kv.append(el("dt", null, k), el("dd", null, v)); };
+    add("Operator", rc.operator || "");
+    add("Bet", (rc.bet_id || "") + " · nonce " + rc.nonce);
+    add("Game", rc.game ? JSON.stringify(rc.game) : "");
+    add("Receipt says", rc.outcome ? display(rc.outcome) : "");
+    if (r.recomputed) add("Recomputed", display(r.recomputed));
+    add("Commitment", short(rc.commitment));
+    const nodes = [el("p", "verdict " + r.verdict, title), el("p", "why", why), list, kv];
+    if (r.problems.length) { const ul = el("ul", "problems"); r.problems.forEach((p) => ul.append(el("li", null, p))); nodes.push(ul); }
+    out.replaceChildren(...nodes);
+  } catch (e) {
+    out.replaceChildren(el("p", "verdict error", "Can't check that"), el("p", "why", e.message || String(e)));
+  }
+}
+
+let demo = null;
+function loadDemo() {
+  const key = vx.keygen();
+  const seed = randomHex(32);
+  const client = "demo player " + randomHex(3);
+  const game = { game: "crash", house_edge_bps: 100 };
+  const nonce = Math.floor(Math.random() * 50);
+  const outcome = vx.derive(game, seed, client, nonce).outcome;
+  const receipt = vx.signReceipt(key, {
+    version: 1, operator: "demo-casino.example", operator_fingerprint: key.fingerprint,
+    bet_id: "demo-" + randomHex(4), game, commitment: vx.commit(seed), client_seed: client,
+    nonce, outcome, issued_at: Math.floor(Date.now() / 1000),
+  });
+  const reveal = vx.signReveal(key, {
+    version: 1, operator: "demo-casino.example", operator_fingerprint: key.fingerprint,
+    commitment: vx.commit(seed), server_seed: seed, bets: nonce + 1, next_commitment: vx.commit(randomHex(32)),
+    revealed_at: Math.floor(Date.now() / 1000),
+  });
+  demo = { key, seed, reveal };
+  $("receipt").value = JSON.stringify(receipt, null, 2);
+  $("opkey").value = JSON.stringify(vx.publicKey(key));
+  $("seed").value = "";
+  $("tamper-btn").disabled = false;
+  $("demo-actions").hidden = false;
+  $("verify-out").replaceChildren(
+    el("p", "verdict pending", "Demo bet ready"),
+    el("p", "why", "Signed by a fresh operator key. Press Verify: it is pending, because the seed is still secret. Then reveal the seed (under the buttons) and verify again."),
+  );
+}
+
+$("cheat").addEventListener("click", (ev) => {
+  ev.preventDefault();
+  if (!demo) return;
+  // The operator signs a receipt whose outcome is not what the seed gives.
+  const signed = parseJSON($("receipt").value, "The receipt");
+  const r = signed.receipt;
+  r.outcome = { type: "crash", multiplier_x100: Math.max(101, Math.floor(r.outcome.multiplier_x100 / 2)) };
+  $("receipt").value = JSON.stringify(vx.signReceipt(demo.key, r), null, 2);
+  $("seed").value = demo.seed;
+  verifyNow();
+});
+$("reveal-seed").addEventListener("click", (ev) => { ev.preventDefault(); if (demo) { $("seed").value = demo.seed; verifyNow(); } });
+$("paste-reveal").addEventListener("click", (ev) => { ev.preventDefault(); if (demo) { $("seed").value = JSON.stringify(demo.reveal); verifyNow(); } });
+
+function tamper() {
+  try {
+    const signed = parseJSON($("receipt").value, "The receipt");
+    const o = signed.receipt.outcome;
+    if (o.type === "crash") o.multiplier_x100 = o.multiplier_x100 * 10 + 7;
+    else if (o.type === "dice") o.roll = (o.roll + 1) % 10000;
+    else if (o.type === "coin") o.heads = !o.heads;
+    else signed.receipt.nonce += 1;
+    $("receipt").value = JSON.stringify(signed, null, 2);
+    if (demo && !$("seed").value) $("seed").value = demo.seed;
+    verifyNow();
+  } catch (e) {
+    $("verify-out").replaceChildren(el("p", "verdict error", "Can't tamper"), el("p", "why", e.message || String(e)));
+  }
+}
+
+$("verify-btn").addEventListener("click", verifyNow);
+$("demo-btn").addEventListener("click", loadDemo);
+$("tamper-btn").addEventListener("click", tamper);
+
+// ── Recompute ────────────────────────────────────────────────────────────────
+const PARAMS = {
+  crash: [["house_edge_bps", "House edge (bps)", 100]],
+  dice: [], coin: [],
+  range: [["min", "Min", 1], ["max", "Max", 100]],
+  wheel: [["segments", "Segments", 54]],
+  plinko: [["rows", "Rows", 16]],
+  mines: [["tiles", "Tiles", 25], ["mines", "Mines", 3]],
+  keno: [["pool", "Pool", 40], ["draws", "Draws", 10]],
+  shuffle: [["cards", "Cards", 52]],
+};
+function renderParams() {
+  const g = $("game").value, box = $("params");
+  box.replaceChildren();
+  const fields = PARAMS[g];
+  if (!fields.length) { box.append(el("label", null, "Parameters"), el("p", "hint", "None for this game.")); return; }
+  const grid = el("div", fields.length > 1 ? "grid2" : "");
+  for (const [name, label, def] of fields) {
+    const w = el("div"); const l = el("label", null, label); l.htmlFor = "p-" + name;
+    const i = el("input"); i.id = "p-" + name; i.type = "number"; i.step = "1"; i.value = def;
+    w.append(l, i); grid.append(w);
+  }
+  box.append(grid);
+}
+function gameJSON() {
+  const g = $("game").value, out = { game: g };
+  for (const [name] of PARAMS[g]) out[name] = Number($("p-" + name).value);
+  return out;
+}
+function recompute() {
+  const out = $("calc-out");
+  try {
+    const game = gameJSON();
+    const seed = $("c-seed").value.trim();
+    const nonce = Number($("c-nonce").value);
+    if (!Number.isSafeInteger(nonce) || nonce < 0) throw new Error("the nonce must be a whole number");
+    const r = vx.derive(game, seed, $("c-client").value, nonce);
+    const kv = el("dl", "kv");
+    kv.append(el("dt", null, "Outcome"), el("dd", null, JSON.stringify(r.outcome)));
+    kv.append(el("dt", null, "Commitment"), el("dd", null, vx.commit(seed)));
+    kv.append(el("dt", null, "Game"), el("dd", null, JSON.stringify(game)));
+    out.replaceChildren(el("p", "hint", "Outcome"), el("p", "big-out", r.display), kv);
+  } catch (e) {
+    out.replaceChildren(el("p", "verdict error", "Can't compute that"), el("p", "why", e.message || String(e)));
+  }
+}
+$("game").addEventListener("change", renderParams);
+$("calc-btn").addEventListener("click", recompute);
+$("random-seed").addEventListener("click", () => { $("c-seed").value = randomHex(32); recompute(); });
+renderParams();
+$("c-seed").value = randomHex(32);
+
+// ── Sign ─────────────────────────────────────────────────────────────────────
+let myKey = null, mySig = null;
+function signOut(...nodes) { $("sign-out").replaceChildren(...nodes); }
+$("keygen-btn").addEventListener("click", () => {
+  const t = performance.now();
+  myKey = vx.keygen(); mySig = null;
+  const ms = Math.max(1, Math.round(performance.now() - t));
+  const kv = el("dl", "kv");
+  kv.append(el("dt", null, "Algorithm"), el("dd", null, "ML-DSA-87 (FIPS 204, category 5)"));
+  kv.append(el("dt", null, "Public key"), el("dd", null, myKey.public_key.length / 2 + " bytes"));
+  kv.append(el("dt", null, "Fingerprint"), el("dd", null, short(myKey.fingerprint, 20)));
+  signOut(el("p", "verdict fair", "Key generated"), el("p", "why", "In " + ms + " ms, from 32 random bytes this tab drew from crypto.getRandomValues."), kv);
+  $("sign-btn").disabled = false; $("download-btn").disabled = false; $("check-btn").disabled = true;
+});
+$("sign-btn").addEventListener("click", () => {
+  mySig = vx.sign(myKey, $("msg").value);
+  const kv = el("dl", "kv");
+  kv.append(el("dt", null, "Signature"), el("dd", null, mySig.signature.length / 2 + " bytes · " + short(mySig.signature, 12)));
+  kv.append(el("dt", null, "Message hash"), el("dd", null, short(mySig.message_hash, 16)));
+  signOut(el("p", "verdict pending", "Signed"), el("p", "why", "Now verify, or change one character of the message first."), kv);
+  $("check-btn").disabled = false;
+});
+$("check-btn").addEventListener("click", () => {
+  const r = vx.verify(vx.publicKey(myKey), mySig, $("msg").value);
+  signOut(
+    el("p", "verdict " + (r.valid ? "fair" : "invalid"), r.valid ? "✓ Signature valid" : "✗ Signature invalid"),
+    el("p", "why", r.valid ? "This key signed exactly this message." : "This signature was not made by this key over this message. Do not trust the data."),
+  );
+});
+$("download-btn").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(vx.publicKey(myKey), null, 2)], { type: "application/json" });
+  const a = el("a"); a.href = URL.createObjectURL(blob); a.download = "browser-key.pub.json"; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+</script>
+</body>
+</html>
