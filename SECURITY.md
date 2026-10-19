@@ -39,7 +39,8 @@ In scope: the crates in this repository (`vantax-core`, `vantax-adapters`,
 in `site/`, and the hosted Vantax API at `api.vantax-cybersecurity.com`,
 including scanning and Stripe billing. The server and the scanning engine are
 not public: report what you can observe and reproduce from outside, against
-your own key and test-mode purchases only.
+your own key and your own subscription only. Billing is live, so purchases
+are real payments.
 
 Especially interesting:
 

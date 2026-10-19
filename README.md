@@ -417,7 +417,7 @@ libraries or the free endpoints.
 | ML-DSA-87 signatures cross-verified with OpenSSL 4.0.2, both directions | Done |
 | API run end to end in production mode: keys, quotas, gateway attestations, key rotation, restart with state kept | Done |
 | Stripe billing: purchase → key, upgrades, cancellations, redeliveries and out-of-order events, with signed webhooks generated in tests | Done |
-| Stripe billing against a real Stripe account (test mode) | In progress: products, payment links, portal and signed webhook connected to the hosted API; live payments next |
+| Stripe billing in live mode on the hosted API | Done: live payment links (Pro £250 / month, Enterprise £650 / month), customer portal and signed webhook connected; the post-checkout page shows each buyer's key once |
 | `vantax scan` over HTTPS through a TLS-inspecting proxy | Done |
 | Vault recovery checked with an independent Python implementation | Done |
 | Fairness algorithm checked against an independent Python implementation (36 test vectors, all nine games); ChaCha20 against RFC 8439; EIP-712 digests against the specification's example | Done |

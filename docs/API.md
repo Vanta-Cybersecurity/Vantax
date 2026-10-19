@@ -77,8 +77,8 @@ Every error is JSON with an `error` field.
 
 ```json
 { "error": "Scanning needs a Pro or Enterprise plan", "plan": "free",
-  "upgrade": { "pro": { "monthly_quota": 10000, "price": "£49 / month", "checkout_url": "https://buy.stripe.com/…" },
-               "enterprise": { "monthly_quota": 250000, "price": "£499 / month", "checkout_url": "https://buy.stripe.com/…" },
+  "upgrade": { "pro": { "monthly_quota": 10000, "price": "£250 / month", "checkout_url": "https://buy.stripe.com/…" },
+               "enterprise": { "monthly_quota": 250000, "price": "£650 / month", "checkout_url": "https://buy.stripe.com/…" },
                "plans": "/api/v1/plans" } }
 ```
 
