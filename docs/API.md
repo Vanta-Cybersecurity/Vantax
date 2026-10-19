@@ -16,8 +16,10 @@ Subscribe to Pro or Enterprise in the **Pricing** section of the site. Payment
 happens on a Stripe-hosted page; afterwards Stripe sends you to
 `welcome.html`, which shows your key once (see [Billing](#billing)). Keys can
 also be issued by Vantax directly, for example for an invoiced Enterprise
-customer. A key is shown once and stored only as a hash. Rotating a key issues a new one and
-disables the old one immediately.
+customer. Wallets that hold the Vantax token can get a Holder key by signing a
+message on `holders.html` (see [Holder access](#holder-access)). A key is shown
+once and stored only as a hash. Rotating a key issues a new one and disables the
+old one immediately.
 
 Send it on every call:
 
@@ -34,6 +36,7 @@ every metered endpoint except the scanner, for trying it out.
 |---|---|---|---|---|
 | No key | 25 / day | 1 | 5 | No |
 | Free | 100 | 2 | 10 | No |
+| Holder | 1,000 | 5 | 15 | Yes |
 | Pro | 10,000 | 10 | 30 | Yes |
 | Enterprise | 250,000 | 50 | 100 | Yes |
 
@@ -41,7 +44,8 @@ Monthly quotas reset at 00:00 UTC on the 1st; the no-key quota resets daily
 at 00:00 UTC. Every admitted call to a metered endpoint counts, including
 calls that fail validation. Calls refused with 429, and scans refused because
 the plan has no scanner, never spend quota. `GET /api/v1/plans` returns this
-table with each plan's price and checkout link.
+table with each plan's price and checkout link, and the Holder plan's terms
+under `holder`.
 
 Metered responses carry:
 
@@ -50,7 +54,7 @@ Metered responses carry:
 | `X-Quota-Limit` | Calls allowed in the current period |
 | `X-Quota-Remaining` | Calls left |
 | `X-Quota-Reset` | When the period resets (RFC 3339) |
-| `X-Vantax-Plan` | `free`, `pro`, `enterprise` or `anonymous` |
+| `X-Vantax-Plan` | `free`, `holder`, `pro`, `enterprise` or `anonymous` |
 
 ## Errors
 
@@ -444,6 +448,41 @@ When a subscription ends (or becomes `unpaid`, `paused` or
 `incomplete_expired`) its key moves to Free: the free endpoints keep working,
 the scanner does not. Upgrades and downgrades in the customer portal change the
 key's plan as soon as Stripe reports them.
+
+### Holder access
+
+A Solana wallet that holds at least the minimum amount of the Vantax token gets
+a key on the Holder plan. The wallet proves it is yours by signing a text
+message (`signMessage`); nothing is sent on-chain and no tokens move. The
+minimum, the token's mint and how often wallets are checked are in
+`GET /api/v1/plans` under `holder` (`"enabled": false` when it is off).
+
+**`POST /api/v1/holder/challenge`** `{"wallet": "<base58 address>"}` returns
+`{ "message": "…", "challenge": "…", "expires_at": "…" }`. The message names
+the site, the wallet, a random nonce and an expiry five minutes ahead. Sign the
+message exactly as returned (UTF-8 bytes, Ed25519).
+
+**`POST /api/v1/holder/claim`** `{"wallet", "message", "signature", "challenge"}`,
+with the signature as base64, base58 or hex, checks the challenge (authentic,
+unexpired, unused), the signature, and the wallet's balance of the mint, then
+returns the key once.
+
+| Status | Body |
+|---|---|
+| 201 | `{ "api_key": "vtx_…", "key": {…}, "plan": "holder", "held": "…", "required": "…", "replaced": null }`: store the key now |
+| 400 | Challenge changed, expired or for another wallet; malformed signature |
+| 401 | The signature is not this wallet's signature of this message |
+| 402 | The wallet holds less than the minimum (`held`, `required`) |
+| 403 | Holder access for this wallet was switched off by Vantax |
+| 409 | The challenge was already used |
+| 503 | The Solana RPC did not answer (`Retry-After`), or holder access is off |
+
+One key per wallet: claiming again issues a new key and disables the previous
+one (`replaced` names it), which is also how to replace a lost key. Wallets are
+checked again on a schedule (every six hours by default): below the minimum the
+key moves to Free, and back on Holder once the wallet holds enough. The wallet
+address is kept with the key id so it can be checked again; it is not written to
+the public audit trail.
 
 ### Your account
 

@@ -124,13 +124,15 @@ dd code,.rules code{font:500 13px var(--mono);color:var(--ink);background:var(--
 .status p{margin:0;max-width:62ch;opacity:.85}
 footer{padding:48px 0 56px;color:var(--mute);font-size:15px;display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
 @media(prefers-reduced-motion:reduce){.ed::after{animation:none}html{scroll-behavior:auto}.btn:hover{transform:none}}
+header{flex-wrap:wrap;gap:12px}nav{display:flex;flex-wrap:wrap;gap:4px 20px}nav a{margin-left:0;white-space:nowrap}
+.holders{margin:16px 2px 0;max-width:72ch}
 </style>
 </head>
 <body>
 <div class="wrap">
 <header>
   <a class="logo" href="#top">Vantax<b>.</b></a>
-  <nav><a href="#platform">Platform</a><a href="migrate.html">Migrate</a><a href="verify.html">Verify a bet</a><a href="#pricing">Pricing</a><a href="#rules">Design rules</a><a href="#status">Status</a><a href="https://x.com/VantaxFounder">@VantaxFounder</a></nav>
+  <nav><a href="#platform">Platform</a><a href="migrate.html">Migrate</a><a href="verify.html">Verify a bet</a><a href="#pricing">Pricing</a><a href="holders.html">Holders</a><a href="#rules">Design rules</a><a href="#status">Status</a><a href="https://x.com/VantaxFounder">@VantaxFounder</a></nav>
 </header>
 
 <main id="top">
@@ -310,6 +312,7 @@ const scheme = "ed25519";</textarea></div>
       <button type="button" id="copy-ca">Copy</button>
       <a href="https://solscan.io/token/DjWckUixq3we6r9SqNoFS5MeppBt146TkJAkBxxFpump" rel="noopener">Check on Solscan</a>
     </div>
+    <p class="holders" id="holders-cta"><b>Holding $VANTAX?</b> A wallet with at least <span id="holders-min">1,000,000</span> $VANTAX can get a Vantax API key with the migration scanner. Sign a message to prove the wallet is yours: no transaction, no tokens moved. <a href="holders.html">Get holder access</a></p>
     <p class="note">Check the address character by character wherever you paste it. Vantax will never ask for your seed phrase or private key, and never asks you to send tokens to claim anything. You don't need the token to use any Vantax product. This is not financial advice or an invitation to buy; cryptoassets are high risk and you can lose everything you put in.</p>
   </section>
 </main>
@@ -425,6 +428,18 @@ const scheme = "ed25519";</textarea></div>
       note.appendChild(document.createTextNode(" "));note.appendChild(link);note.appendChild(document.createTextNode("."));
     }
   }).catch(contact);
+})();
+</script>
+<script>
+(function(){
+  // Holder access: show the minimum from the API, or hide the line when it is off.
+  var p=document.getElementById("holders-cta");if(!p)return;
+  var base=(document.querySelector('meta[name="vantax-api"]')||{}).content||"";
+  fetch(base+"/api/v1/plans",{headers:{"Accept":"application/json"}}).then(function(r){return r.json()}).then(function(d){
+    var h=d.holder||{};
+    if(!h.enabled){p.hidden=true;return}
+    document.getElementById("holders-min").textContent=String(h.min_tokens).replace(/\B(?=(\d{3})+(?!\d))/g,",");
+  }).catch(function(){});
 })();
 </script>
 </body>
