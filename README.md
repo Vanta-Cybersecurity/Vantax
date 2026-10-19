@@ -293,6 +293,7 @@ without the scanner).
 |---|---|---|---|---|
 | No key | 25 / day per IP | 1 (5) | No | Just call the API |
 | Free | 100 / month | 2 (10) | No | Issued by Vantax; also where a cancelled subscription lands |
+| Holder | 1,000 / month | 5 (15) | Yes | Hold the Vantax token and sign a message on the site's [holders page](https://vantax-cybersecurity.com/holders.html) |
 | Pro | 10,000 / month | 10 (30) | Yes | Subscribe on the site (Stripe) |
 | Enterprise | 250,000 / month | 50 (100) | Yes | Subscribe on the site (Stripe), or switch from Pro in the customer portal |
 
@@ -343,6 +344,7 @@ client-side with the CLI (or any FIPS 204 library).
 | `POST /api/v1/fairness/verify`, `/fairness/derive` | Check a provably fair receipt (`fair`, `pending`, `unfair` or `invalid`); recompute an outcome |
 | `GET /health`, `/api/v1/stats`, `/chains`, `/plans`, `/scan/rules`, `/gateway/audit`, `/gateway/keys` | Free, not metered |
 | `POST /api/v1/billing/webhook`, `/billing/claim` | Stripe events in; a purchase's key out, once |
+| `POST /api/v1/holder/challenge`, `/holder/claim` | A message for a wallet to sign; a Holder key out, once, for a wallet holding the minimum |
 | `GET /api/v1/account`, `POST /api/v1/account/key/rotate` | Plan, usage and subscription; a new key (the old one stops at once) |
 
 Keys (`X-API-Key: vtx_…`) come from a Stripe purchase, or from Vantax directly.

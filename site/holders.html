@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vantax holder access</title>
+<meta name="description" content="Wallets that hold $VANTAX can get a Vantax API key with the post-quantum migration scanner. Sign a message to prove the wallet is yours: no transaction, no tokens moved.">
+<meta name="referrer" content="no-referrer">
+<!-- Base URL of the Vantax API (no trailing slash). Empty means this site's own
+     origin, for when the site and the API share a host (nginx proxies /api/). -->
+<meta name="vantax-api" content="https://api.vantax-cybersecurity.com">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://vantax-cybersecurity.com/holders.html">
+<meta property="og:title" content="Vantax holder access">
+<meta property="og:description" content="Hold $VANTAX, sign a message, get a Vantax API key with the post-quantum migration scanner.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@VantaxFounder">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f6;--surface:#fff;--ink:#0b1b33;--mute:#56657f;--line:#cfd7e4;--flag:#c2255c;--flagbg:#fde8ef;--ok:#0b7a7c;--okbg:#e2f4f4;--accent:#2b3cff;
+--sans:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1020;--surface:#111a30;--ink:#e8edf7;--mute:#8fa0bf;--line:#243252;--flag:#ff6b9a;--flagbg:#3a1526;--ok:#4fd1d3;--okbg:#0f2f33;--accent:#8a96ff}}
+:root[data-theme="dark"]{--bg:#0a1020;--surface:#111a30;--ink:#e8edf7;--mute:#8fa0bf;--line:#243252;--flag:#ff6b9a;--flagbg:#3a1526;--ok:#4fd1d3;--okbg:#0f2f33;--accent:#8a96ff}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
+.wrap{max-width:760px;margin:0 auto;padding:0 20px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 0;flex-wrap:wrap}
+.logo{font-weight:800;font-size:22px;letter-spacing:-.02em;text-decoration:none}
+.logo b{color:var(--accent)}
+header nav a{margin-left:18px;font-size:15px;color:var(--mute);text-decoration:none}
+header nav a:first-child{margin-left:0}
+header nav a:hover{color:var(--ink)}
+h1{font-size:clamp(36px,7vw,60px);line-height:1.02;letter-spacing:-.035em;font-weight:800;margin:32px 0 14px}
+.lede{font-size:clamp(17px,2.3vw,21px);color:var(--mute);margin:0 0 26px;max-width:58ch}
+.lede b{color:var(--ink)}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 26px}
+.fact{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px}
+.fact>span{display:block;font-size:13px;color:var(--mute)}
+.fact b{font-size:19px;letter-spacing:-.01em;overflow-wrap:anywhere}
+.card{background:var(--surface);border:1.5px solid var(--ink);border-radius:16px;padding:22px;margin:0 0 18px}
+.card h2{font-size:21px;letter-spacing:-.01em;margin:0 0 12px}
+ol.steps{margin:0 0 18px;padding:0;list-style:none;counter-reset:s}
+ol.steps li{counter-increment:s;position:relative;padding:0 0 12px 40px}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:1px;width:27px;height:27px;border-radius:50%;border:1.5px solid var(--ink);font:700 14px/24px var(--sans);text-align:center}
+ol.steps li.done::before{content:"✓";background:var(--ok);border-color:var(--ok);color:var(--surface)}
+ol.steps li.now::before{background:var(--ink);color:var(--surface)}
+ol.steps b{display:block;line-height:1.35}
+ol.steps span{color:var(--mute);font-size:15px}
+.wallets{display:flex;flex-wrap:wrap;gap:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:10px;font:600 16px var(--sans);text-decoration:none;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;min-height:48px}
+.btn.p{background:var(--ink);color:var(--bg)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.who{font:500 14.5px var(--mono);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;margin:0 0 14px;overflow-wrap:anywhere}
+.key{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;margin:6px 0 14px}
+.key code{flex:1 1 300px;min-width:0;font:500 15px/1.5 var(--mono);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;word-break:break-all;user-select:all}
+.warn{border-left:4px solid var(--flag);background:var(--flagbg);padding:10px 14px;border-radius:0 8px 8px 0;margin:0 0 16px;font-size:15.5px}
+.ok{border-left:4px solid var(--ok);background:var(--okbg);padding:10px 14px;border-radius:0 8px 8px 0;margin:0 0 16px;font-size:15.5px}
+.safe{border:1.5px dashed var(--line);border-radius:12px;padding:14px 16px;font-size:15px;color:var(--mute);margin:0 0 18px}
+.safe b{color:var(--ink)}
+pre{font:400 14px/1.7 var(--mono);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;margin:8px 0 16px}
+.mute{color:var(--mute);font-size:15px}
+.links{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}
+.small{font-size:13.5px;color:var(--mute);margin:8px 2px 0}
+[hidden]{display:none!important}
+footer{padding:36px 0 56px;color:var(--mute);font-size:15px;display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between}
+@media(max-width:560px){.facts{grid-template-columns:1fr}.fact{display:flex;justify-content:space-between;align-items:baseline;gap:12px}.fact>span{display:inline}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="logo" href="/">Vantax<b>.</b></a>
+  <nav><a href="/#pricing">Pricing</a><a href="/#token">Official CA</a><a href="https://x.com/VantaxFounder">@VantaxFounder</a></nav>
+</header>
+<main>
+  <h1>Holder access.</h1>
+  <p class="lede">Hold at least <b><span data-min>1,000,000</span> <span data-token>$VANTAX</span></b> in a Solana wallet and get a Vantax API key with the post-quantum migration scanner. Prove the wallet is yours by signing a message. No transaction, no tokens moved.</p>
+
+  <div class="facts" aria-label="What holders get">
+    <div class="fact"><span>Minimum holding</span><b><span data-min>1,000,000</span></b></div>
+    <div class="fact"><span>Calls a month</span><b data-quota>1,000</b></div>
+    <div class="fact"><span>Scanner</span><b>Included</b></div>
+  </div>
+
+  <p class="warn" id="closed" hidden>Holder access isn't switched on right now. Check back soon, or see <a href="/#pricing">Pro and Enterprise</a>.</p>
+
+  <div class="card" id="flow">
+    <h2>Get your key</h2>
+    <ol class="steps">
+      <li id="s1" class="now"><b>Connect your wallet</b><span>Phantom, Solflare or Backpack.</span></li>
+      <li id="s2"><b>Sign a message</b><span>It's free. Your wallet shows the text: a Vantax message naming your wallet, nothing else.</span></li>
+      <li id="s3"><b>Get your API key</b><span>Vantax reads your <span data-token>$VANTAX</span> balance, then shows your key once.</span></li>
+    </ol>
+    <div class="who" id="who" hidden></div>
+    <div class="wallets" id="wallets"></div>
+    <div class="links" id="actions" hidden>
+      <button class="btn p" id="sign" type="button">Sign and get my key</button>
+      <button class="btn" id="switch" type="button">Use another wallet</button>
+    </div>
+    <p class="warn" id="error" role="alert" hidden></p>
+    <p class="mute" id="busy" role="status" hidden></p>
+  </div>
+
+  <div class="card" id="done" hidden>
+    <h2>Your API key <span class="mute">(holder)</span></h2>
+    <p class="ok" id="held"></p>
+    <div class="key"><code id="key"></code><button class="btn p" id="copy" type="button">Copy</button></div>
+    <p class="warn"><b>This is the only time the key is shown.</b> Store it in a password manager or secret store now. We keep only a hash of it. Lost it? Come back and sign again: you get a new key and the old one stops.</p>
+    <h2>Scan your code</h2>
+    <pre id="cli">export VANTAX_API_KEY=vtx_…
+vantax scan . --fail-on high</pre>
+    <p class="mute" id="terms"></p>
+    <div class="links">
+      <a class="btn" href="https://github.com/Vanta-Cybersecurity/Vantax#scanner-in-ci">Scanner in CI</a>
+      <a class="btn" href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/API.md">API docs</a>
+    </div>
+  </div>
+
+  <div class="safe">
+    <b>Stay safe.</b> This page only asks your wallet to <b>sign a text message</b>. If your wallet shows a transaction, an approval or a request to send anything, reject it: that isn't us. Vantax will never ask for your seed phrase or private key, and never asks you to send tokens.
+  </div>
+
+  <p class="small">How it works: your key is on the Holder plan while the wallet holds the minimum. Vantax checks the balance again about every <span data-hours>6</span> hours; below the minimum the key moves to the Free plan, and it comes back once the wallet holds enough again. One key per wallet. You don't need the token to use Vantax: anyone can subscribe to <a href="/#pricing">Pro or Enterprise</a>. Holder access can change or end. This is not financial advice or an invitation to buy; cryptoassets are high risk.</p>
+</main>
+<footer>
+  <span>Vantax. Post-quantum security, built to be verified.</span>
+  <span><a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub</a> &nbsp; <a href="/#token">Official CA</a></span>
+</footer>
+</div>
+<script>
+(function(){
+  "use strict";
+  var base=(document.querySelector('meta[name="vantax-api"]')||{}).content||"";
+  var $=function(id){return document.getElementById(id)};
+  var all=function(sel){return Array.prototype.slice.call(document.querySelectorAll(sel))};
+  var state={provider:null,name:"",wallet:"",info:null};
+
+  function grouped(n){
+    var s=String(n),parts=s.split("."),i=parts[0].replace(/\B(?=(\d{3})+(?!\d))/g,",");
+    return parts.length>1?i+"."+parts[1]:i;
+  }
+  function short(a){return a.length>12?a.slice(0,6)+"…"+a.slice(-6):a}
+  function showError(text){$("error").textContent=text;$("error").hidden=!text}
+  function busy(text){$("busy").textContent=text||"";$("busy").hidden=!text;$("sign").disabled=!!text}
+  function step(n){
+    ["s1","s2","s3"].forEach(function(id,i){
+      var li=$(id);li.classList.toggle("done",i<n-1);li.classList.toggle("now",i===n-1);
+    });
+  }
+
+  // ── Wallets ──────────────────────────────────────────────────────────────
+  function providers(){
+    var w=window,out=[];
+    if(w.phantom&&w.phantom.solana&&w.phantom.solana.isPhantom)out.push({name:"Phantom",p:w.phantom.solana});
+    if(w.solflare&&w.solflare.isSolflare)out.push({name:"Solflare",p:w.solflare});
+    if(w.backpack&&(w.backpack.isBackpack||w.backpack.signMessage))out.push({name:"Backpack",p:w.backpack});
+    if(!out.length&&w.solana&&w.solana.signMessage)out.push({name:"your wallet",p:w.solana});
+    return out;
+  }
+  function address(pk){
+    if(!pk)return "";
+    if(typeof pk==="string")return pk;
+    if(pk.toBase58)return pk.toBase58();
+    return String(pk);
+  }
+  function drawWallets(){
+    var box=$("wallets");box.textContent="";
+    var found=providers();
+    found.forEach(function(f){
+      var b=document.createElement("button");
+      b.type="button";b.className="btn p";b.textContent="Connect "+f.name;
+      b.addEventListener("click",function(){connect(f)});
+      box.appendChild(b);
+    });
+    if(found.length)return;
+    var mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    var here=location.href.split("#")[0];
+    if(mobile){
+      var p=document.createElement("p");p.className="mute";p.style.margin="0 0 10px";
+      p.textContent="Open this page inside your wallet app to connect:";
+      box.appendChild(p);
+      [["Open in Phantom","https://phantom.app/ul/browse/"+encodeURIComponent(here)+"?ref="+encodeURIComponent(location.origin)],
+       ["Open in Solflare","https://solflare.com/ul/v1/browse/"+encodeURIComponent(here)+"?ref="+encodeURIComponent(location.origin)]].forEach(function(l){
+        var a=document.createElement("a");a.className="btn p";a.href=l[1];a.textContent=l[0];box.appendChild(a);
+      });
+    }else{
+      var q=document.createElement("p");q.className="mute";q.style.margin="0";
+      q.textContent="No Solana wallet found in this browser. Install Phantom, Solflare or Backpack, then reload this page.";
+      box.appendChild(q);
+    }
+  }
+  function connect(f){
+    showError("");busy("Waiting for "+f.name+"…");
+    Promise.resolve(f.p.connect()).then(function(res){
+      var pk=(res&&res.publicKey)||f.p.publicKey;
+      var a=address(pk);
+      if(!a)throw new Error("no address");
+      state.provider=f.p;state.name=f.name;state.wallet=a;
+      $("who").textContent="Connected: "+a;$("who").hidden=false;
+      $("wallets").hidden=true;$("actions").hidden=false;
+      busy("");step(2);
+    }).catch(function(e){
+      busy("");
+      showError(rejected(e)?"You cancelled the connection. Nothing was shared.":"Couldn't connect to "+f.name+". Unlock it and try again.");
+    });
+  }
+  function rejected(e){
+    return !!e&&(e.code===4001||/reject|denied|cancel/i.test(String(e.message||e)));
+  }
+  function toBase64(bytes){
+    var s="";for(var i=0;i<bytes.length;i++)s+=String.fromCharCode(bytes[i]);
+    return btoa(s);
+  }
+
+  // ── API ──────────────────────────────────────────────────────────────────
+  function api(path,body){
+    return fetch(base+path,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(body)})
+      .then(function(r){return r.json().catch(function(){return {}}).then(function(d){return {s:r.status,d:d}})});
+  }
+  function explain(x){
+    var d=x.d||{},info=state.info||{};
+    switch(x.s){
+      case 402:return "This wallet holds "+grouped(d.held||"0")+" "+(d.token||info.token||"$VANTAX")+". Holder access needs "+grouped(d.required||info.min_tokens||"")+".";
+      case 401:return "The signature didn't match this wallet. Try again, and sign with the wallet shown above. (Ledger hardware wallets aren't supported yet: use a software wallet that holds the tokens.)";
+      case 409:return "That signature was already used. Press the button to sign a fresh one.";
+      case 429:return "Too many tries in a row. Wait a few seconds and try again.";
+      case 403:return d.error||"Holder access for this wallet is switched off. Contact @VantaxFounder.";
+      case 503:return d.error||"Vantax couldn't check your balance just now. Try again in a minute.";
+      default:return d.error||"Something went wrong ("+x.s+"). Try again in a minute.";
+    }
+  }
+  function sign(){
+    if(!state.provider)return;
+    showError("");busy("Getting a message to sign…");
+    var ch;
+    api("/api/v1/holder/challenge",{wallet:state.wallet}).then(function(x){
+      if(x.s!==200)throw {api:x};
+      ch=x.d;
+      busy("Check "+state.name+": sign the Vantax message.");
+      return state.provider.signMessage(new TextEncoder().encode(ch.message),"utf8");
+    }).then(function(res){
+      var sig=res&&res.signature?res.signature:res;
+      sig=new Uint8Array(sig);
+      if(sig.length!==64)throw new Error("unexpected signature");
+      step(3);busy("Checking your "+((state.info&&state.info.token)||"$VANTAX")+" balance…");
+      return api("/api/v1/holder/claim",{wallet:state.wallet,message:ch.message,signature:toBase64(sig),challenge:ch.challenge});
+    }).then(function(x){
+      if(x.s!==201)throw {api:x};
+      busy("");show(x.d);
+    }).catch(function(e){
+      busy("");step(2);
+      if(e&&e.api)showError(explain(e.api));
+      else if(rejected(e))showError("You cancelled the signature. Nothing was signed.");
+      else if(e instanceof TypeError)showError("Can't reach Vantax. Check your connection and try again.");
+      else showError("Your wallet couldn't sign the message. Update it, or try another wallet.");
+    });
+  }
+  function show(d){
+    $("flow").hidden=true;
+    $("key").textContent=d.api_key;
+    $("cli").textContent="export VANTAX_API_KEY="+d.api_key+"\nvantax scan . --fail-on high";
+    $("held").textContent="Wallet "+short(d.wallet||state.wallet)+" holds "+grouped(d.held)+" "+(d.token||"$VANTAX")+"."+(d.replaced?" Your previous key ("+d.replaced+") has stopped working.":"");
+    var info=state.info||{},hours=Math.round(info.recheck_hours||d.recheck_hours||6);
+    $("terms").textContent="The wallet is checked again about every "+hours+" hours. Below "+grouped(d.required||info.min_tokens||"")+" "+(d.token||"$VANTAX")+" the key moves to the Free plan (no scanner), and it comes back once the wallet holds enough again. "+grouped(info.monthly_quota||1000)+" calls a month, reset on the 1st.";
+    $("done").hidden=false;
+    $("done").scrollIntoView({behavior:"smooth",block:"start"});
+  }
+
+  $("sign").addEventListener("click",sign);
+  $("switch").addEventListener("click",function(){
+    var p=state.provider;state.provider=null;state.wallet="";
+    try{if(p&&p.disconnect)p.disconnect()}catch(e){}
+    $("who").hidden=true;$("actions").hidden=true;$("wallets").hidden=false;showError("");step(1);drawWallets();
+  });
+  $("copy").addEventListener("click",function(){
+    var k=$("key").textContent,b=$("copy");
+    var done=function(){b.textContent="Copied";setTimeout(function(){b.textContent="Copy"},2000)};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(k).then(done,function(){})}
+    else{var r=document.createRange();r.selectNodeContents($("key"));var s=getSelection();s.removeAllRanges();s.addRange(r);try{document.execCommand("copy");done()}catch(e){}}
+  });
+
+  // Requirements come from the API (GET /api/v1/plans), so they are set in
+  // one place: the server's VANTAX_HOLDER_* settings.
+  fetch(base+"/api/v1/plans",{headers:{"Accept":"application/json"}}).then(function(r){
+    if(!r.ok)throw new Error(r.status);return r.json();
+  }).then(function(d){
+    var h=d.holder||{};
+    if(!h.enabled){$("closed").hidden=false;$("flow").hidden=true;return}
+    state.info=h;
+    all("[data-min]").forEach(function(e){e.textContent=grouped(h.min_tokens)});
+    all("[data-token]").forEach(function(e){e.textContent=h.token||"$VANTAX"});
+    all("[data-quota]").forEach(function(e){e.textContent=grouped(h.monthly_quota)});
+    all("[data-hours]").forEach(function(e){e.textContent=String(Math.round(h.recheck_hours||6))});
+  }).catch(function(){});
+
+  // Wallet extensions can inject a moment after the page loads.
+  drawWallets();
+  if(!providers().length){setTimeout(drawWallets,600);window.addEventListener("load",function(){setTimeout(drawWallets,300)})}
+})();
+</script>
+</body>
+</html>
