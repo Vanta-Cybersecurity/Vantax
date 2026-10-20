@@ -484,6 +484,63 @@ key moves to Free, and back on Holder once the wallet holds enough. The wallet
 address is kept with the key id so it can be checked again; it is not written to
 the public audit trail.
 
+### Vantax Chains launches
+
+Buy a licence for your own post-quantum blockchain and download the node
+software that runs it (`launch.html` on the site does all of this). Licences
+are signed with the Vantax issuer key (ML-DSA-87); the node accepts only
+licences from that key. None of these endpoints need an API key.
+
+**`GET /api/v1/launch`** returns the offer: `price_sol`, `holder_price_sol`
+(`null` without a holder price), `pay_to` (the Solana address payments go to),
+`issuer_fingerprint` and `issuer_key`, the node builds on offer
+(`downloads`), `chains_launched` and the parameter `limits`. 404 when launches
+are off.
+
+**`POST /api/v1/launch/order`** takes the chain's parameters and the Solana
+wallet the licence names:
+
+```json
+{
+  "buyer_wallet": "<base58 address>",
+  "name": "Aurora Chain",
+  "ticker": "AUR",
+  "decimals": 9,
+  "max_supply": "1000000000",
+  "initial_supply": "100000000",
+  "block_time_secs": 5,
+  "block_reward": "1",
+  "min_fee": "0.0001",
+  "holder": { "message": "…", "challenge": "…", "signature": "…" }
+}
+```
+
+Amounts are in coins (commas allowed) with at most `decimals` decimal places,
+and `max_supply` × 10^`decimals` must fit in 64 bits. `holder` is optional: a
+signed [holder challenge](#holder-access) for `buyer_wallet` gets the holder
+price when that wallet holds the minimum. 201 returns the order:
+`order_id`, `token` (shown once: it opens the order and its downloads),
+`status` (`awaiting_payment`), `price_sol`, `pay_to`, `reference`,
+`solana_pay` (a Solana Pay URL) and `qr` (the same URL as an SVG data URI).
+400 for parameters outside the limits, 402 when the wallet doesn't hold enough
+for the holder price.
+
+Pay with the Solana Pay URL. It adds the order's `reference` to the
+transaction, which is how the payment is found: a transfer without it can't
+be matched.
+
+**`GET /api/v1/launch/order/{id}?token=…`** checks Solana for finalized
+transfers to `pay_to` that carry the reference (at most every few seconds per
+order). Once they add up to the price, the order is paid and the response
+gains `payment`, `paid_at`, `licence` and `downloads` (each `{file, path}`).
+A transaction counts towards one order only. 404 for an unknown order or a
+wrong token; 503 when Solana can't be reached (try again).
+
+**`GET /api/v1/launch/download/{id}/{file}?token=…`** downloads
+`licence.json` or a node build listed in `downloads`. 402 before payment.
+
+Unpaid orders are dropped after seven days.
+
 ### Your account
 
 | Endpoint | Returns |
