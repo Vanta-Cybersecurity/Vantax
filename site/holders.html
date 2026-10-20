@@ -90,7 +90,7 @@ footer{padding:36px 0 56px;color:var(--mute);font-size:15px;display:flex;flex-wr
     <div class="fact"><span>Scanner</span><b>Included</b></div>
   </div>
 
-  <p class="warn" id="closed" hidden>Holder access isn't switched on right now. Check back soon, or see <a href="/#pricing">Pro and Enterprise</a>.</p>
+  <p class="warn" id="closed" hidden></p>
 
   <div class="card" id="flow">
     <h2>Get your key</h2>
@@ -293,7 +293,7 @@ vantax scan . --fail-on high</pre>
     if(!r.ok)throw new Error(r.status);return r.json();
   }).then(function(d){
     var h=d.holder||{};
-    if(!h.enabled){$("closed").hidden=false;$("flow").hidden=true;return}
+    if(!h.enabled){var c=$("closed");c.textContent="Holder keys are paused for a moment. Check back soon, or see ";var a=document.createElement("a");a.href="/#pricing";a.textContent="Pro and Enterprise";c.append(a,".");c.hidden=false;$("flow").hidden=true;return}
     state.info=h;
     all("[data-min]").forEach(function(e){e.textContent=grouped(h.min_tokens)});
     all("[data-token]").forEach(function(e){e.textContent=h.token||"$VANTAX"});

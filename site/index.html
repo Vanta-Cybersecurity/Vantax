@@ -179,13 +179,13 @@ const scheme = "ed25519";</textarea></div>
   </section>
 
   <section id="platform">
-    <h2>Eleven crates. Each answers one question.</h2>
+    <h2>Twelve crates. Each answers one question.</h2>
     <p class="big">A flaw in one component never carries the authority of another. The scanner never holds a signing key, so it has none to leak.</p>
     <dl>
       <div class="row"><dt>Verify</dt><dd><code>vantax-core</code> ML-DSA-87 signing, SHA3-512 → BLAKE3 → SHA3-512 hashing, domain-separated encoding. <code>vantax-gateway</code> the policy boundary. <code>vantax-api</code> the HTTP service.</dd></div>
       <div class="row"><dt>Find</dt><dd><code>vantax-scanner</code> locates classical crypto in your code and fails your CI (Pro and Enterprise). <code>vantax-adapters</code> Bitcoin, Ethereum, Solana and generic L1 integration.</dd></div>
       <div class="row"><dt>Govern</dt><dd><code>vantax-identity</code> credentials in four states, signed machine actions. <code>vantax-sentinel</code> detection through containment and evidence. <code>vantax-bridge</code> five-gate cross-chain authorization.</dd></div>
-      <div class="row"><dt>Build with</dt><dd><code>vantax-cli</code> keys, signing, scanning, Shamir vaults and fairness checks. <code>vantax-wasm</code> ML-DSA-87 and the fairness verifier in the browser. <code>vantax-fairness</code> provably fair outcomes with post-quantum signed receipts: <a href="verify.html">verify a bet yourself</a>.</dd></div>
+      <div class="row"><dt>Build with</dt><dd><code>vantax-cli</code> keys, signing, scanning, Shamir vaults and fairness checks. <code>vantax-wasm</code> ML-DSA-87 and the fairness verifier in the browser. <code>vantax-fairness</code> provably fair outcomes with post-quantum signed receipts: <a href="verify.html">verify a bet yourself</a>. <code>vantax-chain</code> your own post-quantum blockchain: validators, sync, an API and a block explorer in one program: <a href="launch.html">launch one</a>.</dd></div>
     </dl>
   </section>
 
@@ -310,7 +310,8 @@ const scheme = "ed25519";</textarea></div>
 
   <section class="status" id="status">
     <h2>Live, and open to inspection.</h2>
-    <p>The API is running, nine of the eleven crates are open source, and the whitepaper sets out the design, the threat model and the limits. The cryptography is NIST FIPS 204 ML-DSA-87. Vantax hasn't had an independent third-party audit yet, so don't rely on it alone to custody value until a review covers your deployment.</p>
+    <p>The API is running, nine of the twelve crates are open source, and the whitepaper sets out the design, the threat model and the limits. The cryptography is NIST FIPS 204 ML-DSA-87. Vantax hasn't had an independent third-party audit yet, so don't rely on it alone to custody value until a review covers your deployment.</p>
+    <p>Check it yourself, live: <a href="https://api.vantax-cybersecurity.com/health">health</a> · <a href="https://api.vantax-cybersecurity.com/api/v1/stats">stats</a> · <a href="https://api.vantax-cybersecurity.com/api/v1/plans">plans</a> · <a href="https://api.vantax-cybersecurity.com/api/v1/launch">chain launches</a> · <a href="https://api.vantax-cybersecurity.com/api/v1/scan/rules">scanner rules</a> · <a href="https://api.vantax-cybersecurity.com/api/v1/gateway/audit">audit trail</a> · <a href="https://github.com/Vanta-Cybersecurity/Vantax">the code</a>.</p>
   </section>
 
   <section class="token" id="token" aria-labelledby="token-title">

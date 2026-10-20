@@ -126,7 +126,7 @@ footer{padding:36px 0 56px;color:var(--mute);font-size:15px;display:flex;flex-wr
     <div class="fact"><span>Hosting</span><b>Yours</b></div>
   </div>
 
-  <p class="warn" id="closed" hidden>Chain launches aren't open yet. Check back soon, or follow <a href="https://x.com/VantaxFounder">@VantaxFounder</a>.</p>
+  <p class="warn" id="closed" hidden></p>
 
   <div class="card soft" id="gets">
     <h2>What you get</h2>
@@ -261,7 +261,7 @@ footer{padding:36px 0 56px;color:var(--mute);font-size:15px;display:flex;flex-wr
     <b>Stay safe.</b> The only transaction on this page is the one-off payment of <b data-order-price data-price>6.5 SOL</b> to the Vantax launch wallet<span id="paytoline"></span>, and your wallet shows it before you approve. Vantax will never ask for your seed phrase or private key, and never DMs you a payment address. Questions: <a href="https://x.com/VantaxFounder">@VantaxFounder</a>.
   </div>
 
-  <p class="small">You're buying a software licence, not an investment: Vantax doesn't host, run or promote your chain, and has no share in it. If you offer your chain's coins to other people, the rules where you and they live apply to you. Vantax Chains is new software and hasn't had an independent security audit yet; test your network before you rely on it. The node software runs on Linux x86-64; other systems will follow. Licences are signed with ML-DSA-87; <span id="issuerline">the issuer key is shown by the Vantax API</span>.</p>
+  <p class="small">You're buying a software licence, not an investment: Vantax doesn't host, run or promote your chain, and has no share in it. If you offer your chain's coins to other people, the rules where you and they live apply to you. Vantax Chains is new software and hasn't had an independent security audit yet; test your network before you rely on it. The node software runs on Linux x86-64; other systems will follow. Licences are signed with ML-DSA-87; <span id="issuerline">the issuer key is shown by the Vantax API</span>. Check it's live yourself: <a href="https://api.vantax-cybersecurity.com/api/v1/launch">the launch API</a> answers with the price and the downloads on offer.</p>
 </main>
 <footer>
   <span>Vantax. Post-quantum security, built to be verified.</span>
@@ -456,7 +456,7 @@ footer{padding:36px 0 56px;color:var(--mute);font-size:15px;display:flex;flex-wr
       case 400:return d.error||"Something in the form isn't right. Check it and try again.";
       case 401:return "The signature didn't match this wallet. Sign with the wallet shown in the form.";
       case 402:return d.error||"This wallet doesn't hold enough for the holder price. Untick it to pay the standard price.";
-      case 404:return "Chain launches aren't open right now.";
+      case 404:return "Ordering is paused for a moment. Reload soon.";
       case 409:return "That signature was already used. Try again to sign a fresh one.";
       case 429:return "Too many tries in a row. Wait a few seconds and try again.";
       case 503:return d.error||"Vantax is busy. Try again in a minute.";
@@ -621,7 +621,9 @@ footer{padding:36px 0 56px;color:var(--mute);font-size:15px;display:flex;flex-wr
 
   api("GET","/api/v1/launch").then(function(x){
     if(x.s!==200){
-      $("closed").hidden=false;$("flow").hidden=true;
+      var c=$("closed");c.textContent="Ordering is paused for a moment. Reload soon, or check ";
+      var a=document.createElement("a");a.href="https://x.com/VantaxFounder";a.textContent="@VantaxFounder";
+      c.append(a,".");c.hidden=false;$("flow").hidden=true;
       return;
     }
     var i=x.d;state.info=i;
