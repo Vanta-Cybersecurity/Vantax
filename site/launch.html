@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vantax Chains: launch your own chain</title>
+<meta name="description" content="Your own post-quantum blockchain, ready to run on your own servers. Pick the name, ticker and supply, pay in SOL, and download a signed licence and the node software.">
+<meta name="referrer" content="no-referrer">
+<!-- Base URL of the Vantax API (no trailing slash). Empty means this site's own
+     origin, for when the site and the API share a host (nginx proxies /api/). -->
+<meta name="vantax-api" content="https://api.vantax-cybersecurity.com">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://vantax-cybersecurity.com/launch.html">
+<meta property="og:title" content="Vantax Chains: launch your own chain">
+<meta property="og:description" content="Your own post-quantum blockchain, on your own servers. ML-DSA-87 signatures on every transaction and block.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@VantaxFounder">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f6;--surface:#fff;--ink:#0b1b33;--mute:#56657f;--line:#cfd7e4;--flag:#c2255c;--flagbg:#fde8ef;--ok:#0b7a7c;--okbg:#e2f4f4;--accent:#2b3cff;
+--sans:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1020;--surface:#111a30;--ink:#e8edf7;--mute:#8fa0bf;--line:#243252;--flag:#ff6b9a;--flagbg:#3a1526;--ok:#4fd1d3;--okbg:#0f2f33;--accent:#8a96ff}}
+:root[data-theme="dark"]{--bg:#0a1020;--surface:#111a30;--ink:#e8edf7;--mute:#8fa0bf;--line:#243252;--flag:#ff6b9a;--flagbg:#3a1526;--ok:#4fd1d3;--okbg:#0f2f33;--accent:#8a96ff}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
+.wrap{max-width:820px;margin:0 auto;padding:0 20px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 0;flex-wrap:wrap}
+.logo{font-weight:800;font-size:22px;letter-spacing:-.02em;text-decoration:none}
+.logo b{color:var(--accent)}
+header nav{display:flex;flex-wrap:wrap;gap:2px 18px}
+header nav a{font-size:15px;color:var(--mute);text-decoration:none;white-space:nowrap}
+header nav a:hover,header nav a[aria-current]{color:var(--ink)}
+h1{font-size:clamp(36px,7vw,60px);line-height:1.02;letter-spacing:-.035em;font-weight:800;margin:32px 0 14px}
+.lede{font-size:clamp(17px,2.3vw,21px);color:var(--mute);margin:0 0 26px;max-width:60ch}
+.lede b{color:var(--ink)}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 26px}
+.fact{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px}
+.fact>span{display:block;font-size:13px;color:var(--mute)}
+.fact b{font-size:19px;letter-spacing:-.01em;overflow-wrap:anywhere}
+.card{background:var(--surface);border:1.5px solid var(--ink);border-radius:16px;padding:22px;margin:0 0 18px}
+.card.soft{border-color:var(--line)}
+.card h2{font-size:21px;letter-spacing:-.01em;margin:0 0 12px}
+.card h3{font-size:17px;margin:18px 0 8px}
+ul.gets{margin:0;padding:0;list-style:none}
+ul.gets li{padding:0 0 10px 26px;position:relative}
+ul.gets li::before{content:"";position:absolute;left:4px;top:.62em;width:9px;height:9px;border-radius:2px;background:var(--accent)}
+ul.gets b{color:var(--ink)}
+ul.gets span{color:var(--mute)}
+ol.steps{margin:0 0 18px;padding:0;list-style:none;counter-reset:s;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+ol.steps li{counter-increment:s;position:relative;padding:0 0 0 38px;line-height:1.3;min-height:30px}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:27px;height:27px;border-radius:50%;border:1.5px solid var(--ink);font:700 14px/24px var(--sans);text-align:center}
+ol.steps li.done::before{content:"✓";background:var(--ok);border-color:var(--ok);color:var(--surface)}
+ol.steps li.now::before{background:var(--ink);color:var(--surface)}
+ol.steps b{display:block;font-size:15.5px}
+ol.steps li>span{color:var(--mute);font-size:13.5px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.wide{grid-column:1/-1}
+.field label{font-weight:600;font-size:15px}
+.field small{color:var(--mute);font-size:13.5px;line-height:1.45}
+input[type=text],input[type=number]{font:500 16px var(--mono);color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;width:100%;min-height:48px}
+input:focus{border-color:var(--ink);outline:none}
+input[aria-invalid=true]{border-color:var(--flag)}
+.inline{display:flex;gap:10px;flex-wrap:wrap}
+.inline input{flex:1 1 260px;min-width:0}
+.check{display:flex;gap:10px;align-items:flex-start;background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15.5px;cursor:pointer}
+.check input{width:20px;height:20px;margin:3px 0 0;flex:none;accent-color:var(--ink)}
+.check span{color:var(--mute)}
+.check b{color:var(--ink)}
+.summary{border:1.5px dashed var(--line);border-radius:12px;padding:12px 14px;font-size:15px;color:var(--mute);margin:16px 0}
+.summary b{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:10px;font:600 16px var(--sans);text-decoration:none;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;min-height:48px}
+.btn.p{background:var(--ink);color:var(--bg)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.pay{display:grid;grid-template-columns:220px 1fr;gap:20px;align-items:start}
+.qr{width:220px;height:220px;border-radius:12px;border:1.5px solid var(--line);background:#fff;display:block;image-rendering:pixelated}
+.amount{font-size:clamp(30px,5vw,40px);font-weight:800;letter-spacing:-.02em;line-height:1.1;margin:0 0 6px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14.5px;margin:12px 0}
+.kv dt{color:var(--mute)}
+.kv dd{margin:0;font:500 13.5px/1.5 var(--mono);overflow-wrap:anywhere}
+.code{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;margin:6px 0 14px}
+.code code{flex:1 1 300px;min-width:0;font:500 14px/1.5 var(--mono);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;word-break:break-all;user-select:all}
+.warn{border-left:4px solid var(--flag);background:var(--flagbg);padding:10px 14px;border-radius:0 8px 8px 0;margin:0 0 16px;font-size:15.5px}
+.ok{border-left:4px solid var(--ok);background:var(--okbg);padding:10px 14px;border-radius:0 8px 8px 0;margin:0 0 16px;font-size:15.5px}
+.status{display:flex;align-items:center;gap:10px;font-size:15.5px;margin:14px 0 0}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--accent);flex:none;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+@media(prefers-reduced-motion:reduce){.dot{animation:none}}
+.safe{border:1.5px dashed var(--line);border-radius:12px;padding:14px 16px;font-size:15px;color:var(--mute);margin:0 0 18px;overflow-wrap:anywhere}
+.safe b{color:var(--ink)}
+pre{font:400 14px/1.7 var(--mono);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;margin:8px 0 16px;white-space:pre}
+.mute{color:var(--mute);font-size:15px}
+.small{font-size:13.5px;color:var(--mute);margin:8px 2px 0;overflow-wrap:anywhere}
+[hidden]{display:none!important}
+footer{padding:36px 0 56px;color:var(--mute);font-size:15px;display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between}
+@media(max-width:640px){
+  .grid{grid-template-columns:1fr}
+  .pay{grid-template-columns:1fr;justify-items:start}
+  ol.steps{grid-template-columns:1fr;gap:10px}
+}
+@media(max-width:560px){.facts{grid-template-columns:1fr}.fact{display:flex;justify-content:space-between;align-items:baseline;gap:12px}.fact>span{display:inline}}
+</style>
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="logo" href="/">Vantax<b>.</b></a>
+  <nav><a href="/#pricing">Pricing</a><a href="holders.html">Holders</a><a href="launch.html" aria-current="page">Launch a chain</a><a href="https://x.com/VantaxFounder">@VantaxFounder</a></nav>
+</header>
+<main>
+  <h1>Launch your own chain.</h1>
+  <p class="lede">Your own <b>post-quantum blockchain</b>, ready to run on your own servers. Pick the name, ticker and supply, pay <b data-price>6.5 SOL</b> once, and download a licence signed by Vantax together with the node software. You host it and you run it. Vantax takes no cut afterwards.</p>
+
+  <div class="facts" aria-label="At a glance">
+    <div class="fact"><span>One-off price</span><b data-price>6.5 SOL</b></div>
+    <div class="fact"><span>Signatures</span><b>ML-DSA-87</b></div>
+    <div class="fact"><span>Hosting</span><b>Yours</b></div>
+  </div>
+
+  <p class="warn" id="closed" hidden>Chain launches aren't open yet. Check back soon, or follow <a href="https://x.com/VantaxFounder">@VantaxFounder</a>.</p>
+
+  <div class="card soft" id="gets">
+    <h2>What you get</h2>
+    <ul class="gets">
+      <li><b>The node software.</b> <span>One program for Linux (x86-64) that runs a validator, syncs with your other nodes, serves a JSON API and hosts a block explorer for your chain.</span></li>
+      <li><b>Post-quantum signatures.</b> <span>Every account, transaction and block is signed with ML-DSA-87 (NIST FIPS 204), not the elliptic-curve signatures a quantum computer would break.</span></li>
+      <li><b>A signed licence.</b> <span>Your chain's name, ticker and supply rules, and your Solana wallet, signed with the Vantax issuer key. It's built into your chain's first block.</span></li>
+      <li><b>Validators you choose.</b> <span>1 to 21 validators take turns making blocks (proof of authority). The chain keeps going while more than half of them are online.</span></li>
+      <li><b>Balances checked in every block.</b> <span>Nodes refuse any block that spends more than an account holds, reuses a nonce or mints more than the reward.</span></li>
+    </ul>
+  </div>
+
+  <div class="card" id="flow">
+    <ol class="steps" aria-label="Progress">
+      <li id="s1" class="now"><b>Design your chain</b><span>Name, ticker, supply</span></li>
+      <li id="s2"><b>Pay <span data-order-price data-price>6.5 SOL</span></b><span>With any Solana Pay wallet</span></li>
+      <li id="s3"><b>Download and run</b><span>Licence and node software</span></li>
+    </ol>
+
+    <p class="ok" id="resume" hidden></p>
+
+    <form id="form" novalidate>
+      <div class="grid">
+        <div class="field">
+          <label for="name">Chain name</label>
+          <input type="text" id="name" maxlength="40" autocomplete="off" spellcheck="false" placeholder="Aurora Chain" required>
+          <small>1 to 40 characters.</small>
+        </div>
+        <div class="field">
+          <label for="ticker">Ticker</label>
+          <input type="text" id="ticker" maxlength="10" autocomplete="off" spellcheck="false" placeholder="AUR" style="text-transform:uppercase" required>
+          <small>2 to 10 capital letters or digits.</small>
+        </div>
+        <div class="field">
+          <label for="maxs">Maximum supply</label>
+          <input type="text" id="maxs" inputmode="decimal" autocomplete="off" value="1,000,000,000">
+          <small>The most coins that can ever exist.</small>
+        </div>
+        <div class="field">
+          <label for="init">Initial supply</label>
+          <input type="text" id="init" inputmode="decimal" autocomplete="off" value="100,000,000">
+          <small>Created at launch in your founder wallet.</small>
+        </div>
+        <div class="field">
+          <label for="reward">Block reward</label>
+          <input type="text" id="reward" inputmode="decimal" autocomplete="off" value="1">
+          <small>New coins for the validator that makes each block, until the maximum is reached. 0 for none.</small>
+        </div>
+        <div class="field">
+          <label for="fee">Minimum fee</label>
+          <input type="text" id="fee" inputmode="decimal" autocomplete="off" value="0.0001">
+          <small>Smallest fee a transfer can pay. Fees go to the validator.</small>
+        </div>
+        <div class="field">
+          <label for="btime">Block time (seconds)</label>
+          <input type="number" id="btime" min="1" max="600" step="1" value="5">
+          <small>1 to 600. Blocks come this often while there's traffic, and at least every 10 minutes when it's quiet.</small>
+        </div>
+        <div class="field">
+          <label for="dec">Decimals</label>
+          <input type="number" id="dec" min="0" max="12" step="1" value="9">
+          <small>0 to 12. With 9, one coin splits into a billion units.</small>
+        </div>
+        <div class="field wide">
+          <label for="wallet">Your Solana wallet</label>
+          <div class="inline">
+            <input type="text" id="wallet" autocomplete="off" spellcheck="false" placeholder="The wallet your licence will name">
+            <span id="connectors" class="inline" style="flex:0 1 auto"></span>
+          </div>
+          <small>Your licence names this wallet as the owner. Use one you control. It doesn't have to be the wallet you pay from.</small>
+        </div>
+        <label class="check wide" id="holderbox" hidden>
+          <input type="checkbox" id="holder">
+          <span><b>Holder price: <span data-holder-price>5 SOL</span>.</b> For wallets holding at least <span data-min>1,000,000</span> <span data-token>$VANTAX</span>. You'll connect that wallet and sign a message to prove it's yours (no transaction). The licence then names that wallet.</span>
+        </label>
+      </div>
+
+      <div class="summary" id="summary" aria-live="polite"></div>
+      <p class="warn" id="error" role="alert" hidden></p>
+      <div class="links">
+        <button class="btn p" id="create" type="submit">Continue to payment</button>
+      </div>
+      <p class="mute" id="busy" role="status" hidden></p>
+    </form>
+
+    <div id="paybox" hidden>
+      <div class="pay">
+        <img class="qr" id="qr" alt="Solana Pay QR code for this order" width="220" height="220">
+        <div>
+          <p class="amount" id="amount"></p>
+          <p class="mute" style="margin:0 0 12px">Scan with Phantom, Solflare or Backpack on your phone, or open the payment in your wallet app. The wallet shows the amount and the Vantax address before you approve.</p>
+          <div class="links">
+            <a class="btn p" id="paylink" href="#">Open in wallet app</a>
+            <button class="btn" id="copypay" type="button">Copy payment link</button>
+          </div>
+        </div>
+      </div>
+      <dl class="kv">
+        <dt>Chain</dt><dd id="o-chain"></dd>
+        <dt>Pay to</dt><dd id="o-payto"></dd>
+        <dt>Reference</dt><dd id="o-ref"></dd>
+        <dt>Order</dt><dd id="o-id"></dd>
+      </dl>
+      <p class="warn"><b>Pay through the QR code or the button.</b> They add this order's reference to the transaction, which is how Vantax finds your payment. A plain transfer from an exchange can't be matched to your order.</p>
+      <h3>Your order link</h3>
+      <p class="mute" style="margin:0">It's the only way back to this order and your downloads. Save it somewhere private, and don't share it.</p>
+      <div class="code"><code id="olink"></code><button class="btn" id="copylink" type="button">Copy</button></div>
+      <div class="status" id="paystatus" role="status"><span class="dot" aria-hidden="true"></span><span id="paytext">Waiting for your payment…</span></div>
+      <p class="warn" id="payerror" role="alert" hidden style="margin-top:14px"></p>
+      <div class="links" style="margin-top:12px"><button class="btn" id="checknow" type="button">Check now</button><button class="btn" id="startover" type="button">Start a new chain</button></div>
+    </div>
+
+    <div id="donebox" hidden>
+      <p class="ok" id="paidline"></p>
+      <h3 style="margin-top:0">Downloads</h3>
+      <div class="links" id="downloads"></div>
+      <p class="small" id="nobuild" hidden>The node software download will appear here shortly. Your licence is ready now: keep it safe.</p>
+      <h3>Start your chain</h3>
+      <pre id="quick"></pre>
+      <p class="mute">The setup command checks your licence, then creates your validator keys, a founder wallet holding the initial supply, and <code>genesis.json</code>. Every node of your chain uses the same <code>genesis.json</code>. Open <code>http://your-server:7700</code> for the explorer. <code>START-HERE.txt</code> and the README in the download walk through the rest.</p>
+      <dl class="kv">
+        <dt>Licence</dt><dd id="l-id"></dd>
+        <dt>Owner</dt><dd id="l-owner"></dd>
+        <dt>Payment</dt><dd id="l-pay"></dd>
+        <dt>Signed by</dt><dd id="l-issuer"></dd>
+      </dl>
+      <p class="warn"><b>Keep your keys safe.</b> <code>validator-*.key</code> and <code>founder.wallet</code> control your chain and its coins. Vantax never sees them and can't recover them.</p>
+    </div>
+  </div>
+
+  <div class="safe">
+    <b>Stay safe.</b> The only transaction on this page is the one-off payment of <b data-order-price data-price>6.5 SOL</b> to the Vantax launch wallet<span id="paytoline"></span>, and your wallet shows it before you approve. Vantax will never ask for your seed phrase or private key, and never DMs you a payment address. Questions: <a href="https://x.com/VantaxFounder">@VantaxFounder</a>.
+  </div>
+
+  <p class="small">You're buying a software licence, not an investment: Vantax doesn't host, run or promote your chain, and has no share in it. If you offer your chain's coins to other people, the rules where you and they live apply to you. Vantax Chains is new software and hasn't had an independent security audit yet; test your network before you rely on it. The node software runs on Linux x86-64; other systems will follow. Licences are signed with ML-DSA-87; <span id="issuerline">the issuer key is shown by the Vantax API</span>.</p>
+</main>
+<footer>
+  <span>Vantax. Post-quantum security, built to be verified.</span>
+  <span><a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub</a> &nbsp; <a href="/#token">Official CA</a></span>
+</footer>
+</div>
+<script>
+(function(){
+  "use strict";
+  var base=(document.querySelector('meta[name="vantax-api"]')||{}).content||"";
+  var $=function(id){return document.getElementById(id)};
+  var all=function(sel){return Array.prototype.slice.call(document.querySelectorAll(sel))};
+  var SAVE="vantax.launch.order";
+  var state={info:null,provider:null,providerName:"",connected:"",order:null,timer:null,tries:0};
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+  function grouped(s){
+    s=String(s);var parts=s.split("."),i=parts[0].replace(/\B(?=(\d{3})+(?!\d))/g,",");
+    return parts.length>1?i+"."+parts[1]:i;
+  }
+  function short(a){a=String(a||"");return a.length>16?a.slice(0,8)+"…"+a.slice(-8):a}
+  function clean(v){return String(v||"").replace(/[,_\s]/g,"")}
+  // Decimal string → base units (BigInt), or null.
+  function units(v,dec){
+    var s=clean(v);
+    if(!/^\d+(\.\d+)?$/.test(s))return null;
+    var p=s.split("."),f=p[1]||"";
+    if(f.length>dec)return null;
+    while(f.length<dec)f+="0";
+    return BigInt(p[0]+f);
+  }
+  function fmt(u,dec){
+    var s=u.toString();
+    if(!dec)return grouped(s);
+    while(s.length<=dec)s="0"+s;
+    var i=s.slice(0,s.length-dec),f=s.slice(s.length-dec).replace(/0+$/,"");
+    return grouped(i)+(f?"."+f:"");
+  }
+  var U64=BigInt("18446744073709551615");
+  function setText(sel,t){all(sel).forEach(function(e){e.textContent=t})}
+  function step(n){
+    ["s1","s2","s3"].forEach(function(id,i){
+      var li=$(id);li.classList.toggle("done",i<n-1||n>3);li.classList.toggle("now",i===n-1);
+    });
+  }
+  function showError(id,text){$(id).textContent=text||"";$(id).hidden=!text}
+  function busy(text){$("busy").textContent=text||"";$("busy").hidden=!text;$("create").disabled=!!text}
+  function copy(text,btn){
+    var label=btn.textContent;
+    var done=function(){btn.textContent="Copied";setTimeout(function(){btn.textContent=label},2000)};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(done,function(){})}
+  }
+  function store(v){try{if(v)localStorage.setItem(SAVE,JSON.stringify(v));else localStorage.removeItem(SAVE)}catch(e){}}
+  function stored(){try{return JSON.parse(localStorage.getItem(SAVE)||"null")}catch(e){return null}}
+  function isWallet(a){return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(a)}
+
+  // ── API ──────────────────────────────────────────────────────────────────
+  function api(method,path,body){
+    var o={method:method,headers:{"Accept":"application/json"}};
+    if(body){o.headers["Content-Type"]="application/json";o.body=JSON.stringify(body)}
+    return fetch(base+path,o).then(function(r){
+      return r.json().catch(function(){return {}}).then(function(d){return {s:r.status,d:d}});
+    });
+  }
+
+  // ── The design form ──────────────────────────────────────────────────────
+  function read(){
+    var dec=parseInt($("dec").value,10);
+    return {
+      name:$("name").value.trim(),
+      ticker:$("ticker").value.trim().toUpperCase(),
+      decimals:dec,
+      max:$("maxs").value,init:$("init").value,reward:$("reward").value,fee:$("fee").value,
+      btime:parseInt($("btime").value,10),
+      wallet:$("wallet").value.trim()
+    };
+  }
+  // Same rules as the server (which has the final say).
+  function check(f,needWallet){
+    var bad=function(id,msg){return {id:id,msg:msg}};
+    if(!f.name||f.name.length>40)return bad("name","Give your chain a name of 1 to 40 characters.");
+    if(!/^[A-Z0-9]{2,10}$/.test(f.ticker))return bad("ticker","The ticker must be 2 to 10 capital letters or digits.");
+    if(!(f.decimals>=0&&f.decimals<=12))return bad("dec","Decimals must be 0 to 12.");
+    var n={};
+    var names={max:["maxs","the maximum supply"],init:["init","the initial supply"],reward:["reward","the block reward"],fee:["fee","the minimum fee"]};
+    for(var k in names){
+      var u=units(f[k],f.decimals);
+      if(u===null)return bad(names[k][0],"Enter "+names[k][1]+" as a number with at most "+f.decimals+" decimal places.");
+      if(u>U64)return bad(names[k][0],"That's too big for "+f.decimals+" decimals. Lower the supply or use fewer decimals (with "+f.decimals+", the most is "+fmt(U64,f.decimals).split(".")[0]+").");
+      n[k]=u;
+    }
+    if(n.max===BigInt(0))return bad("maxs","The maximum supply must be more than 0.");
+    if(n.init>n.max)return bad("init","The initial supply can't be more than the maximum.");
+    if(n.init===BigInt(0)&&n.reward===BigInt(0))return bad("reward","With no initial supply, set a block reward, or nobody will ever have coins.");
+    if(n.reward>n.max)return bad("reward","The block reward can't be more than the maximum supply.");
+    if(!(f.btime>=1&&f.btime<=600))return bad("btime","The block time must be 1 to 600 seconds.");
+    if(needWallet&&!isWallet(f.wallet))return bad("wallet","Enter your Solana wallet address (or connect your wallet).");
+    return {ok:true,n:n};
+  }
+  function summarise(){
+    var f=read(),box=$("summary");
+    all("input[aria-invalid]").forEach(function(e){e.removeAttribute("aria-invalid")});
+    var c=check(f,false);
+    if(!c.ok){
+      // Name and ticker first; after that, say what's wrong with the numbers.
+      box.textContent=c.id==="name"||c.id==="ticker"?"Fill in your chain's name and ticker to see a summary.":c.msg;
+      return c;
+    }
+    var n=c.n,t=f.ticker,d=f.decimals;
+    box.textContent="";
+    var line=function(label,value){var p=document.createElement("div");var b=document.createElement("b");b.textContent=value;p.append(label,b);box.appendChild(p)};
+    line("",f.name+" ("+t+")");
+    line("At launch, your founder wallet holds ",fmt(n.init,d)+" "+t);
+    if(n.reward>BigInt(0)&&n.max>n.init){
+      var perDay=n.reward*BigInt(Math.floor(86400/f.btime));
+      var left=n.max-n.init;
+      var days=Number(left/(perDay||BigInt(1)));
+      var when=days<1?"in under a day":days<60?"in about "+Math.round(days)+" days":days<730?"in about "+Math.round(days/30)+" months":"in about "+grouped(Math.round(days/365))+" years";
+      line("Block rewards add at most ",fmt(perDay,d)+" "+t+" a day");
+      box.lastChild.append(", reaching the "+fmt(n.max,d)+" maximum "+when+" at the busiest.");
+    }else{
+      line("No block reward: the supply stays at ",fmt(n.init,d)+" "+t);
+    }
+    return c;
+  }
+
+  // ── Wallets ──────────────────────────────────────────────────────────────
+  function providers(){
+    var w=window,out=[];
+    if(w.phantom&&w.phantom.solana&&w.phantom.solana.isPhantom)out.push({name:"Phantom",p:w.phantom.solana});
+    if(w.solflare&&w.solflare.isSolflare)out.push({name:"Solflare",p:w.solflare});
+    if(w.backpack&&(w.backpack.isBackpack||w.backpack.signMessage))out.push({name:"Backpack",p:w.backpack});
+    if(!out.length&&w.solana&&w.solana.signMessage)out.push({name:"your wallet",p:w.solana});
+    return out;
+  }
+  function address(pk){
+    if(!pk)return "";
+    if(typeof pk==="string")return pk;
+    if(pk.toBase58)return pk.toBase58();
+    return String(pk);
+  }
+  function rejected(e){return !!e&&(e.code===4001||/reject|denied|cancel/i.test(String(e.message||e)))}
+  function drawConnectors(){
+    var box=$("connectors");box.textContent="";
+    providers().forEach(function(f){
+      var b=document.createElement("button");
+      b.type="button";b.className="btn";b.textContent=state.connected&&state.providerName===f.name?f.name+" connected":"Use "+f.name;
+      b.addEventListener("click",function(){connect(f)});
+      box.appendChild(b);
+    });
+  }
+  function connect(f){
+    showError("error","");busy("Waiting for "+f.name+"…");
+    return Promise.resolve(f.p.connect()).then(function(res){
+      var a=address((res&&res.publicKey)||f.p.publicKey);
+      if(!a)throw new Error("no address");
+      state.provider=f.p;state.providerName=f.name;state.connected=a;
+      $("wallet").value=a;busy("");drawConnectors();summarise();
+      return f;
+    }).catch(function(e){
+      busy("");
+      showError("error",rejected(e)?"You cancelled the connection. Nothing was shared.":"Couldn't connect to "+f.name+". Unlock it and try again.");
+      throw e;
+    });
+  }
+  function toBase64(bytes){var s="";for(var i=0;i<bytes.length;i++)s+=String.fromCharCode(bytes[i]);return btoa(s)}
+
+  // The holder price: prove the buyer wallet holds the token by signing a challenge.
+  function holderProof(wallet){
+    var p=state.provider;
+    if(!p||state.connected!==wallet){
+      var found=providers();
+      if(!found.length)return Promise.reject({msg:"The holder price needs a Solana wallet in this browser (Phantom, Solflare or Backpack) to sign with."});
+      return connect(found[0]).then(function(){return holderProof(state.connected)});
+    }
+    var ch;
+    busy("Getting a message to sign…");
+    return api("POST","/api/v1/holder/challenge",{wallet:wallet}).then(function(x){
+      if(x.s!==200)throw {api:x};
+      ch=x.d;busy("Check "+state.providerName+": sign the Vantax message.");
+      return p.signMessage(new TextEncoder().encode(ch.message),"utf8");
+    }).then(function(res){
+      var sig=new Uint8Array(res&&res.signature?res.signature:res);
+      if(sig.length!==64)throw new Error("unexpected signature");
+      return {wallet:wallet,proof:{message:ch.message,challenge:ch.challenge,signature:toBase64(sig)}};
+    });
+  }
+
+  function explain(x){
+    var d=x.d||{};
+    switch(x.s){
+      case 400:return d.error||"Something in the form isn't right. Check it and try again.";
+      case 401:return "The signature didn't match this wallet. Sign with the wallet shown in the form.";
+      case 402:return d.error||"This wallet doesn't hold enough for the holder price. Untick it to pay the standard price.";
+      case 404:return "Chain launches aren't open right now.";
+      case 409:return "That signature was already used. Try again to sign a fresh one.";
+      case 429:return "Too many tries in a row. Wait a few seconds and try again.";
+      case 503:return d.error||"Vantax is busy. Try again in a minute.";
+      default:return d.error||"Something went wrong ("+x.s+"). Try again in a minute.";
+    }
+  }
+
+  function create(ev){
+    ev.preventDefault();
+    showError("error","");
+    summarise();
+    // With the holder price, the wallet comes from connecting it.
+    var f=read(),c=check(f,!$("holder").checked||isWallet(f.wallet));
+    if(!c.ok){
+      showError("error",c.msg);
+      var el=$(c.id);if(el){el.setAttribute("aria-invalid","true");el.focus()}
+      return;
+    }
+    var body={buyer_wallet:f.wallet,name:f.name,ticker:f.ticker,decimals:f.decimals,max_supply:clean(f.max),initial_supply:clean(f.init),
+      block_time_secs:f.btime,block_reward:clean(f.reward),min_fee:clean(f.fee)};
+    var proof=$("holder").checked?holderProof(f.wallet):Promise.resolve(null);
+    proof.then(function(h){
+      if(h){body.holder=h.proof;body.buyer_wallet=h.wallet}
+      busy("Creating your order…");
+      return api("POST","/api/v1/launch/order",body);
+    }).then(function(x){
+      busy("");
+      if(x.s!==201)throw {api:x};
+      var o={id:x.d.order_id,token:x.d.token,name:x.d.chain&&x.d.chain.name,paid:false};
+      store(o);
+      history.replaceState(null,"","#order="+encodeURIComponent(o.id)+"&token="+encodeURIComponent(o.token));
+      state.order=o;
+      showOrder(x.d);
+      poll(4000);
+    }).catch(function(e){
+      busy("");
+      if(e&&e.api)showError("error",explain(e.api));
+      else if(e&&e.msg)showError("error",e.msg);
+      else if(rejected(e))showError("error","You cancelled in your wallet. Nothing was signed.");
+      else if(e instanceof TypeError)showError("error","Can't reach Vantax. Check your connection and try again.");
+      else showError("error","Something went wrong. Try again.");
+    });
+  }
+
+  // ── Paying ───────────────────────────────────────────────────────────────
+  function orderLink(){
+    return location.origin+location.pathname+"#order="+encodeURIComponent(state.order.id)+"&token="+encodeURIComponent(state.order.token);
+  }
+  function showOrder(d){
+    $("form").hidden=true;$("resume").hidden=true;$("gets").hidden=true;
+    if(d.status==="paid")return showDone(d);
+    step(2);
+    $("paybox").hidden=false;
+    $("qr").hidden=!d.qr;
+    if(d.qr)$("qr").src=d.qr;
+    $("amount").textContent=grouped(d.price_sol)+" SOL"+(d.holder_price?" (holder price)":"");
+    setText("[data-order-price]",grouped(d.price_sol)+" SOL");
+    $("paylink").href=d.solana_pay;
+    $("o-chain").textContent=d.chain.name+" ("+d.chain.ticker+")";
+    $("o-payto").textContent=d.pay_to;
+    $("o-ref").textContent=d.reference;
+    $("o-id").textContent=d.order_id;
+    $("olink").textContent=orderLink();
+    state.payUrl=d.solana_pay;
+    $("paybox").scrollIntoView({behavior:"smooth",block:"start"});
+  }
+  function poll(delay){
+    clearTimeout(state.timer);
+    state.timer=setTimeout(check2,delay);
+  }
+  function check2(){
+    if(!state.order)return;
+    if(document.hidden){poll(4000);return}
+    api("GET","/api/v1/launch/order/"+encodeURIComponent(state.order.id)+"?token="+encodeURIComponent(state.order.token)).then(function(x){
+      if(x.s===200){
+        showError("payerror","");
+        state.tries++;
+        if(x.d.status==="paid"){showOrder(x.d);return}
+        $("paytext").textContent=state.tries>10?"Still waiting. Finalized payments usually show up within a minute of approving them.":"Waiting for your payment…";
+        poll(state.tries<30?5000:15000);
+        return;
+      }
+      if(x.s===404){
+        store(null);state.order=null;
+        $("paybox").hidden=true;$("form").hidden=false;$("gets").hidden=false;step(1);
+        showError("error","That order link isn't valid, or the order expired unpaid after 7 days. Start a new one below.");
+        return;
+      }
+      showError("payerror",explain(x));poll(15000);
+    }).catch(function(){
+      showError("payerror","Can't reach Vantax right now. This page keeps checking.");poll(15000);
+    });
+  }
+  function showDone(d){
+    clearTimeout(state.timer);
+    step(4);
+    $("paybox").hidden=true;$("donebox").hidden=false;
+    var l=d.licence||{},p=l.params||{};
+    $("paidline").textContent="Paid. "+d.chain.name+" ("+d.chain.ticker+") is licensed to "+short(d.buyer_wallet)+".";
+    var box=$("downloads");box.textContent="";
+    var builds=0;
+    (d.downloads||[]).forEach(function(f){
+      var a=document.createElement("a");
+      a.className="btn"+(f.file==="licence.json"?" p":"");
+      a.href=base+f.path;a.rel="noopener";
+      a.textContent=f.file==="licence.json"?"Licence (licence.json)":f.file;
+      if(f.file!=="licence.json")builds++;
+      box.appendChild(a);
+    });
+    $("nobuild").hidden=builds>0;
+    var tar=(d.downloads||[]).map(function(f){return f.file}).filter(function(n){return /\.tar\.gz$/.test(n)})[0]||"vantax-chain-linux-x86_64.tar.gz";
+    var dir=tar.replace(/\.tar\.gz$/,"");
+    $("quick").textContent=
+      "tar xzf "+tar+"\n"+
+      "sudo install "+dir+"/vantax-chain /usr/local/bin/\n"+
+      "vantax-chain setup --licence licence.json --out mychain --validators 1\n"+
+      "cd mychain\n"+
+      "vantax-chain run --genesis genesis.json --data data-1 \\\n    --validator-key validator-1.key --bind 0.0.0.0:7700";
+    $("l-id").textContent=l.licence_id||d.order_id;
+    $("l-owner").textContent=l.buyer_wallet||d.buyer_wallet;
+    var sig=l.payment||d.payment||"",pay=$("l-pay");pay.textContent="";
+    if(/^[1-9A-HJ-NP-Za-km-z]{60,100}$/.test(sig)){
+      var a=document.createElement("a");a.href="https://solscan.io/tx/"+sig;a.rel="noopener";a.textContent=sig;pay.appendChild(a);
+    }else pay.textContent=sig;
+    $("l-issuer").textContent=l.issuer&&l.issuer.fingerprint?"Vantax issuer "+l.issuer.fingerprint:"Vantax";
+    state.order.name=d.chain.name;state.order.paid=true;
+    store(state.order);
+  }
+
+  // ── Wiring ───────────────────────────────────────────────────────────────
+  $("form").addEventListener("submit",create);
+  // A site policy that blocks data: images hides the QR; the button and the link still work.
+  $("qr").addEventListener("error",function(){$("qr").hidden=true});
+  $("form").addEventListener("input",function(){summarise()});
+  $("ticker").addEventListener("input",function(){var e=$("ticker"),v=e.value.toUpperCase().replace(/[^A-Z0-9]/g,"");if(v!==e.value)e.value=v});
+  $("copypay").addEventListener("click",function(){copy(state.payUrl||"",$("copypay"))});
+  $("copylink").addEventListener("click",function(){copy($("olink").textContent,$("copylink"))});
+  $("checknow").addEventListener("click",function(){state.tries=0;check2()});
+  $("startover").addEventListener("click",function(){
+    clearTimeout(state.timer);state.order=null;
+    history.replaceState(null,"",location.pathname);
+    if(state.info)setText("[data-order-price]",grouped(state.info.price_sol)+" SOL");
+    $("paybox").hidden=true;$("donebox").hidden=true;$("form").hidden=false;$("gets").hidden=false;step(1);
+    $("form").scrollIntoView({behavior:"smooth",block:"start"});
+  });
+
+  function fromHash(){
+    var h=new URLSearchParams(location.hash.replace(/^#/,""));
+    var id=h.get("order"),token=h.get("token");
+    return id&&token?{id:id,token:token}:null;
+  }
+  function resume(o){
+    state.order=o;state.tries=0;
+    $("form").hidden=true;$("gets").hidden=true;
+    $("paybox").hidden=false;$("paytext").textContent="Loading your order…";step(2);
+    api("GET","/api/v1/launch/order/"+encodeURIComponent(o.id)+"?token="+encodeURIComponent(o.token)).then(function(x){
+      if(x.s!==200){state.tries=0;check2();return}
+      showOrder(x.d);
+      if(x.d.status!=="paid")poll(5000);
+    }).catch(function(){showError("payerror","Can't reach Vantax right now. This page keeps checking.");poll(10000)});
+  }
+
+  api("GET","/api/v1/launch").then(function(x){
+    if(x.s!==200){
+      $("closed").hidden=false;$("flow").hidden=true;
+      return;
+    }
+    var i=x.d;state.info=i;
+    setText("[data-price]",grouped(i.price_sol)+" SOL");
+    if(i.holder_price_sol){
+      $("holderbox").hidden=false;
+      setText("[data-holder-price]",grouped(i.holder_price_sol)+" SOL");
+      setText("[data-min]",grouped(i.holder_min_tokens||"1000000"));
+      setText("[data-token]",i.holder_token||"$VANTAX");
+    }
+    $("paytoline").textContent=" ("+i.pay_to+")";
+    $("issuerline").textContent="the Vantax issuer key's fingerprint is "+i.issuer_fingerprint;
+    var o=fromHash();
+    if(o){resume(o);return}
+    var s=stored();
+    if(s&&s.id&&s.token){
+      var r=$("resume");r.textContent="";
+      var what=s.name||"your chain";
+      r.append(s.paid?"Your licence for "+what+" is ready. ":"Your order for "+what+" is waiting for payment. ");
+      var b=document.createElement("button");b.type="button";b.className="btn";b.textContent="Open it";
+      b.style.marginLeft="6px";b.addEventListener("click",function(){
+        history.replaceState(null,"","#order="+encodeURIComponent(s.id)+"&token="+encodeURIComponent(s.token));resume(s);
+      });
+      r.appendChild(b);r.hidden=false;
+    }
+  }).catch(function(){
+    showError("error","Can't reach Vantax right now. Reload the page in a minute.");
+  });
+
+  summarise();
+  drawConnectors();
+  if(!providers().length){setTimeout(drawConnectors,600);window.addEventListener("load",function(){setTimeout(drawConnectors,300)})}
+})();
+</script>
+</body>
+</html>
