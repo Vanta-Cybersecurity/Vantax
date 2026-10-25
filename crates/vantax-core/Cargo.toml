@@ -1,23 +1,27 @@
 [package]
 name = "vantax-core"
-description = "ML-DSA-87 (FIPS 204) signing, the SHA3-512 → BLAKE3 → SHA3-512 hash cascade and domain-separated canonical encoding for Vantax."
+description = "ML-DSA-87 (FIPS 204) and Falcon-512 signing, the SHA3-512 → BLAKE3 → SHA3-512 hash cascade and domain-separated canonical encoding for Vantax."
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 authors.workspace = true
 repository.workspace = true
 homepage.workspace = true
-keywords = ["post-quantum", "ml-dsa", "signatures", "cryptography", "fips-204"]
+keywords = ["post-quantum", "ml-dsa", "falcon", "signatures", "fips-204"]
 categories = ["cryptography"]
 
 [features]
-default = ["legacy-dilithium5"]
+default = ["legacy-dilithium5", "falcon"]
 # Load, verify and sign with version 1 Dilithium5 keys (FIPS 204 draft).
 legacy-dilithium5 = ["dep:pqcrypto-dilithium"]
+# Falcon-512 keys and signatures (vantax_core::falcon), the scheme Solana's
+# post-quantum work uses.
+falcon = ["dep:pqcrypto-falcon"]
 
 [dependencies]
 pqcrypto-mldsa.workspace = true
 pqcrypto-dilithium = { workspace = true, optional = true }
+pqcrypto-falcon = { workspace = true, optional = true }
 pqcrypto-traits.workspace = true
 sha3.workspace = true
 blake3.workspace = true

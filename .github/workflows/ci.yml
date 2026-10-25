@@ -92,3 +92,42 @@ jobs:
           path: |
             target/wasm32-unknown-unknown/release/vantax_wasm.wasm
             crates/vantax-wasm/js/vantax.js
+
+  falcon:
+    name: Falcon-512 (browser build, KAT, interop)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install clang and lld
+        run: sudo apt-get update && sudo apt-get install -y clang lld
+
+      - name: Build falcon512.wasm and the known-answer-test build
+        run: ./falcon/build.sh kat
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Native Falcon-512 tests (write the native interop vector)
+        run: cargo test -p vantax-core falcon
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: NIST KAT, round trips, interop with the native build
+        run: node --test falcon/js/falcon.test.mjs
+
+      # The site ships a copy of the loader and the module.
+      - name: The site's copy is current and passes too
+        run: |
+          diff falcon/js/falcon.js site/wasm/falcon.js
+          FALCON_WASM=site/wasm/falcon512.wasm node --test falcon/js/falcon.test.mjs
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: falcon512-wasm
+          path: |
+            falcon/dist/falcon512.wasm
+            falcon/js/falcon.js

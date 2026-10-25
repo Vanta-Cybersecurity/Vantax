@@ -1,9 +1,11 @@
 # Build output
 /target
+/falcon/dist/
 
 # Secrets: never commit these
 .env
 vantax-key*.json
+falcon-key*.json
 *.ml-dsa-87.json
 vantax-vault/
 share-*-of-*.json

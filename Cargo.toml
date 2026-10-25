@@ -47,6 +47,8 @@ vantax-bridge = { path = "crates/vantax-bridge", version = "2.0.0" }
 # version 1 keys and signatures still load and verify.
 pqcrypto-mldsa = "0.1"
 pqcrypto-dilithium = "0.5"
+# pqcrypto-falcon: Falcon-512 (padded, 666-byte signatures) for vantax_core::falcon.
+pqcrypto-falcon = "0.4"
 pqcrypto-traits = "0.3"
 
 # Hashing

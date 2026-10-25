@@ -29,6 +29,8 @@
 pub mod canonical;
 pub mod clock;
 pub mod encoding;
+#[cfg(feature = "falcon")]
+pub mod falcon;
 pub mod hash;
 mod keys;
 

@@ -3,271 +3,279 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Vantax Chains: launch your own chain</title>
-<meta name="description" content="Your own post-quantum blockchain, ready to run on your own servers. Pick the name, ticker and supply, pay in SOL, and download a signed licence and the node software.">
-<meta name="referrer" content="no-referrer">
 <!-- Base URL of the Vantax API (no trailing slash). Empty means this site's own
      origin, for when the site and the API share a host (nginx proxies /api/). -->
 <meta name="vantax-api" content="https://api.vantax-cybersecurity.com">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://vantax-cybersecurity.com/launch.html">
+<!-- Where the VantaxBot store runs (see the bot's deploy guide). -->
+<meta name="vantax-store" content="https://store.vantax-cybersecurity.com">
+<meta name="theme-color" content="#2b3cff">
+<link rel="preload" href="assets/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/vantax.css">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<script>try{var t=localStorage.getItem("vantax-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script src="assets/vantax.js" defer></script>
+<title>Vantax Chains: launch your own chain</title>
+<meta name="description" content="Your own post-quantum blockchain, ready to run on your own servers. Pick the name, ticker and supply, pay in SOL, and download a signed licence and the node software.">
+<meta name="referrer" content="no-referrer">
+<link rel="canonical" href="https://vantax-cybersecurity.com/launch.html">
 <meta property="og:title" content="Vantax Chains: launch your own chain">
 <meta property="og:description" content="Your own post-quantum blockchain, on your own servers. ML-DSA-87 signatures on every transaction and block.">
+<meta property="og:url" content="https://vantax-cybersecurity.com/launch.html">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@VantaxFounder">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#eef1f6;--surface:#fff;--ink:#0b1b33;--mute:#56657f;--line:#cfd7e4;--flag:#c2255c;--flagbg:#fde8ef;--ok:#0b7a7c;--okbg:#e2f4f4;--accent:#2b3cff;
---sans:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1020;--surface:#111a30;--ink:#e8edf7;--mute:#8fa0bf;--line:#243252;--flag:#ff6b9a;--flagbg:#3a1526;--ok:#4fd1d3;--okbg:#0f2f33;--accent:#8a96ff}}
-:root[data-theme="dark"]{--bg:#0a1020;--surface:#111a30;--ink:#e8edf7;--mute:#8fa0bf;--line:#243252;--flag:#ff6b9a;--flagbg:#3a1526;--ok:#4fd1d3;--okbg:#0f2f33;--accent:#8a96ff}
-*,*::before,*::after{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
-a{color:inherit}
-:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
-.wrap{max-width:820px;margin:0 auto;padding:0 20px}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 0;flex-wrap:wrap}
-.logo{font-weight:800;font-size:22px;letter-spacing:-.02em;text-decoration:none}
-.logo b{color:var(--accent)}
-header nav{display:flex;flex-wrap:wrap;gap:2px 18px}
-header nav a{font-size:15px;color:var(--mute);text-decoration:none;white-space:nowrap}
-header nav a:hover,header nav a[aria-current]{color:var(--ink)}
-h1{font-size:clamp(36px,7vw,60px);line-height:1.02;letter-spacing:-.035em;font-weight:800;margin:32px 0 14px}
-.lede{font-size:clamp(17px,2.3vw,21px);color:var(--mute);margin:0 0 26px;max-width:60ch}
-.lede b{color:var(--ink)}
-.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 26px}
-.fact{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px}
-.fact>span{display:block;font-size:13px;color:var(--mute)}
-.fact b{font-size:19px;letter-spacing:-.01em;overflow-wrap:anywhere}
-.card{background:var(--surface);border:1.5px solid var(--ink);border-radius:16px;padding:22px;margin:0 0 18px}
-.card.soft{border-color:var(--line)}
-.card h2{font-size:21px;letter-spacing:-.01em;margin:0 0 12px}
-.card h3{font-size:17px;margin:18px 0 8px}
-ul.gets{margin:0;padding:0;list-style:none}
-ul.gets li{padding:0 0 10px 26px;position:relative}
-ul.gets li::before{content:"";position:absolute;left:4px;top:.62em;width:9px;height:9px;border-radius:2px;background:var(--accent)}
-ul.gets b{color:var(--ink)}
-ul.gets span{color:var(--mute)}
-ol.steps{margin:0 0 18px;padding:0;list-style:none;counter-reset:s;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-ol.steps li{counter-increment:s;position:relative;padding:0 0 0 38px;line-height:1.3;min-height:30px}
-ol.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:27px;height:27px;border-radius:50%;border:1.5px solid var(--ink);font:700 14px/24px var(--sans);text-align:center}
-ol.steps li.done::before{content:"✓";background:var(--ok);border-color:var(--ok);color:var(--surface)}
-ol.steps li.now::before{background:var(--ink);color:var(--surface)}
-ol.steps b{display:block;font-size:15.5px}
-ol.steps li>span{color:var(--mute);font-size:13.5px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 16px}
-.field{display:flex;flex-direction:column;gap:5px;min-width:0}
-.wide{grid-column:1/-1}
-.field label{font-weight:600;font-size:15px}
-.field small{color:var(--mute);font-size:13.5px;line-height:1.45}
-input[type=text],input[type=number]{font:500 16px var(--mono);color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;width:100%;min-height:48px}
-input:focus{border-color:var(--ink);outline:none}
-input[aria-invalid=true]{border-color:var(--flag)}
-.inline{display:flex;gap:10px;flex-wrap:wrap}
-.inline input{flex:1 1 260px;min-width:0}
-.check{display:flex;gap:10px;align-items:flex-start;background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15.5px;cursor:pointer}
-.check input{width:20px;height:20px;margin:3px 0 0;flex:none;accent-color:var(--ink)}
-.check span{color:var(--mute)}
-.check b{color:var(--ink)}
-.summary{border:1.5px dashed var(--line);border-radius:12px;padding:12px 14px;font-size:15px;color:var(--mute);margin:16px 0}
-.summary b{color:var(--ink)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:10px;font:600 16px var(--sans);text-decoration:none;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;min-height:48px}
-.btn.p{background:var(--ink);color:var(--bg)}
-.btn[disabled]{opacity:.5;cursor:not-allowed}
-.links{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
-.pay{display:grid;grid-template-columns:220px 1fr;gap:20px;align-items:start}
-.qr{width:220px;height:220px;border-radius:12px;border:1.5px solid var(--line);background:#fff;display:block;image-rendering:pixelated}
-.amount{font-size:clamp(30px,5vw,40px);font-weight:800;letter-spacing:-.02em;line-height:1.1;margin:0 0 6px}
-.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14.5px;margin:12px 0}
-.kv dt{color:var(--mute)}
-.kv dd{margin:0;font:500 13.5px/1.5 var(--mono);overflow-wrap:anywhere}
-.code{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;margin:6px 0 14px}
-.code code{flex:1 1 300px;min-width:0;font:500 14px/1.5 var(--mono);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;word-break:break-all;user-select:all}
-.warn{border-left:4px solid var(--flag);background:var(--flagbg);padding:10px 14px;border-radius:0 8px 8px 0;margin:0 0 16px;font-size:15.5px}
-.ok{border-left:4px solid var(--ok);background:var(--okbg);padding:10px 14px;border-radius:0 8px 8px 0;margin:0 0 16px;font-size:15.5px}
-.status{display:flex;align-items:center;gap:10px;font-size:15.5px;margin:14px 0 0}
-.dot{width:10px;height:10px;border-radius:50%;background:var(--accent);flex:none;animation:pulse 1.4s ease-in-out infinite}
-@keyframes pulse{50%{opacity:.25}}
-@media(prefers-reduced-motion:reduce){.dot{animation:none}}
-.safe{border:1.5px dashed var(--line);border-radius:12px;padding:14px 16px;font-size:15px;color:var(--mute);margin:0 0 18px;overflow-wrap:anywhere}
-.safe b{color:var(--ink)}
-pre{font:400 14px/1.7 var(--mono);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;margin:8px 0 16px;white-space:pre}
-.mute{color:var(--mute);font-size:15px}
-.small{font-size:13.5px;color:var(--mute);margin:8px 2px 0;overflow-wrap:anywhere}
-[hidden]{display:none!important}
-footer{padding:36px 0 56px;color:var(--mute);font-size:15px;display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between}
-@media(max-width:640px){
-  .grid{grid-template-columns:1fr}
-  .pay{grid-template-columns:1fr;justify-items:start}
-  ol.steps{grid-template-columns:1fr;gap:10px}
-}
-@media(max-width:560px){.facts{grid-template-columns:1fr}.fact{display:flex;justify-content:space-between;align-items:baseline;gap:12px}.fact>span{display:inline}}
-</style>
-<link rel="icon" href="/favicon.ico" sizes="48x48">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="manifest" href="/site.webmanifest">
 </head>
 <body>
-<div class="wrap">
-<header>
-  <a class="logo" href="/">Vantax<b>.</b></a>
-  <nav><a href="/#pricing">Pricing</a><a href="holders.html">Holders</a><a href="launch.html" aria-current="page">Launch a chain</a><a href="https://x.com/VantaxFounder">@VantaxFounder</a></nav>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="shell">
+    <a class="brand" href="index.html" aria-label="Vantax home"><svg viewBox="0 0 372.84 120" role="img" aria-label="Vantax" xmlns="http://www.w3.org/2000/svg"><path class="v-main" d="M34.64 120 L92.38 20 L80.83 0 L34.64 80 L11.55 40 L0 60 Z"/><path class="v-facet" d="M34.64 120 L5.77 50 L0 60 Z"/><path class="v-facet" d="M34.64 120 L86.6 10 L80.83 0 L34.64 80 Z"/><g class="wm"><path d="M116.38 39.6 L128.36 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M145.24 39.6 L157.22 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M149.97 94.8 L161.95 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M178.83 94.8 L190.81 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M197.99 39.6 L209.58 39.6 L209.58 94.8 L197.99 94.8 Z"/><path d="M228.35 39.6 L239.94 39.6 L239.94 94.8 L228.35 94.8 Z"/><path d="M197.99 39.6 L211.07 39.6 L239.94 94.8 L226.86 94.8 Z"/><path d="M247.12 39.6 L286.86 39.6 L286.86 51.19 L247.12 51.19 Z"/><path d="M261.19 39.6 L272.79 39.6 L272.79 94.8 L261.19 94.8 Z"/><path d="M282.87 94.8 L294.85 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M311.73 94.8 L323.71 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M330.89 39.6 L343.97 39.6 L372.84 94.8 L359.76 94.8 Z"/><path d="M359.76 39.6 L372.84 39.6 L343.97 94.8 L330.89 94.8 Z"/></g></svg></a>
+    <nav class="nav" aria-label="Main">
+      <div class="menu-wrap">
+        <button type="button" data-menu aria-expanded="false" aria-controls="products-menu">Products <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3.2l4 3.6 4-3.6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+        <div class="menu" id="products-menu" hidden>
+          <a href="index.html#scanner"><b>Quantum-risk scanner</b><span>Find the keys and signatures a quantum computer breaks.</span></a>
+          <a href="migrate.html"><b>Migrate</b><span>Add ML-DSA-87 next to Ed25519 or ECDSA, then enforce it.</span></a>
+          <a href="falcon.html"><b>Falcon-512</b><span>The post-quantum signature Solana's validator teams picked.</span></a>
+          <a href="verify.html"><b>Verify a bet</b><span>Check a casino's provably fair receipt in your browser.</span></a>
+          <a href="launch.html" aria-current="page"><b>Vantax Chains</b><span>Your own post-quantum blockchain, on your own servers.</span></a>
+          <a href="bot.html"><b>VantaxBot</b><span>Signal trading that waits for the anti-rug scanner.</span></a>
+        </div>
+      </div>
+      <a href="packages.html">Packages</a>
+      <a href="holders.html">Holders</a>
+      <a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub</a>
+    </nav>
+    <div class="header-tools">
+      <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.25" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 2.75a7.25 7.25 0 0 1 0 14.5z" fill="currentColor"/></svg></button>
+      <a class="btn p sm header-cta" href="index.html#scanner">Scan your code</a>
+      <button class="icon-btn menu-btn" type="button" data-sheet aria-expanded="false" aria-controls="sheet" aria-label="Open menu"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7h14M3 13h14" stroke="currentColor" stroke-width="1.8"/></svg></button>
+    </div>
+  </div>
 </header>
-<main>
-  <h1>Launch your own chain.</h1>
-  <p class="lede">Your own <b>post-quantum blockchain</b>, ready to run on your own servers. Pick the name, ticker and supply, pay <b data-price>6.5 SOL</b> once, and download a licence signed by Vantax together with the node software. You host it and you run it. Vantax takes no cut afterwards.</p>
+<nav class="sheet" id="sheet" hidden aria-label="Menu">
+  <a href="index.html#scanner">Quantum-risk scanner <span>Find what a quantum computer breaks</span></a>
+  <a href="migrate.html">Migrate <span>ML-DSA-87 next to your keys</span></a>
+  <a href="falcon.html">Falcon-512 <span>Solana's post-quantum signature</span></a>
+  <a href="verify.html">Verify a bet <span>Provably fair, checked by you</span></a>
+  <a href="launch.html">Vantax Chains <span>Your own post-quantum chain</span></a>
+  <a href="bot.html">VantaxBot <span>Signal trading with rug checks</span></a>
+  <a href="packages.html">Packages <span>Pay in any currency</span></a>
+  <a href="holders.html">Holder access <span>For $VANTAX holders</span></a>
+  <a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub <span>Read the code</span></a>
+  <a class="btn p" href="index.html#scanner">Scan your code</a>
+</nav>
 
-  <div class="facts" aria-label="At a glance">
-    <div class="fact"><span>One-off price</span><b data-price>6.5 SOL</b></div>
-    <div class="fact"><span>Signatures</span><b>ML-DSA-87</b></div>
-    <div class="fact"><span>Hosting</span><b>Yours</b></div>
-  </div>
-
-  <p class="warn" id="closed" hidden></p>
-
-  <div class="card soft" id="gets">
-    <h2>What you get</h2>
-    <ul class="gets">
-      <li><b>The node software.</b> <span>One program for Linux (x86-64) that runs a validator, syncs with your other nodes, serves a JSON API and hosts a block explorer for your chain.</span></li>
-      <li><b>Post-quantum signatures.</b> <span>Every account, transaction and block is signed with ML-DSA-87 (NIST FIPS 204), not the elliptic-curve signatures a quantum computer would break.</span></li>
-      <li><b>A signed licence.</b> <span>Your chain's name, ticker and supply rules, and your Solana wallet, signed with the Vantax issuer key. It's built into your chain's first block.</span></li>
-      <li><b>Validators you choose.</b> <span>1 to 21 validators take turns making blocks (proof of authority). The chain keeps going while more than half of them are online.</span></li>
-      <li><b>Balances checked in every block.</b> <span>Nodes refuse any block that spends more than an account holds, reuses a nonce or mints more than the reward.</span></li>
-    </ul>
-  </div>
-
-  <div class="card" id="flow">
-    <ol class="steps" aria-label="Progress">
-      <li id="s1" class="now"><b>Design your chain</b><span>Name, ticker, supply</span></li>
-      <li id="s2"><b>Pay <span data-order-price data-price>6.5 SOL</span></b><span>With any Solana Pay wallet</span></li>
-      <li id="s3"><b>Download and run</b><span>Licence and node software</span></li>
-    </ol>
-
-    <p class="ok" id="resume" hidden></p>
-
-    <form id="form" novalidate>
-      <div class="grid">
-        <div class="field">
-          <label for="name">Chain name</label>
-          <input type="text" id="name" maxlength="40" autocomplete="off" spellcheck="false" placeholder="Aurora Chain" required>
-          <small>1 to 40 characters.</small>
-        </div>
-        <div class="field">
-          <label for="ticker">Ticker</label>
-          <input type="text" id="ticker" maxlength="10" autocomplete="off" spellcheck="false" placeholder="AUR" style="text-transform:uppercase" required>
-          <small>2 to 10 capital letters or digits.</small>
-        </div>
-        <div class="field">
-          <label for="maxs">Maximum supply</label>
-          <input type="text" id="maxs" inputmode="decimal" autocomplete="off" value="1,000,000,000">
-          <small>The most coins that can ever exist.</small>
-        </div>
-        <div class="field">
-          <label for="init">Initial supply</label>
-          <input type="text" id="init" inputmode="decimal" autocomplete="off" value="100,000,000">
-          <small>Created at launch in your founder wallet.</small>
-        </div>
-        <div class="field">
-          <label for="reward">Block reward</label>
-          <input type="text" id="reward" inputmode="decimal" autocomplete="off" value="1">
-          <small>New coins for the validator that makes each block, until the maximum is reached. 0 for none.</small>
-        </div>
-        <div class="field">
-          <label for="fee">Minimum fee</label>
-          <input type="text" id="fee" inputmode="decimal" autocomplete="off" value="0.0001">
-          <small>Smallest fee a transfer can pay. Fees go to the validator.</small>
-        </div>
-        <div class="field">
-          <label for="btime">Block time (seconds)</label>
-          <input type="number" id="btime" min="1" max="600" step="1" value="5">
-          <small>1 to 600. Blocks come this often while there's traffic, and at least every 10 minutes when it's quiet.</small>
-        </div>
-        <div class="field">
-          <label for="dec">Decimals</label>
-          <input type="number" id="dec" min="0" max="12" step="1" value="9">
-          <small>0 to 12. With 9, one coin splits into a billion units.</small>
-        </div>
-        <div class="field wide">
-          <label for="wallet">Your Solana wallet</label>
-          <div class="inline">
-            <input type="text" id="wallet" autocomplete="off" spellcheck="false" placeholder="The wallet your licence will name">
-            <span id="connectors" class="inline" style="flex:0 1 auto"></span>
-          </div>
-          <small>Your licence names this wallet as the owner. Use one you control. It doesn't have to be the wallet you pay from.</small>
-        </div>
-        <label class="check wide" id="holderbox" hidden>
-          <input type="checkbox" id="holder">
-          <span><b>Holder price: <span data-holder-price>5 SOL</span>.</b> For wallets holding at least <span data-min>1,000,000</span> <span data-token>$VANTAX</span>. You'll connect that wallet and sign a message to prove it's yours (no transaction). The licence then names that wallet.</span>
-        </label>
-      </div>
-
-      <div class="summary" id="summary" aria-live="polite"></div>
-      <p class="warn" id="error" role="alert" hidden></p>
-      <div class="links">
-        <button class="btn p" id="create" type="submit">Continue to payment</button>
-      </div>
-      <p class="mute" id="busy" role="status" hidden></p>
-    </form>
-
-    <div id="paybox" hidden>
-      <div class="pay">
-        <img class="qr" id="qr" alt="Solana Pay QR code for this order" width="220" height="220">
-        <div>
-          <p class="amount" id="amount"></p>
-          <p class="mute" style="margin:0 0 12px">Scan with Phantom, Solflare or Backpack on your phone, or open the payment in your wallet app. The wallet shows the amount and the Vantax address before you approve.</p>
-          <div class="links">
-            <a class="btn p" id="paylink" href="#">Open in wallet app</a>
-            <button class="btn" id="copypay" type="button">Copy payment link</button>
-          </div>
-        </div>
-      </div>
-      <dl class="kv">
-        <dt>Chain</dt><dd id="o-chain"></dd>
-        <dt>Pay to</dt><dd id="o-payto"></dd>
-        <dt>Reference</dt><dd id="o-ref"></dd>
-        <dt>Order</dt><dd id="o-id"></dd>
+<main id="main">
+  <section class="field page-head" aria-labelledby="l-title">
+    <div class="shell">
+      <a class="crumb" href="index.html#products">Vantax products</a>
+      <h1 id="l-title">Launch your own chain.</h1>
+      <p class="lede">Your own <b>post-quantum blockchain</b>, ready to run on your own servers. Pick the name, ticker and supply, pay <b data-price>6.5 SOL</b> once, and download a licence signed by Vantax together with the node software. You host it and you run it. Vantax takes no cut afterwards.</p>
+      <dl class="terms" aria-label="At a glance">
+        <div><dt>One-off price</dt><dd data-price>6.5 SOL</dd></div>
+        <div><dt>Signatures</dt><dd>ML-DSA-87</dd></div>
+        <div><dt>Validators</dt><dd>1 to 21, yours</dd></div>
+        <div><dt>Hosting</dt><dd>Your own servers</dd></div>
       </dl>
-      <p class="warn"><b>Pay through the QR code or the button.</b> They add this order's reference to the transaction, which is how Vantax finds your payment. A plain transfer from an exchange can't be matched to your order.</p>
-      <h3>Your order link</h3>
-      <p class="mute" style="margin:0">It's the only way back to this order and your downloads. Save it somewhere private, and don't share it.</p>
-      <div class="code"><code id="olink"></code><button class="btn" id="copylink" type="button">Copy</button></div>
-      <div class="status" id="paystatus" role="status"><span class="dot" aria-hidden="true"></span><span id="paytext">Waiting for your payment…</span></div>
-      <p class="warn" id="payerror" role="alert" hidden style="margin-top:14px"></p>
-      <div class="links" style="margin-top:12px"><button class="btn" id="checknow" type="button">Check now</button><button class="btn" id="startover" type="button">Start a new chain</button></div>
     </div>
+  </section>
 
-    <div id="donebox" hidden>
-      <p class="ok" id="paidline"></p>
-      <h3 style="margin-top:0">Downloads</h3>
-      <div class="links" id="downloads"></div>
-      <p class="small" id="nobuild" hidden>The node software download will appear here shortly. Your licence is ready now: keep it safe.</p>
-      <h3>Start your chain</h3>
-      <pre id="quick"></pre>
-      <p class="mute">The setup command checks your licence, then creates your validator keys, a founder wallet holding the initial supply, and <code>genesis.json</code>. Every node of your chain uses the same <code>genesis.json</code>. Open <code>http://your-server:7700</code> for the explorer. <code>START-HERE.txt</code> and the README in the download walk through the rest.</p>
-      <dl class="kv">
-        <dt>Licence</dt><dd id="l-id"></dd>
-        <dt>Owner</dt><dd id="l-owner"></dd>
-        <dt>Payment</dt><dd id="l-pay"></dd>
-        <dt>Signed by</dt><dd id="l-issuer"></dd>
-      </dl>
-      <p class="warn"><b>Keep your keys safe.</b> <code>validator-*.key</code> and <code>founder.wallet</code> control your chain and its coins. Vantax never sees them and can't recover them.</p>
+  <section class="section" aria-labelledby="flow-title">
+    <div class="shell split wide-left">
+      <div>
+        <p class="notice warn" id="closed" hidden></p>
+
+        <div class="instrument" id="flow">
+          <div class="instrument-head"><b id="flow-title">Your chain</b><span>Paid once, in SOL, from any Solana Pay wallet</span></div>
+          <div class="flow-body">
+            <ol class="steps steps-row" aria-label="Progress">
+              <li id="s1" class="now"><h3>Design your chain</h3><p>Name, ticker, supply</p></li>
+              <li id="s2"><h3>Pay <span data-order-price data-price>6.5 SOL</span></h3><p>With any Solana Pay wallet</p></li>
+              <li id="s3"><h3>Download and run</h3><p>Licence and node software</p></li>
+            </ol>
+
+            <p class="notice ok" id="resume" hidden></p>
+
+            <form class="form" id="form" novalidate>
+              <div class="form-grid two">
+                <div class="fld">
+                  <label for="name">Chain name</label>
+                  <input type="text" id="name" maxlength="40" autocomplete="off" spellcheck="false" placeholder="Aurora Chain" required>
+                  <span class="hint">1 to 40 characters.</span>
+                </div>
+                <div class="fld">
+                  <label for="ticker">Ticker</label>
+                  <input type="text" id="ticker" maxlength="10" autocomplete="off" spellcheck="false" placeholder="AUR" style="text-transform:uppercase" required>
+                  <span class="hint">2 to 10 capital letters or digits.</span>
+                </div>
+                <div class="fld">
+                  <label for="maxs">Maximum supply</label>
+                  <input type="text" id="maxs" inputmode="decimal" autocomplete="off" value="1,000,000,000">
+                  <span class="hint">The most coins that can ever exist.</span>
+                </div>
+                <div class="fld">
+                  <label for="init">Initial supply</label>
+                  <input type="text" id="init" inputmode="decimal" autocomplete="off" value="100,000,000">
+                  <span class="hint">Created at launch in your founder wallet.</span>
+                </div>
+                <div class="fld">
+                  <label for="reward">Block reward</label>
+                  <input type="text" id="reward" inputmode="decimal" autocomplete="off" value="1">
+                  <span class="hint">New coins for the validator that makes each block, until the maximum is reached. 0 for none.</span>
+                </div>
+                <div class="fld">
+                  <label for="fee">Minimum fee</label>
+                  <input type="text" id="fee" inputmode="decimal" autocomplete="off" value="0.0001">
+                  <span class="hint">Smallest fee a transfer can pay. Fees go to the validator.</span>
+                </div>
+                <div class="fld">
+                  <label for="btime">Block time (seconds)</label>
+                  <input type="number" id="btime" min="1" max="600" step="1" value="5">
+                  <span class="hint">1 to 600. Blocks come this often while there's traffic, and at least every 10 minutes when it's quiet.</span>
+                </div>
+                <div class="fld">
+                  <label for="dec">Decimals</label>
+                  <input type="number" id="dec" min="0" max="12" step="1" value="9">
+                  <span class="hint">0 to 12. With 9, one coin splits into a billion units.</span>
+                </div>
+                <div class="fld span-all">
+                  <label for="wallet">Your Solana wallet</label>
+                  <input class="mono" type="text" id="wallet" autocomplete="off" spellcheck="false" placeholder="The wallet your licence will name">
+                  <span class="cluster" id="connectors" style="--gap:8px"></span>
+                  <span class="hint">Your licence names this wallet as the owner. Use one you control. It doesn't have to be the wallet you pay from.</span>
+                </div>
+                <label class="check span-all" id="holderbox" hidden>
+                  <input type="checkbox" id="holder">
+                  <span><b>Holder price: <span data-holder-price>5 SOL</span>.</b> For wallets holding at least <span data-min>1,000,000</span> <span data-token>$VANTAX</span>. You'll connect that wallet and sign a message to prove it's yours (no transaction). The licence then names that wallet.</span>
+                </label>
+              </div>
+
+              <div class="summary" id="summary" aria-live="polite"></div>
+              <p class="notice bad" id="error" role="alert" hidden></p>
+              <div class="cluster">
+                <button class="btn p" id="create" type="submit">Continue to payment</button>
+              </div>
+              <p class="mute small" id="busy" role="status" hidden></p>
+            </form>
+
+            <div class="stack" id="paybox" hidden>
+              <div class="pay-grid">
+                <img class="qr" id="qr" alt="Solana Pay QR code for this order" width="220" height="220">
+                <div class="stack" style="--stack:12px">
+                  <p class="amount" id="amount"></p>
+                  <p class="mute small">Scan with Phantom, Solflare or Backpack on your phone, or open the payment in your wallet app. The wallet shows the amount and the Vantax address before you approve.</p>
+                  <div class="cluster">
+                    <a class="btn p" id="paylink" href="#">Open in wallet app</a>
+                    <button class="btn" id="copypay" type="button">Copy payment link</button>
+                  </div>
+                </div>
+              </div>
+              <dl class="kv">
+                <dt>Chain</dt><dd id="o-chain"></dd>
+                <dt>Pay to</dt><dd id="o-payto"></dd>
+                <dt>Reference</dt><dd id="o-ref"></dd>
+                <dt>Order</dt><dd id="o-id"></dd>
+              </dl>
+              <p class="notice warn"><b>Pay through the QR code or the button.</b> They add this order's reference to the transaction, which is how Vantax finds your payment. A plain transfer from an exchange can't be matched to your order.</p>
+              <h3>Your order link</h3>
+              <p class="mute small">It's the only way back to this order and your downloads. Save it somewhere private, and don't share it.</p>
+              <div class="copyline"><code id="olink"></code><button id="copylink" type="button">Copy</button></div>
+              <p class="paystatus" id="paystatus" role="status"><span class="spinner" aria-hidden="true"></span><span id="paytext">Waiting for your payment…</span></p>
+              <p class="notice bad" id="payerror" role="alert" hidden></p>
+              <div class="cluster"><button class="btn" id="checknow" type="button">Check now</button><button class="btn" id="startover" type="button">Start a new chain</button></div>
+            </div>
+
+            <div class="stack" id="donebox" hidden>
+              <p class="notice ok" id="paidline"></p>
+              <h3>Downloads</h3>
+              <div class="cluster" id="downloads"></div>
+              <p class="small mute" id="nobuild" hidden>The node software download will appear here shortly. Your licence is ready now: keep it safe.</p>
+              <h3>Start your chain</h3>
+              <pre class="code" id="quick"></pre>
+              <p class="mute small">The setup command checks your licence, then creates your validator keys, a founder wallet holding the initial supply, and <code>genesis.json</code>. Every node of your chain uses the same <code>genesis.json</code>. Open <code>http://your-server:7700</code> for the explorer. <code>START-HERE.txt</code> and the README in the download walk through the rest.</p>
+              <dl class="kv">
+                <dt>Licence</dt><dd id="l-id"></dd>
+                <dt>Owner</dt><dd id="l-owner"></dd>
+                <dt>Payment</dt><dd id="l-pay"></dd>
+                <dt>Signed by</dt><dd id="l-issuer"></dd>
+              </dl>
+              <p class="notice warn"><b>Keep your keys safe.</b> <code>validator-*.key</code> and <code>founder.wallet</code> control your chain and its coins. Vantax never sees them and can't recover them.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack" style="--stack:28px">
+        <div id="gets">
+          <h2 class="h-sm">What you get</h2>
+          <ul class="gets">
+            <li><b>The node software.</b> One program for Linux (x86-64) that runs a validator, syncs with your other nodes, serves a JSON API and hosts a block explorer for your chain.</li>
+            <li><b>Post-quantum signatures.</b> Every account, transaction and block is signed with ML-DSA-87 (NIST FIPS 204), not the elliptic-curve signatures a quantum computer would break.</li>
+            <li><b>A signed licence.</b> Your chain's name, ticker and supply rules, and your Solana wallet, signed with the Vantax issuer key. It's built into your chain's first block.</li>
+            <li><b>Validators you choose.</b> 1 to 21 validators take turns making blocks (proof of authority). The chain keeps going while more than half of them are online.</li>
+            <li><b>Balances checked in every block.</b> Nodes refuse any block that spends more than an account holds, reuses a nonce or mints more than the reward.</li>
+          </ul>
+        </div>
+        <div class="panel strong">
+          <h3>Stay safe</h3>
+          <p class="small" style="margin:0">The only transaction on this page is the one-off payment of <b data-order-price data-price>6.5 SOL</b> to the Vantax launch wallet<span id="paytoline"></span>, and your wallet shows it before you approve. Vantax will never ask for your seed phrase or private key, and never DMs you a payment address. Questions: <a href="https://x.com/VantaxFounder">@VantaxFounder</a>.</p>
+        </div>
+        <p class="tiny mute">You're buying a software licence, not an investment: Vantax doesn't host, run or promote your chain, and has no share in it. If you offer your chain's coins to other people, the rules where you and they live apply to you. Vantax Chains is new software and hasn't had an independent security audit yet; test your network before you rely on it. The node software runs on Linux x86-64; other systems will follow. Licences are signed with ML-DSA-87; <span id="issuerline">the issuer key is shown by the Vantax API</span>. Check it's live yourself: <a href="https://api.vantax-cybersecurity.com/api/v1/launch">the launch API</a> answers with the price and the downloads on offer.</p>
+      </div>
     </div>
-  </div>
-
-  <div class="safe">
-    <b>Stay safe.</b> The only transaction on this page is the one-off payment of <b data-order-price data-price>6.5 SOL</b> to the Vantax launch wallet<span id="paytoline"></span>, and your wallet shows it before you approve. Vantax will never ask for your seed phrase or private key, and never DMs you a payment address. Questions: <a href="https://x.com/VantaxFounder">@VantaxFounder</a>.
-  </div>
-
-  <p class="small">You're buying a software licence, not an investment: Vantax doesn't host, run or promote your chain, and has no share in it. If you offer your chain's coins to other people, the rules where you and they live apply to you. Vantax Chains is new software and hasn't had an independent security audit yet; test your network before you rely on it. The node software runs on Linux x86-64; other systems will follow. Licences are signed with ML-DSA-87; <span id="issuerline">the issuer key is shown by the Vantax API</span>. Check it's live yourself: <a href="https://api.vantax-cybersecurity.com/api/v1/launch">the launch API</a> answers with the price and the downloads on offer.</p>
+  </section>
 </main>
-<footer>
-  <span>Vantax. Post-quantum security, built to be verified.</span>
-  <span><a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub</a> &nbsp; <a href="/#token">Official CA</a></span>
+
+<footer class="site-footer">
+  <div class="shell">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="index.html" aria-label="Vantax home"><svg viewBox="0 0 372.84 120" role="img" aria-label="Vantax" xmlns="http://www.w3.org/2000/svg"><path class="v-main" d="M34.64 120 L92.38 20 L80.83 0 L34.64 80 L11.55 40 L0 60 Z"/><path class="v-facet" d="M34.64 120 L5.77 50 L0 60 Z"/><path class="v-facet" d="M34.64 120 L86.6 10 L80.83 0 L34.64 80 Z"/><g class="wm"><path d="M116.38 39.6 L128.36 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M145.24 39.6 L157.22 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M149.97 94.8 L161.95 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M178.83 94.8 L190.81 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M197.99 39.6 L209.58 39.6 L209.58 94.8 L197.99 94.8 Z"/><path d="M228.35 39.6 L239.94 39.6 L239.94 94.8 L228.35 94.8 Z"/><path d="M197.99 39.6 L211.07 39.6 L239.94 94.8 L226.86 94.8 Z"/><path d="M247.12 39.6 L286.86 39.6 L286.86 51.19 L247.12 51.19 Z"/><path d="M261.19 39.6 L272.79 39.6 L272.79 94.8 L261.19 94.8 Z"/><path d="M282.87 94.8 L294.85 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M311.73 94.8 L323.71 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M330.89 39.6 L343.97 39.6 L372.84 94.8 L359.76 94.8 Z"/><path d="M359.76 39.6 L372.84 39.6 L343.97 94.8 L330.89 94.8 Z"/></g></svg></a>
+        <p>Post-quantum security, built to be verified.</p>
+        <p class="tiny">Written in Rust by one developer, with no outside funding. Nine of the twelve crates are open source.</p>
+      </div>
+      <div>
+        <h4>Products</h4>
+        <ul>
+          <li><a href="index.html#scanner">Quantum-risk scanner</a></li>
+          <li><a href="migrate.html">Migrate</a></li>
+          <li><a href="falcon.html">Falcon-512</a></li>
+          <li><a href="verify.html">Verify a bet</a></li>
+          <li><a href="launch.html">Vantax Chains</a></li>
+          <li><a href="bot.html">VantaxBot</a></li>
+          <li><a href="packages.html">Packages</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Check our work</h4>
+        <ul>
+          <li><a href="https://github.com/Vanta-Cybersecurity/Vantax">Source code</a></li>
+          <li><a href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/WHITEPAPER.md">Whitepaper</a></li>
+          <li><a href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/API.md">API reference</a></li>
+          <li><a href="https://api.vantax-cybersecurity.com/health">API health</a></li>
+          <li><a href="https://api.vantax-cybersecurity.com/api/v1/gateway/audit">Audit trail</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>$VANTAX</h4>
+        <ul>
+          <li><a href="index.html#token">Official address</a></li>
+          <li><a href="holders.html">Holder access</a></li>
+          <li><a href="burns.html">Buyback and burns</a></li>
+          <li><a href="https://x.com/VantaxFounder">@VantaxFounder on X</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-legal">
+      <span>© 2026 Vantax Cybersecurity</span>
+      <span>Cryptoassets are high risk and you can lose everything you put in. Nothing here is financial advice.</span>
+    </div>
+  </div>
 </footer>
-</div>
+
 <script>
 (function(){
   "use strict";
@@ -634,8 +642,8 @@ footer{padding:36px 0 56px;color:var(--mute);font-size:15px;display:flex;flex-wr
       setText("[data-min]",grouped(i.holder_min_tokens||"1000000"));
       setText("[data-token]",i.holder_token||"$VANTAX");
     }
-    $("paytoline").textContent=" ("+i.pay_to+")";
-    $("issuerline").textContent="the Vantax issuer key's fingerprint is "+i.issuer_fingerprint;
+    if(i.pay_to)$("paytoline").textContent=" ("+i.pay_to+")";
+    if(i.issuer_fingerprint)$("issuerline").textContent="the Vantax issuer key's fingerprint is "+i.issuer_fingerprint;
     var o=fromHash();
     if(o){resume(o);return}
     var s=stored();

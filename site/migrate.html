@@ -3,272 +3,280 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- Base URL of the Vantax API (no trailing slash), as on index.html. -->
+<!-- Base URL of the Vantax API (no trailing slash). Empty means this site's own
+     origin, for when the site and the API share a host (nginx proxies /api/). -->
 <meta name="vantax-api" content="https://api.vantax-cybersecurity.com">
-<title>Vantax Migrate: post-quantum, step by step</title>
+<!-- Where the VantaxBot store runs (see the bot's deploy guide). -->
+<meta name="vantax-store" content="https://store.vantax-cybersecurity.com">
+<meta name="theme-color" content="#2b3cff">
+<link rel="preload" href="assets/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/vantax.css">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<script>try{var t=localStorage.getItem("vantax-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script src="assets/vantax.js" defer></script>
+<title>Migrate: Vantax</title>
 <meta name="description" content="Move a Solana, Ethereum or Bitcoin project to post-quantum security today: find the vulnerable keys, create an ML-DSA-87 key, bind it on-chain, sign in hybrid mode and enforce it.">
 <link rel="canonical" href="https://vantax-cybersecurity.com/migrate.html">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://vantax-cybersecurity.com/migrate.html">
 <meta property="og:title" content="Find it. Fix it. Prove it.">
 <meta property="og:description" content="The post-quantum migration path for Solana, Ethereum and Bitcoin, with tools that work today.">
+<meta property="og:url" content="https://vantax-cybersecurity.com/migrate.html">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@VantaxFounder">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#eef1f6;--surface:#fff;--ink:#0b1b33;--mute:#56657f;--line:#cfd7e4;--flag:#c2255c;--flagbg:#fde8ef;--ok:#0b7a7c;--okbg:#e2f4f4;--accent:#2b3cff;--accbg:#e7e9ff;
---sans:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1020;--surface:#111a30;--ink:#e8edf7;--mute:#8fa0bf;--line:#243252;--flag:#ff6b9a;--flagbg:#3a1526;--ok:#4fd1d3;--okbg:#0f2f33;--accent:#8a96ff;--accbg:#1c2350}}
-:root[data-theme="dark"]{--bg:#0a1020;--surface:#111a30;--ink:#e8edf7;--mute:#8fa0bf;--line:#243252;--flag:#ff6b9a;--flagbg:#3a1526;--ok:#4fd1d3;--okbg:#0f2f33;--accent:#8a96ff;--accbg:#1c2350}
-*,*::before,*::after{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
-a{color:inherit}
-:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
-.wrap{max-width:1080px;margin:0 auto;padding:0 22px}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:20px 0}
-.logo{font-weight:800;font-size:22px;letter-spacing:-.02em;text-decoration:none}
-.logo b{color:var(--accent)}
-nav{display:flex;flex-wrap:wrap;gap:4px 20px}
-nav a{font-size:15px;color:var(--mute);text-decoration:none}
-nav a:hover,nav a[aria-current]{color:var(--ink)}
-h1{font-size:clamp(38px,7vw,74px);line-height:1.02;letter-spacing:-.035em;font-weight:800;margin:40px 0 18px;max-width:14ch}
-.lede{font-size:clamp(18px,2.3vw,21px);color:var(--mute);max-width:62ch;margin:0 0 22px}
-.chip{display:inline-flex;align-items:center;gap:8px;font:500 13px var(--mono);border:1.5px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--surface);color:var(--mute)}
-.chip i{width:8px;height:8px;border-radius:50%;background:var(--mute);display:inline-block}
-.chip.ready{color:var(--ok);border-color:var(--ok)}.chip.ready i{background:var(--ok)}
-.chip.fail{color:var(--flag);border-color:var(--flag)}.chip.fail i{background:var(--flag)}
-.chains{display:flex;flex-wrap:wrap;gap:8px;margin:26px 0 0}
-.chains button{font:600 15px var(--sans);padding:9px 16px;border-radius:999px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer}
-.chains button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
-.steps{list-style:none;padding:0;margin:34px 0 0;display:grid;gap:18px;counter-reset:s}
-.step{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:22px 22px 24px;position:relative;min-width:0}
-.step.on{border-color:var(--ink)}
-.step-h{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap}
-.n{flex:none;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--ink);display:inline-grid;place-items:center;font-weight:800}
-.step.done .n{background:var(--ok);border-color:var(--ok);color:var(--surface)}
-.step h2{font-size:clamp(22px,3.2vw,30px);letter-spacing:-.025em;line-height:1.15;margin:0}
-.step h2 small{display:block;font-size:15px;font-weight:400;color:var(--mute);letter-spacing:0;margin-top:4px}
-.body{margin:14px 0 0 48px;min-width:0}
-@media(max-width:600px){.body{margin-left:0}}
-.body p{margin:0 0 12px;color:var(--mute);max-width:70ch;overflow-wrap:anywhere}
-.body p b{color:var(--ink)}
-.btns{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0 12px}
-button.b,.btn{font:600 15px var(--sans);padding:11px 18px;border-radius:10px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;text-decoration:none;display:inline-block}
-button.b.p,.btn.p{background:var(--ink);color:var(--bg)}
-button.b:disabled{opacity:.5;cursor:not-allowed}
-button.b:not(:disabled):hover,.btn:hover{transform:translateY(-1px)}
-pre{margin:0 0 12px;background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;font:400 13px/1.6 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink)}
-code{font:500 13px var(--mono);overflow-wrap:anywhere}
-.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0 0 12px;font-size:14px}
-.kv dt{color:var(--mute)}
-.kv dd{margin:0;font:500 13px var(--mono);overflow-wrap:anywhere;min-width:0}
-.copyrow{display:flex;gap:8px;align-items:flex-start;margin:0 0 10px}
-.copyrow pre{flex:1;margin:0;min-width:0}
-.copy{font:600 13px var(--sans);padding:8px 12px;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;flex:none}
-.warn{border-left:4px solid var(--flag);background:var(--flagbg);padding:9px 12px;border-radius:0 8px 8px 0;margin:0 0 12px;font-size:14.5px;color:var(--ink)}
-.good{border-left:4px solid var(--ok);background:var(--okbg);padding:9px 12px;border-radius:0 8px 8px 0;margin:0 0 12px;font-size:14.5px;color:var(--ink)}
-.hint{color:var(--mute);font-size:14.5px}
-.status{margin-top:56px;background:var(--ink);color:var(--bg);border-radius:16px;padding:28px 26px}
-.status h2{margin:0 0 8px;font-size:clamp(24px,3.6vw,34px);letter-spacing:-.03em}
-.status p{margin:0;max-width:66ch;opacity:.85}
-footer{padding:44px 0 56px;color:var(--mute);font-size:15px;display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
-.top-hint{margin:-8px 0 18px}
-.top-hint a{color:var(--ink);font-weight:600}
-.pk{margin-top:72px;scroll-margin-top:16px}
-.pk h2{font-size:clamp(30px,5vw,48px);letter-spacing:-.035em;line-height:1.05;margin:0 0 12px}
-.pk>p{color:var(--mute);max-width:64ch;margin:0}
-.pkgs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:28px 0 0}
-@media(max-width:760px){.pkgs{grid-template-columns:minmax(0,1fr)}}
-.pkg{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:22px 22px 24px;display:flex;flex-direction:column;min-width:0}
-.pkg.hi{border-color:var(--ink)}
-.pkg .for{font:500 12px var(--mono);color:var(--mute);text-transform:uppercase;letter-spacing:.07em;margin:0 0 6px}
-.pkg h3{margin:0;font-size:23px;letter-spacing:-.02em;line-height:1.2}
-.pkg .price{font-size:clamp(32px,4.4vw,40px);font-weight:800;letter-spacing:-.035em;margin:12px 0 0;line-height:1.1}
-.pkg .price small{font-size:15px;font-weight:600;color:var(--mute);letter-spacing:0;margin-left:6px}
-.pkg .price em{font-style:normal;font-size:16px;font-weight:600;color:var(--mute);letter-spacing:0;margin-right:6px}
-.pkg .sol{font:500 13px var(--mono);color:var(--mute);margin:6px 0 16px}
-.pkg ul{list-style:none;padding:0;margin:0 0 22px;display:grid;gap:8px;font-size:15.5px;line-height:1.45}
-.pkg li{padding-left:24px;position:relative}
-.pkg li::before{content:"✓";position:absolute;left:0;color:var(--ok);font-weight:800}
-.pkg li.all{font-weight:600}
-.pkg .btn{margin-top:auto;text-align:center}
-.terms{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:6px;font-size:14.5px;color:var(--mute);max-width:80ch}
-.terms li{padding-left:16px;position:relative}
-.terms li::before{content:"";position:absolute;left:0;top:.65em;width:6px;height:6px;border-radius:50%;background:var(--line)}
-.terms b{color:var(--ink);font-weight:600}
-[hidden]{display:none!important}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}button.b:hover,.btn:hover{transform:none}}
-</style>
-<link rel="icon" href="/favicon.ico" sizes="48x48">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="manifest" href="/site.webmanifest">
 </head>
 <body>
-<div class="wrap">
-<header>
-  <a class="logo" href="index.html">Vantax<b>.</b></a>
-  <nav><a href="index.html#try">Scan</a><a href="migrate.html" aria-current="page">Migrate</a><a href="#packages">Packages</a><a href="verify.html">Verify a bet</a><a href="index.html#pricing">Pricing</a><a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub</a></nav>
-</header>
-<main>
-  <h1>Find it. Fix it. Prove it.</h1>
-  <p class="lede">No blockchain checks post-quantum signatures at consensus yet, so you can't rip out Ed25519 or ECDSA. What you can do today is add ML-DSA-87 next to them, bind it to your accounts on-chain, and refuse anything that isn't signed both ways. This is the whole path, with tools that work right now.</p>
-  <p class="hint top-hint">Rather have it done for you? <a href="#packages">See the migration packages</a>, priced in USDC or SOL.</p>
-  <span class="chip" id="chip"><i></i><span id="chip-text">Loading…</span></span>
-  <div class="chains" role="group" aria-label="Chain">
-    <button data-chain="solana" aria-pressed="true">Solana</button>
-    <button data-chain="ethereum" aria-pressed="false">Ethereum</button>
-    <button data-chain="bitcoin" aria-pressed="false">Bitcoin</button>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="shell">
+    <a class="brand" href="index.html" aria-label="Vantax home"><svg viewBox="0 0 372.84 120" role="img" aria-label="Vantax" xmlns="http://www.w3.org/2000/svg"><path class="v-main" d="M34.64 120 L92.38 20 L80.83 0 L34.64 80 L11.55 40 L0 60 Z"/><path class="v-facet" d="M34.64 120 L5.77 50 L0 60 Z"/><path class="v-facet" d="M34.64 120 L86.6 10 L80.83 0 L34.64 80 Z"/><g class="wm"><path d="M116.38 39.6 L128.36 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M145.24 39.6 L157.22 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M149.97 94.8 L161.95 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M178.83 94.8 L190.81 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M197.99 39.6 L209.58 39.6 L209.58 94.8 L197.99 94.8 Z"/><path d="M228.35 39.6 L239.94 39.6 L239.94 94.8 L228.35 94.8 Z"/><path d="M197.99 39.6 L211.07 39.6 L239.94 94.8 L226.86 94.8 Z"/><path d="M247.12 39.6 L286.86 39.6 L286.86 51.19 L247.12 51.19 Z"/><path d="M261.19 39.6 L272.79 39.6 L272.79 94.8 L261.19 94.8 Z"/><path d="M282.87 94.8 L294.85 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M311.73 94.8 L323.71 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M330.89 39.6 L343.97 39.6 L372.84 94.8 L359.76 94.8 Z"/><path d="M359.76 39.6 L372.84 39.6 L343.97 94.8 L330.89 94.8 Z"/></g></svg></a>
+    <nav class="nav" aria-label="Main">
+      <div class="menu-wrap">
+        <button type="button" data-menu aria-expanded="false" aria-controls="products-menu">Products <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3.2l4 3.6 4-3.6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+        <div class="menu" id="products-menu" hidden>
+          <a href="index.html#scanner"><b>Quantum-risk scanner</b><span>Find the keys and signatures a quantum computer breaks.</span></a>
+          <a href="migrate.html" aria-current="page"><b>Migrate</b><span>Add ML-DSA-87 next to Ed25519 or ECDSA, then enforce it.</span></a>
+          <a href="falcon.html"><b>Falcon-512</b><span>The post-quantum signature Solana's validator teams picked.</span></a>
+          <a href="verify.html"><b>Verify a bet</b><span>Check a casino's provably fair receipt in your browser.</span></a>
+          <a href="launch.html"><b>Vantax Chains</b><span>Your own post-quantum blockchain, on your own servers.</span></a>
+          <a href="bot.html"><b>VantaxBot</b><span>Signal trading that waits for the anti-rug scanner.</span></a>
+        </div>
+      </div>
+      <a href="packages.html">Packages</a>
+      <a href="holders.html">Holders</a>
+      <a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub</a>
+    </nav>
+    <div class="header-tools">
+      <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.25" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 2.75a7.25 7.25 0 0 1 0 14.5z" fill="currentColor"/></svg></button>
+      <a class="btn p sm header-cta" href="index.html#scanner">Scan your code</a>
+      <button class="icon-btn menu-btn" type="button" data-sheet aria-expanded="false" aria-controls="sheet" aria-label="Open menu"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7h14M3 13h14" stroke="currentColor" stroke-width="1.8"/></svg></button>
+    </div>
   </div>
+</header>
+<nav class="sheet" id="sheet" hidden aria-label="Menu">
+  <a href="index.html#scanner">Quantum-risk scanner <span>Find what a quantum computer breaks</span></a>
+  <a href="migrate.html">Migrate <span>ML-DSA-87 next to your keys</span></a>
+  <a href="falcon.html">Falcon-512 <span>Solana's post-quantum signature</span></a>
+  <a href="verify.html">Verify a bet <span>Provably fair, checked by you</span></a>
+  <a href="launch.html">Vantax Chains <span>Your own post-quantum chain</span></a>
+  <a href="bot.html">VantaxBot <span>Signal trading with rug checks</span></a>
+  <a href="packages.html">Packages <span>Pay in any currency</span></a>
+  <a href="holders.html">Holder access <span>For $VANTAX holders</span></a>
+  <a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub <span>Read the code</span></a>
+  <a class="btn p" href="index.html#scanner">Scan your code</a>
+</nav>
 
-  <ol class="steps">
-    <li class="step on" id="s1">
-      <div class="step-h"><span class="n">1</span><h2>Find what's exposed<small>Every key and signature a quantum computer breaks, with a plan per family.</small></h2></div>
-      <div class="body">
-        <p data-chain-text="find"></p>
-        <div class="btns"><a class="btn p" href="index.html#try">Try the scanner</a></div>
-        <p>On your whole repository (Pro and Enterprise), with the plan grouped by family and CI exit codes:</p>
-        <pre>vantax scan . --migrate
-vantax scan . --format sarif -o vantax.sarif --fail-on high   # in CI</pre>
+<main id="main">
+  <section class="field page-head" aria-labelledby="m-title">
+    <div class="shell">
+      <a class="crumb" href="index.html#products">Vantax products</a>
+      <h1 id="m-title">Find it. Fix it. Prove it.</h1>
+      <p class="lede">No blockchain checks post-quantum signatures at consensus yet, so you can't rip out Ed25519 or ECDSA. What you can do today is add ML-DSA-87 next to them, bind it to your accounts on-chain, and refuse anything that isn't signed both ways. This is the whole path, with tools that work right now.</p>
+      <div class="cluster" style="margin-top:26px">
+        <a class="btn p" href="#path">Start the path</a>
+        <a class="btn" href="#packages">Have us do it</a>
+        <span class="chip on-field" id="chip"><span id="chip-text">Loading…</span></span>
       </div>
-    </li>
+    </div>
+  </section>
 
-    <li class="step" id="s2">
-      <div class="step-h"><span class="n">2</span><h2>Create your post-quantum key<small>ML-DSA-87, NIST FIPS 204, security category 5.</small></h2></div>
-      <div class="body">
-        <p>This key never replaces your wallet key. It stands next to it. Make one here to see the whole flow, or with the CLI for anything real:</p>
-        <div class="btns"><button class="b p" id="keygen" disabled>Generate a key in this browser</button><button class="b" id="use-own" disabled>Use my own .pub.json</button></div>
-        <input type="file" id="pubfile" accept=".json,application/json" hidden>
-        <div id="key-out"></div>
-        <pre data-chain-text="keygen"></pre>
-        <p class="hint">Back the key up across people or places with <code>vantax vault create -k treasury.json</code> (Shamir shares, 3-of-5 by default).</p>
+  <section class="section" id="path" aria-labelledby="path-title">
+    <div class="shell">
+      <div class="path-head">
+        <h2 id="path-title">Five steps, on your chain.</h2>
+        <div class="chains seg" role="group" aria-label="Chain">
+          <button type="button" data-chain="solana" aria-pressed="true">Solana</button>
+          <button type="button" data-chain="ethereum" aria-pressed="false">Ethereum</button>
+          <button type="button" data-chain="bitcoin" aria-pressed="false">Bitcoin</button>
+        </div>
       </div>
-    </li>
-
-    <li class="step" id="s3">
-      <div class="step-h"><span class="n">3</span><h2>Bind it to your account<small>A commitment on-chain says "this post-quantum key belongs to this account", publicly and permanently.</small></h2></div>
-      <div class="body">
-        <p id="bind-wait" class="hint">Create or load a key in step 2 first.</p>
-        <div id="bind-out" hidden></div>
-        <div class="warn">A commitment is not a payment address. Never send funds to it.</div>
-      </div>
-    </li>
-
-    <li class="step" id="s4">
-      <div class="step-h"><span class="n">4</span><h2>Sign in hybrid mode<small>Your wallet signs as it always has. Your ML-DSA-87 key signs the same intent next to it.</small></h2></div>
-      <div class="body">
-        <p>Build a canonical intent for each transaction, sign it with the post-quantum key, and send both signatures. A verifier checks both, so a forged classical signature on its own gets nothing.</p>
-        <pre data-chain-text="tx"></pre>
-        <p>intent.json holds the canonical intent, the exact bytes signed (<code>signing_payload_hex</code>) and the ML-DSA-87 signature. Anyone can check it with the CLI or the API:</p>
-        <pre>jq .signature intent.json &gt; intent.sig.json
+      <ol class="mig-steps">
+        <li class="step on" id="s1">
+          <div class="step-h"><span class="n">1</span><div><h3>Find what's exposed</h3><p>Every key and signature a quantum computer breaks, with a plan per family.</p></div></div>
+          <div class="body stack">
+            <p data-chain-text="find"></p>
+            <div class="cluster"><a class="btn p" href="index.html#scanner">Try the scanner</a></div>
+            <p>On your whole repository (Pro and Enterprise), with the plan grouped by family and CI exit codes:</p>
+<pre class="code">vantax scan . --migrate
+vantax scan . --format sarif -o vantax.sarif --fail-on high   <span class="c"># in CI</span></pre>
+          </div>
+        </li>
+        <li class="step" id="s2">
+          <div class="step-h"><span class="n">2</span><div><h3>Create your post-quantum key</h3><p>ML-DSA-87, NIST FIPS 204, security category 5.</p></div></div>
+          <div class="body stack">
+            <p>This key never replaces your wallet key. It stands next to it. Make one here to see the whole flow, or with the CLI for anything real:</p>
+            <div class="cluster"><button class="btn p" type="button" id="keygen" disabled>Generate a key in this browser</button><button class="btn" type="button" id="use-own" disabled>Use my own .pub.json</button></div>
+            <input type="file" id="pubfile" accept=".json,application/json" hidden>
+            <div class="stack" id="key-out"></div>
+            <pre class="code" data-chain-text="keygen"></pre>
+            <p class="hint">Back the key up across people or places with <code>vantax vault create -k treasury.json</code> (Shamir shares, 3-of-5 by default).</p>
+          </div>
+        </li>
+        <li class="step" id="s3">
+          <div class="step-h"><span class="n">3</span><div><h3>Bind it to your account</h3><p>A commitment on-chain says "this post-quantum key belongs to this account", publicly and permanently.</p></div></div>
+          <div class="body stack">
+            <p id="bind-wait" class="hint">Create or load a key in step 2 first.</p>
+            <div class="stack" id="bind-out" hidden></div>
+            <p class="notice warn">A commitment is not a payment address. Never send funds to it.</p>
+          </div>
+        </li>
+        <li class="step" id="s4">
+          <div class="step-h"><span class="n">4</span><div><h3>Sign in hybrid mode</h3><p>Your wallet signs as it always has. Your ML-DSA-87 key signs the same intent next to it.</p></div></div>
+          <div class="body stack">
+            <p>Build a canonical intent for each transaction, sign it with the post-quantum key, and send both signatures. A verifier checks both, so a forged classical signature on its own gets nothing.</p>
+            <pre class="code" data-chain-text="tx"></pre>
+            <p><code>intent.json</code> holds the canonical intent, the exact bytes signed (<code>signing_payload_hex</code>) and the ML-DSA-87 signature. Anyone can check it with the CLI or the API:</p>
+<pre class="code">jq .signature intent.json &gt; intent.sig.json
 vantax verify -k treasury.pub.json -s intent.sig.json --hex "$(jq -r .signing_payload_hex intent.json)"
-
 curl -s -X POST https://api.vantax-cybersecurity.com/api/v1/verify -H 'Content-Type: application/json' \
   -d '{"public_key":"&lt;hex&gt;","signature":"&lt;hex&gt;","message":"&lt;signing_payload_hex&gt;","encoding":"hex"}'</pre>
-        <div class="btns"><a class="btn" href="verify.html#sign">Try signing in your browser</a></div>
-      </div>
-    </li>
-
-    <li class="step" id="s5">
-      <div class="step-h"><span class="n">5</span><h2>Enforce it, then retire the old path<small>Refuse anything without a post-quantum signature, and set a date for classical-only to stop counting.</small></h2></div>
-      <div class="body">
-        <p>The Vantax gateway turns this into policy: algorithm allowlists, a required post-quantum signature, value and rate limits, and an optional <b>sunset date</b> after which classical signatures are refused even alongside a post-quantum one. Every decision is hash-chained in an audit log and attested with the gateway's own key.</p>
-        <div class="copyrow"><pre id="policy-req"></pre></div>
-        <div class="btns"><button class="b" id="policy-btn" disabled>Ask the live gateway</button><button class="b" id="policy-classical" disabled>Try classical-only</button></div>
-        <div id="policy-out"></div>
-        <p data-chain-text="retire"></p>
-        <p>Keep the scan in CI so nothing new slips in, and get an independent review before you secure real value.</p>
-      </div>
-    </li>
-  </ol>
-
-  <section class="pk" id="packages" aria-labelledby="pk-title">
-    <h2 id="pk-title">Or have us do it.</h2>
-    <p>Done-for-you post-quantum migration for blockchains, protocols and the teams that run them. Every package is priced in USDC; pay in USDC or the SOL equivalent.</p>
-    <div class="pkgs">
-      <article class="pkg">
-        <p class="for">Any team on Ed25519 or ECDSA</p>
-        <h3>Quantum Risk Assessment</h3>
-        <p class="price">$4,950<small>USDC</small></p>
-        <p class="sol" data-usd="4950">or the SOL equivalent on your invoice date</p>
-        <ul>
-          <li>Full scan of up to 3 repositories, every finding reviewed by hand</li>
-          <li>Inventory of every exposed key: wallets, treasuries, upgrade authorities, bots</li>
-          <li>Migration plan ranked by the value each key controls</li>
-          <li>Report signed with ML-DSA-87, so anyone can verify it came from us</li>
-          <li>One-hour walkthrough call</li>
-        </ul>
-        <a class="btn" href="https://x.com/VantaxFounder">Book on X</a>
-      </article>
-      <article class="pkg">
-        <p class="for">Treasuries, multisigs, authorities</p>
-        <h3>Treasury Migration</h3>
-        <p class="price">$19,500<small>USDC</small></p>
-        <p class="sol" data-usd="19500">or the SOL equivalent on your invoice date</p>
-        <ul>
-          <li class="all">Everything in the Assessment</li>
-          <li>Guided key ceremony: ML-DSA-87 keys for up to 5 accounts, made on your machines</li>
-          <li>Shamir backup of each key across your signers</li>
-          <li>Commitments anchored on-chain for every account</li>
-          <li>Hybrid signing wired into your treasury operations</li>
-          <li>Gateway policy: allowlists, value limits and a sunset date</li>
-          <li>30 days of support</li>
-        </ul>
-        <a class="btn" href="https://x.com/VantaxFounder">Book on X</a>
-      </article>
-      <article class="pkg hi">
-        <p class="for">DeFi protocols, DAOs and dApps</p>
-        <h3>Protocol Migration</h3>
-        <p class="price">$49,500<small>USDC</small></p>
-        <p class="sol" data-usd="49500">or the SOL equivalent on your invoice date</p>
-        <ul>
-          <li class="all">Everything in Treasury Migration</li>
-          <li>Hybrid signing on admin, upgrade, keeper and bot paths</li>
-          <li>Commitment checks in your Ethereum smart account or Solana program</li>
-          <li>Machine identities and signed actions for your bots and services</li>
-          <li>Sentinel monitoring: automatic suspension, revocation always by a person</li>
-          <li>12 months of the Enterprise API</li>
-          <li>90 days of support</li>
-        </ul>
-        <a class="btn p" href="https://x.com/VantaxFounder">Book on X</a>
-      </article>
-      <article class="pkg">
-        <p class="for">L1 and L2 chains, foundations, bridges</p>
-        <h3>Chain Integration</h3>
-        <p class="price"><em>from</em>$150,000<small>USDC</small></p>
-        <p class="sol" data-usd="150000">or the SOL equivalent on your invoice date</p>
-        <ul>
-          <li class="all">Everything in Protocol Migration</li>
-          <li>A Vantax adapter for your chain: commitments, anchors and signed transaction intents</li>
-          <li>Migration programme for foundation and treasury keys, with a path for validator operators</li>
-          <li>Bridge security: five gates and m-of-n post-quantum attestations</li>
-          <li>Developer guide and tooling for your ecosystem</li>
-          <li>12 months of support</li>
-        </ul>
-        <a class="btn" href="https://x.com/VantaxFounder">Get a quote on X</a>
-      </article>
+            <div class="cluster"><a class="btn" href="verify.html#sign">Try signing in your browser</a><a class="btn" href="falcon.html">Or use Falcon-512</a></div>
+          </div>
+        </li>
+        <li class="step" id="s5">
+          <div class="step-h"><span class="n">5</span><div><h3>Enforce it, then retire the old path</h3><p>Refuse anything without a post-quantum signature, and set a date for classical-only to stop counting.</p></div></div>
+          <div class="body stack">
+            <p>The Vantax gateway turns this into policy: algorithm allowlists, a required post-quantum signature, value and rate limits, and an optional <b>sunset date</b> after which classical signatures are refused even alongside a post-quantum one. Every decision is hash-chained in an audit log and attested with the gateway's own key.</p>
+            <pre class="code" id="policy-req"></pre>
+            <div class="cluster"><button class="btn" type="button" id="policy-btn" disabled>Ask the live gateway</button><button class="btn" type="button" id="policy-classical" disabled>Try classical-only</button></div>
+            <div id="policy-out"></div>
+            <p data-chain-text="retire"></p>
+            <p>Keep the scan in CI so nothing new slips in, and get an independent review before you secure real value.</p>
+          </div>
+        </li>
+      </ol>
     </div>
-    <ul class="terms">
-      <li><b>Payment:</b> USDC on Solana, or the SOL equivalent at the rate on your invoice date. Half to start, half on delivery; Chain Integration is billed by milestone.</li>
-      <li><b>Your keys stay yours:</b> every secret key is made and kept on your machines. We never hold them.</li>
-      <li><b>What this is:</b> engineering and integration work, not a security audit or a certification. Vantax itself hasn't had an independent third-party audit yet.</li>
-    </ul>
   </section>
 
-  <section class="status">
-    <h2>What hybrid mode covers.</h2>
-    <p>Hybrid mode adds post-quantum protection at the application layer: your backend, your gateway, your smart account. It cannot make a chain's own consensus check ML-DSA signatures; that needs protocol upgrades. Vantax has not had an independent third-party audit yet.</p>
+  <section class="section" id="packages" aria-labelledby="pk-title">
+    <div class="shell">
+      <div class="section-head">
+        <h2 id="pk-title">Or have us do it.</h2>
+        <p>Done-for-you post-quantum migration for blockchains, protocols and the teams that run them. Priced in US dollars, invoiced in your currency; pay by bank transfer, card, USDC, SOL or another major cryptoasset.</p>
+      </div>
+      <div class="tiers four">
+        <div class="tier">
+          <p class="who">Any team on Ed25519 or ECDSA</p>
+          <h3>Quantum Risk Assessment</h3>
+          <div class="price"><span class="amt">$4,950</span><span class="per">Fixed price</span><span class="alt" data-money data-alt data-amount="4950" data-base="USD"></span></div>
+          <ul class="ticks">
+            <li><span>Full scan of up to 3 repositories, every finding reviewed by hand</span></li>
+            <li><span>Inventory of every exposed key: wallets, treasuries, upgrade authorities, bots</span></li>
+            <li><span>Migration plan ranked by the value each key controls</span></li>
+            <li><span>Report signed with ML-DSA-87, so anyone can verify it came from us</span></li>
+            <li><span>One-hour walkthrough call</span></li>
+          </ul>
+          <a class="btn" href="https://x.com/VantaxFounder">Book on X</a>
+        </div>
+        <div class="tier">
+          <p class="who">Treasuries, multisigs, authorities</p>
+          <h3>Treasury Migration</h3>
+          <div class="price"><span class="amt">$19,500</span><span class="per">Fixed price</span><span class="alt" data-money data-alt data-amount="19500" data-base="USD"></span></div>
+          <ul class="ticks">
+            <li><span>Everything in the Assessment</span></li>
+            <li><span>Guided key ceremony: ML-DSA-87 keys for up to 5 accounts, made on your machines</span></li>
+            <li><span>Shamir backup of each key across your signers</span></li>
+            <li><span>Commitments anchored on-chain for every account</span></li>
+            <li><span>Hybrid signing in your treasury operations</span></li>
+            <li><span>Gateway policy: allowlists, value limits and a sunset date</span></li>
+            <li><span>30 days of support</span></li>
+          </ul>
+          <a class="btn" href="https://x.com/VantaxFounder">Book on X</a>
+        </div>
+        <div class="tier featured">
+          <p class="who">DeFi protocols, DAOs and dApps</p>
+          <h3>Protocol Migration</h3>
+          <div class="price"><span class="amt">$49,500</span><span class="per">Fixed price</span><span class="alt" data-money data-alt data-amount="49500" data-base="USD"></span></div>
+          <ul class="ticks">
+            <li><span>Everything in Treasury Migration</span></li>
+            <li><span>Hybrid signing on admin, upgrade, keeper and bot paths</span></li>
+            <li><span>Commitment checks in your Ethereum smart account or Solana program</span></li>
+            <li><span>Machine identities and signed actions for your bots and services</span></li>
+            <li><span>Sentinel monitoring: automatic suspension, revocation always by a person</span></li>
+            <li><span>12 months of the Enterprise API</span></li>
+            <li><span>90 days of support</span></li>
+          </ul>
+          <a class="btn p" href="https://x.com/VantaxFounder">Book on X</a>
+        </div>
+        <div class="tier">
+          <p class="who">L1 and L2 chains, foundations, bridges</p>
+          <h3>Chain Integration</h3>
+          <div class="price"><span class="amt"><small>from</small>$150,000</span><span class="per">Scoped with you</span><span class="alt" data-money data-alt data-amount="150000" data-base="USD"></span></div>
+          <ul class="ticks">
+            <li><span>Everything in Protocol Migration</span></li>
+            <li><span>A Vantax adapter for your chain: commitments, anchors and signed transaction intents</span></li>
+            <li><span>Migration programme for foundation and treasury keys, with a path for validator operators</span></li>
+            <li><span>Bridge security: five gates and m-of-n post-quantum attestations</span></li>
+            <li><span>Developer guide and tooling for your ecosystem</span></li>
+            <li><span>12 months of support</span></li>
+          </ul>
+          <a class="btn" href="https://x.com/VantaxFounder">Get a quote on X</a>
+        </div>
+      </div>
+      <div class="mig-terms">
+        <div><h3>Payment</h3><p>Half to start, half on delivery; Chain Integration is billed by milestone. Bank transfer in your currency, card, USDC, SOL or another major cryptoasset.</p></div>
+        <div><h3>Your keys stay yours</h3><p>Every secret key is made and kept on your machines. We never hold them.</p></div>
+        <div><h3>What this is</h3><p>Engineering and integration work, not a security audit or a certification. Vantax itself hasn't had an independent third-party audit yet.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band" aria-labelledby="hybrid-title">
+    <div class="shell">
+      <h2 id="hybrid-title">What hybrid mode covers.</h2>
+      <p class="measure" style="margin-top:16px">Hybrid mode adds post-quantum protection at the application layer: your backend, your gateway, your smart account. It cannot make a chain's own consensus check ML-DSA signatures; that needs protocol upgrades. Vantax has not had an independent third-party audit yet.</p>
+    </div>
   </section>
 </main>
-<footer>
-  <span>Vantax. Post-quantum security, built to be verified.</span>
-  <span><a href="index.html">Home</a> &nbsp; <a href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/API.md">API</a> &nbsp; <a href="index.html#token">Official CA</a> &nbsp; <a href="https://x.com/VantaxFounder">@VantaxFounder</a></span>
+
+<footer class="site-footer">
+  <div class="shell">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="index.html" aria-label="Vantax home"><svg viewBox="0 0 372.84 120" role="img" aria-label="Vantax" xmlns="http://www.w3.org/2000/svg"><path class="v-main" d="M34.64 120 L92.38 20 L80.83 0 L34.64 80 L11.55 40 L0 60 Z"/><path class="v-facet" d="M34.64 120 L5.77 50 L0 60 Z"/><path class="v-facet" d="M34.64 120 L86.6 10 L80.83 0 L34.64 80 Z"/><g class="wm"><path d="M116.38 39.6 L128.36 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M145.24 39.6 L157.22 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M149.97 94.8 L161.95 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M178.83 94.8 L190.81 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M197.99 39.6 L209.58 39.6 L209.58 94.8 L197.99 94.8 Z"/><path d="M228.35 39.6 L239.94 39.6 L239.94 94.8 L228.35 94.8 Z"/><path d="M197.99 39.6 L211.07 39.6 L239.94 94.8 L226.86 94.8 Z"/><path d="M247.12 39.6 L286.86 39.6 L286.86 51.19 L247.12 51.19 Z"/><path d="M261.19 39.6 L272.79 39.6 L272.79 94.8 L261.19 94.8 Z"/><path d="M282.87 94.8 L294.85 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M311.73 94.8 L323.71 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M330.89 39.6 L343.97 39.6 L372.84 94.8 L359.76 94.8 Z"/><path d="M359.76 39.6 L372.84 39.6 L343.97 94.8 L330.89 94.8 Z"/></g></svg></a>
+        <p>Post-quantum security, built to be verified.</p>
+        <p class="tiny">Written in Rust by one developer, with no outside funding. Nine of the twelve crates are open source.</p>
+      </div>
+      <div>
+        <h4>Products</h4>
+        <ul>
+          <li><a href="index.html#scanner">Quantum-risk scanner</a></li>
+          <li><a href="migrate.html">Migrate</a></li>
+          <li><a href="falcon.html">Falcon-512</a></li>
+          <li><a href="verify.html">Verify a bet</a></li>
+          <li><a href="launch.html">Vantax Chains</a></li>
+          <li><a href="bot.html">VantaxBot</a></li>
+          <li><a href="packages.html">Packages</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Check our work</h4>
+        <ul>
+          <li><a href="https://github.com/Vanta-Cybersecurity/Vantax">Source code</a></li>
+          <li><a href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/WHITEPAPER.md">Whitepaper</a></li>
+          <li><a href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/API.md">API reference</a></li>
+          <li><a href="https://api.vantax-cybersecurity.com/health">API health</a></li>
+          <li><a href="https://api.vantax-cybersecurity.com/api/v1/gateway/audit">Audit trail</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>$VANTAX</h4>
+        <ul>
+          <li><a href="index.html#token">Official address</a></li>
+          <li><a href="holders.html">Holder access</a></li>
+          <li><a href="burns.html">Buyback and burns</a></li>
+          <li><a href="https://x.com/VantaxFounder">@VantaxFounder on X</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-legal">
+      <span>© 2026 Vantax Cybersecurity</span>
+      <span>Cryptoassets are high risk and you can lose everything you put in. Nothing here is financial advice.</span>
+    </div>
+  </div>
 </footer>
-</div>
+
 <script type="module">
 import { loadVantax } from "./wasm/vantax.js";
 
@@ -327,7 +335,7 @@ function mark(id, done) { $(id).classList.toggle("done", done); $(id).classList.
 function copyRow(text) {
   const row = el("div", "copyrow");
   const pre = el("pre", null, text);
-  const btn = el("button", "copy", "Copy");
+  const btn = el("button", null, "Copy"); btn.type = "button";
   btn.addEventListener("click", async () => {
     try { await navigator.clipboard.writeText(text); btn.textContent = "Copied"; }
     catch { const r = document.createRange(); r.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = "Selected"; }
@@ -344,7 +352,7 @@ function renderBinding() {
   const out = $("bind-out");
   const kv = el("dl", "kv");
   const add = (k, v) => kv.append(el("dt", null, k), el("dd", null, v));
-  add("Key", r.algorithm + " · " + r.key_fingerprint.slice(0, 16) + "…");
+  add("Key", r.algorithm + ", " + r.key_fingerprint.slice(0, 16) + "…");
   add("Scheme", r.scheme);
   add("Commitment", r.commitment);
   const nodes = [el("p", null, c.bindHow), kv];
@@ -380,7 +388,7 @@ async function askGateway(hybrid) {
     });
     const d = await res.json();
     if (!res.ok) throw new Error(d.error || d.message || res.status);
-    const box = el("div", d.allowed ? "good" : "warn");
+    const box = el("div", d.allowed ? "notice ok" : "notice bad");
     box.append(el("b", null, d.allowed ? "Allowed. " : "Refused. "));
     box.append(document.createTextNode(d.allowed
       ? "The action carries a post-quantum signature next to the classical one. The gateway logged it (audit entry " + d.audit_index + ") and signed an attestation."
@@ -400,32 +408,15 @@ document.querySelectorAll(".chains button").forEach((b) => b.addEventListener("c
 render();
 mark("s1", false);
 
-// SOL equivalents for the packages. USDC is the price; this is a guide only,
-// and the line keeps its fallback text if the rate can't be fetched.
-(async () => {
-  const lines = document.querySelectorAll("[data-usd]");
-  try {
-    const ctl = new AbortController();
-    setTimeout(() => ctl.abort(), 6000);
-    const r = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd", { signal: ctl.signal });
-    const usd = Number((await r.json())?.solana?.usd);
-    if (!(usd > 0)) return;
-    lines.forEach((n) => {
-      const sol = Number(n.dataset.usd) / usd;
-      n.textContent = "≈ " + sol.toLocaleString("en-US", { maximumFractionDigits: sol < 100 ? 1 : 0 }) + " SOL at today's rate";
-    });
-  } catch { /* keep the fallback text */ }
-})();
-
 try {
   vx = await loadVantax(new URL("./wasm/vantax_wasm.wasm", import.meta.url));
   $("chip").className = "chip ready";
-  $("chip-text").textContent = vx.version() + " · ML-DSA-87 · keys stay on your device";
+  $("chip-text").textContent = "Tools ready: " + vx.version() + ", ML-DSA-87, keys stay on your device";
   ["keygen", "use-own", "policy-btn", "policy-classical"].forEach((id) => ($(id).disabled = false));
 } catch (e) {
   $("chip").className = "chip fail";
   $("chip-text").textContent = "Browser tools failed to load";
-  $("key-out").replaceChildren(el("p", "warn", String(e.message || e) + ". The CLI commands on this page work without it."));
+  $("key-out").replaceChildren(el("p", "notice warn", String(e.message || e) + ". The CLI commands on this page work without it."));
   ["policy-btn", "policy-classical"].forEach((id) => ($(id).disabled = false));
 }
 
@@ -435,9 +426,9 @@ function showKey(pub, secretKeyPair) {
   kv.append(el("dt", null, "Algorithm"), el("dd", null, pub.algorithm));
   kv.append(el("dt", null, "Public key"), el("dd", null, pub.public_key.length / 2 + " bytes"));
   kv.append(el("dt", null, "Fingerprint"), el("dd", null, pub.fingerprint));
-  const btns = el("div", "btns");
+  const btns = el("div", "cluster");
   const dl = (name, obj) => {
-    const b = el("button", "b", "Download " + name);
+    const b = el("button", "btn sm", "Download " + name);
     b.addEventListener("click", () => {
       const a = el("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" }));
       a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
@@ -448,7 +439,7 @@ function showKey(pub, secretKeyPair) {
   const nodes = [kv, btns];
   if (secretKeyPair) {
     btns.append(dl("treasury.json", secretKeyPair));
-    nodes.push(el("p", "warn", "treasury.json holds the secret key. It works with the CLI (vantax sign, vantax tx), but a key made in a web page is for trying this out: make keys that guard value with the CLI."));
+    nodes.push(el("p", "notice warn", "treasury.json holds the secret key. It works with the CLI (vantax sign, vantax tx), but a key made in a web page is for trying this out: make keys that guard value with the CLI."));
   }
   $("key-out").replaceChildren(...nodes);
   mark("s2", true);
@@ -471,7 +462,7 @@ $("pubfile").addEventListener("change", async () => {
     vx.commitment(pub, "generic"); // validates the key and its fingerprint
     showKey(pub, null);
   } catch (e) {
-    $("key-out").replaceChildren(el("p", "warn", "That file isn't an ML-DSA-87 public key: " + (e.message || e)));
+    $("key-out").replaceChildren(el("p", "notice bad", "That file isn't an ML-DSA-87 public key: " + (e.message || e)));
   }
 });
 $("policy-btn").addEventListener("click", () => askGateway(true));

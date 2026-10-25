@@ -4,10 +4,12 @@
 
 Vantax is a post-quantum security platform written in Rust, starting with
 Solana. It finds the keys and signatures a quantum computer breaks, adds NIST
-ML-DSA-87 around them, and enforces who is allowed to do what.
+ML-DSA-87 (or compact Falcon-512) around them, and enforces who is allowed to
+do what.
 
 [Website](https://vantax-cybersecurity.com) ·
 [Migrate](https://vantax-cybersecurity.com/migrate.html) ·
+[Falcon-512](https://vantax-cybersecurity.com/falcon.html) ·
 [Verify a bet](https://vantax-cybersecurity.com/verify.html) ·
 [Whitepaper](docs/WHITEPAPER.md) ·
 [API reference](docs/API.md) ·
@@ -66,7 +68,7 @@ The design is in the [whitepaper](docs/WHITEPAPER.md), section 8.
 
 | | Crate | What it does | Here |
 |---|---|---|---|
-| **Verify** | [`vantax-core`](crates/vantax-core) | ML-DSA-87 (FIPS 204) keys and signatures, the SHA3-512 → BLAKE3 → SHA3-512 hash cascade, domain-separated canonical encoding, version 1 key support | Yes |
+| **Verify** | [`vantax-core`](crates/vantax-core) | ML-DSA-87 (FIPS 204) and Falcon-512 keys and signatures, the SHA3-512 → BLAKE3 → SHA3-512 hash cascade, domain-separated canonical encoding, version 1 key support | Yes |
 | | [`vantax-gateway`](crates/vantax-gateway) | The policy boundary: allowlist policy, hash-chained audit log, gateway-signed attestations, key rotation with history | Yes |
 | | `vantax-api` | The HTTP service: scanning, verification, commitments, intents and the gateway, with API keys, quotas, rate limits and Stripe billing | Hosted ([API](docs/API.md)); proprietary |
 | **Find** | `vantax-scanner` | The scanning engine: finds quantum-vulnerable cryptography in source code. Runs on the API for Pro and Enterprise | Hosted; proprietary |
@@ -117,6 +119,31 @@ exit 1
 The key file is written owner-only and never overwritten without `--force`.
 Share the `.pub.json`; keep the other file secret. `sign` and `verify` also take
 `--file` (streamed, any size) and `--hex`.
+
+### Falcon-512
+
+Falcon-512 is the compact lattice signature Solana's post-quantum work uses:
+897-byte public keys and 666-byte signatures, against 2,592 and 4,627 for
+ML-DSA-87. It targets NIST security category 1 (ML-DSA-87 is category 5).
+`vantax falcon` signs the raw message, as Falcon specifies, so any Falcon-512
+verifier can check the result, and `export` prints the bytes on-chain
+verifiers take.
+
+```console
+$ vantax falcon keygen -o hot.json
+Generated Falcon-512 key pair
+  Fingerprint  0d0714dd6c12c8c6315b8e409753c120eca8f5ef28288042f3824feb79b30969…
+  Secret key   hot.json  (owner-only; back it up with `vantax vault create`)
+  Public key   hot.pub.json  (897 bytes)
+$ vantax falcon sign -k hot.json -m "Built to be verified." -o hot.sig.json
+$ vantax falcon verify -k hot.pub.json -s hot.sig.json -m "Built to be verified."
+✓ SIGNATURE VALID
+$ vantax falcon export -k hot.pub.json -s hot.sig.json   # base64 and hex
+```
+
+The implementation is PQClean's Falcon-padded-512 in both the CLI and the
+browser build ([`falcon/`](falcon)), which reproduces the NIST known-answer
+test byte for byte; signatures move freely between the two.
 
 ### Scan for quantum-vulnerable cryptography
 
@@ -226,6 +253,11 @@ const sig = vx.sign(key, "hello");
 vx.verify(vx.publicKey(key), sig, "hello").valid;      // true; the CLI verifies it too
 vx.commitment(vx.publicKey(key), "solana");          // same commitment and memo as `vantax commitment`
 vx.verifyReceipt(receipt, operatorKey, serverSeed);    // { verdict: "fair", … }
+
+import { loadFalcon } from "./falcon.js";               // falcon/js, no dependencies
+const fn = await loadFalcon("./falcon512.wasm", { hash: vx.hash });  // falcon/build.sh
+const fkey = fn.keygen();                              // Falcon-512, same JSON as `vantax falcon keygen`
+fn.verify(fn.publicKey(fkey), fn.sign(fkey, "hello"), "hello").valid;  // true
 ```
 
 ### Back up a key with a Shamir vault
@@ -484,8 +516,9 @@ Vantax/
 │   ├── vantax-fairness/    provably fair outcomes, receipts, seed chains
 │   ├── vantax-wasm/        the browser build and js/vantax.js
 │   └── vantax-cli/         command line (binary: vantax)
+├── falcon/                 Falcon-512 for the browser: PQClean, build.sh, js/falcon.js, KAT test
 ├── docs/                   API.md, WHITEPAPER.md, VAULT-FORMAT.md, FAIRNESS.md, fairness/
-├── site/                   vantax-cybersecurity.com: index.html, migrate.html, verify.html, welcome.html, wasm/
+├── site/                   vantax-cybersecurity.com: every page, assets/ (one stylesheet and script), wasm/
 ├── .github/workflows/      CI: format, clippy, tests, cargo audit, WebAssembly build
 └── SECURITY.md
 ```

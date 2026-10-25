@@ -3,138 +3,192 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Vantax holder access</title>
-<meta name="description" content="Wallets that hold $VANTAX can get a Vantax API key with the post-quantum migration scanner. Sign a message to prove the wallet is yours: no transaction, no tokens moved.">
-<meta name="referrer" content="no-referrer">
 <!-- Base URL of the Vantax API (no trailing slash). Empty means this site's own
      origin, for when the site and the API share a host (nginx proxies /api/). -->
 <meta name="vantax-api" content="https://api.vantax-cybersecurity.com">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://vantax-cybersecurity.com/holders.html">
+<!-- Where the VantaxBot store runs (see the bot's deploy guide). -->
+<meta name="vantax-store" content="https://store.vantax-cybersecurity.com">
+<meta name="theme-color" content="#2b3cff">
+<link rel="preload" href="assets/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/vantax.css">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<script>try{var t=localStorage.getItem("vantax-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script src="assets/vantax.js" defer></script>
+<title>Holder access: Vantax</title>
+<meta name="description" content="Wallets that hold $VANTAX can get a Vantax API key with the post-quantum migration scanner, and VantaxBot at the holder price. Sign a message to prove the wallet is yours: no transaction, no tokens moved.">
+<meta name="referrer" content="no-referrer">
+<link rel="canonical" href="https://vantax-cybersecurity.com/holders.html">
 <meta property="og:title" content="Vantax holder access">
 <meta property="og:description" content="Hold $VANTAX, sign a message, get a Vantax API key with the post-quantum migration scanner.">
+<meta property="og:url" content="https://vantax-cybersecurity.com/holders.html">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@VantaxFounder">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#eef1f6;--surface:#fff;--ink:#0b1b33;--mute:#56657f;--line:#cfd7e4;--flag:#c2255c;--flagbg:#fde8ef;--ok:#0b7a7c;--okbg:#e2f4f4;--accent:#2b3cff;
---sans:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1020;--surface:#111a30;--ink:#e8edf7;--mute:#8fa0bf;--line:#243252;--flag:#ff6b9a;--flagbg:#3a1526;--ok:#4fd1d3;--okbg:#0f2f33;--accent:#8a96ff}}
-:root[data-theme="dark"]{--bg:#0a1020;--surface:#111a30;--ink:#e8edf7;--mute:#8fa0bf;--line:#243252;--flag:#ff6b9a;--flagbg:#3a1526;--ok:#4fd1d3;--okbg:#0f2f33;--accent:#8a96ff}
-*,*::before,*::after{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
-a{color:inherit}
-:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
-.wrap{max-width:760px;margin:0 auto;padding:0 20px}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 0;flex-wrap:wrap}
-.logo{font-weight:800;font-size:22px;letter-spacing:-.02em;text-decoration:none}
-.logo b{color:var(--accent)}
-header nav a{margin-left:18px;font-size:15px;color:var(--mute);text-decoration:none}
-header nav a:first-child{margin-left:0}
-header nav a:hover{color:var(--ink)}
-h1{font-size:clamp(36px,7vw,60px);line-height:1.02;letter-spacing:-.035em;font-weight:800;margin:32px 0 14px}
-.lede{font-size:clamp(17px,2.3vw,21px);color:var(--mute);margin:0 0 26px;max-width:58ch}
-.lede b{color:var(--ink)}
-.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 26px}
-.fact{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px}
-.fact>span{display:block;font-size:13px;color:var(--mute)}
-.fact b{font-size:19px;letter-spacing:-.01em;overflow-wrap:anywhere}
-.card{background:var(--surface);border:1.5px solid var(--ink);border-radius:16px;padding:22px;margin:0 0 18px}
-.card h2{font-size:21px;letter-spacing:-.01em;margin:0 0 12px}
-ol.steps{margin:0 0 18px;padding:0;list-style:none;counter-reset:s}
-ol.steps li{counter-increment:s;position:relative;padding:0 0 12px 40px}
-ol.steps li::before{content:counter(s);position:absolute;left:0;top:1px;width:27px;height:27px;border-radius:50%;border:1.5px solid var(--ink);font:700 14px/24px var(--sans);text-align:center}
-ol.steps li.done::before{content:"✓";background:var(--ok);border-color:var(--ok);color:var(--surface)}
-ol.steps li.now::before{background:var(--ink);color:var(--surface)}
-ol.steps b{display:block;line-height:1.35}
-ol.steps span{color:var(--mute);font-size:15px}
-.wallets{display:flex;flex-wrap:wrap;gap:10px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:10px;font:600 16px var(--sans);text-decoration:none;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;min-height:48px}
-.btn.p{background:var(--ink);color:var(--bg)}
-.btn[disabled]{opacity:.5;cursor:not-allowed}
-.who{font:500 14.5px var(--mono);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;margin:0 0 14px;overflow-wrap:anywhere}
-.key{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;margin:6px 0 14px}
-.key code{flex:1 1 300px;min-width:0;font:500 15px/1.5 var(--mono);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;word-break:break-all;user-select:all}
-.warn{border-left:4px solid var(--flag);background:var(--flagbg);padding:10px 14px;border-radius:0 8px 8px 0;margin:0 0 16px;font-size:15.5px}
-.ok{border-left:4px solid var(--ok);background:var(--okbg);padding:10px 14px;border-radius:0 8px 8px 0;margin:0 0 16px;font-size:15.5px}
-.safe{border:1.5px dashed var(--line);border-radius:12px;padding:14px 16px;font-size:15px;color:var(--mute);margin:0 0 18px}
-.safe b{color:var(--ink)}
-pre{font:400 14px/1.7 var(--mono);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;margin:8px 0 16px}
-.mute{color:var(--mute);font-size:15px}
-.links{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px}
-.small{font-size:13.5px;color:var(--mute);margin:8px 2px 0}
-[hidden]{display:none!important}
-footer{padding:36px 0 56px;color:var(--mute);font-size:15px;display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between}
-@media(max-width:560px){.facts{grid-template-columns:1fr}.fact{display:flex;justify-content:space-between;align-items:baseline;gap:12px}.fact>span{display:inline}}
-</style>
-<link rel="icon" href="/favicon.ico" sizes="48x48">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="manifest" href="/site.webmanifest">
 </head>
 <body>
-<div class="wrap">
-<header>
-  <a class="logo" href="/">Vantax<b>.</b></a>
-  <nav><a href="/#pricing">Pricing</a><a href="launch.html">Launch a chain</a><a href="/#token">Official CA</a><a href="https://x.com/VantaxFounder">@VantaxFounder</a></nav>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="shell">
+    <a class="brand" href="index.html" aria-label="Vantax home"><svg viewBox="0 0 372.84 120" role="img" aria-label="Vantax" xmlns="http://www.w3.org/2000/svg"><path class="v-main" d="M34.64 120 L92.38 20 L80.83 0 L34.64 80 L11.55 40 L0 60 Z"/><path class="v-facet" d="M34.64 120 L5.77 50 L0 60 Z"/><path class="v-facet" d="M34.64 120 L86.6 10 L80.83 0 L34.64 80 Z"/><g class="wm"><path d="M116.38 39.6 L128.36 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M145.24 39.6 L157.22 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M149.97 94.8 L161.95 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M178.83 94.8 L190.81 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M197.99 39.6 L209.58 39.6 L209.58 94.8 L197.99 94.8 Z"/><path d="M228.35 39.6 L239.94 39.6 L239.94 94.8 L228.35 94.8 Z"/><path d="M197.99 39.6 L211.07 39.6 L239.94 94.8 L226.86 94.8 Z"/><path d="M247.12 39.6 L286.86 39.6 L286.86 51.19 L247.12 51.19 Z"/><path d="M261.19 39.6 L272.79 39.6 L272.79 94.8 L261.19 94.8 Z"/><path d="M282.87 94.8 L294.85 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M311.73 94.8 L323.71 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M330.89 39.6 L343.97 39.6 L372.84 94.8 L359.76 94.8 Z"/><path d="M359.76 39.6 L372.84 39.6 L343.97 94.8 L330.89 94.8 Z"/></g></svg></a>
+    <nav class="nav" aria-label="Main">
+      <div class="menu-wrap">
+        <button type="button" data-menu aria-expanded="false" aria-controls="products-menu">Products <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3.2l4 3.6 4-3.6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+        <div class="menu" id="products-menu" hidden>
+          <a href="index.html#scanner"><b>Quantum-risk scanner</b><span>Find the keys and signatures a quantum computer breaks.</span></a>
+          <a href="migrate.html"><b>Migrate</b><span>Add ML-DSA-87 next to Ed25519 or ECDSA, then enforce it.</span></a>
+          <a href="falcon.html"><b>Falcon-512</b><span>The post-quantum signature Solana's validator teams picked.</span></a>
+          <a href="verify.html"><b>Verify a bet</b><span>Check a casino's provably fair receipt in your browser.</span></a>
+          <a href="launch.html"><b>Vantax Chains</b><span>Your own post-quantum blockchain, on your own servers.</span></a>
+          <a href="bot.html"><b>VantaxBot</b><span>Signal trading that waits for the anti-rug scanner.</span></a>
+        </div>
+      </div>
+      <a href="packages.html">Packages</a>
+      <a href="holders.html" aria-current="page">Holders</a>
+      <a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub</a>
+    </nav>
+    <div class="header-tools">
+      <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.25" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 2.75a7.25 7.25 0 0 1 0 14.5z" fill="currentColor"/></svg></button>
+      <a class="btn p sm header-cta" href="index.html#scanner">Scan your code</a>
+      <button class="icon-btn menu-btn" type="button" data-sheet aria-expanded="false" aria-controls="sheet" aria-label="Open menu"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7h14M3 13h14" stroke="currentColor" stroke-width="1.8"/></svg></button>
+    </div>
+  </div>
 </header>
-<main>
-  <h1>Holder access.</h1>
-  <p class="lede">Hold at least <b><span data-min>1,000,000</span> <span data-token>$VANTAX</span></b> in a Solana wallet and get a Vantax API key with the post-quantum migration scanner. Prove the wallet is yours by signing a message. No transaction, no tokens moved.</p>
+<nav class="sheet" id="sheet" hidden aria-label="Menu">
+  <a href="index.html#scanner">Quantum-risk scanner <span>Find what a quantum computer breaks</span></a>
+  <a href="migrate.html">Migrate <span>ML-DSA-87 next to your keys</span></a>
+  <a href="falcon.html">Falcon-512 <span>Solana's post-quantum signature</span></a>
+  <a href="verify.html">Verify a bet <span>Provably fair, checked by you</span></a>
+  <a href="launch.html">Vantax Chains <span>Your own post-quantum chain</span></a>
+  <a href="bot.html">VantaxBot <span>Signal trading with rug checks</span></a>
+  <a href="packages.html">Packages <span>Pay in any currency</span></a>
+  <a href="holders.html">Holder access <span>For $VANTAX holders</span></a>
+  <a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub <span>Read the code</span></a>
+  <a class="btn p" href="index.html#scanner">Scan your code</a>
+</nav>
 
-  <div class="facts" aria-label="What holders get">
-    <div class="fact"><span>Minimum holding</span><b><span data-min>1,000,000</span></b></div>
-    <div class="fact"><span>Calls a month</span><b data-quota>1,000</b></div>
-    <div class="fact"><span>Scanner</span><b>Included</b></div>
-  </div>
-
-  <p class="warn" id="closed" hidden></p>
-
-  <div class="card" id="flow">
-    <h2>Get your key</h2>
-    <ol class="steps">
-      <li id="s1" class="now"><b>Connect your wallet</b><span>Phantom, Solflare or Backpack.</span></li>
-      <li id="s2"><b>Sign a message</b><span>It's free. Your wallet shows the text: a Vantax message naming your wallet, nothing else.</span></li>
-      <li id="s3"><b>Get your API key</b><span>Vantax reads your <span data-token>$VANTAX</span> balance, then shows your key once.</span></li>
-    </ol>
-    <div class="who" id="who" hidden></div>
-    <div class="wallets" id="wallets"></div>
-    <div class="links" id="actions" hidden>
-      <button class="btn p" id="sign" type="button">Sign and get my key</button>
-      <button class="btn" id="switch" type="button">Use another wallet</button>
+<main id="main">
+  <section class="field page-head" aria-labelledby="h-title">
+    <div class="shell">
+      <h1 id="h-title">Holder access.</h1>
+      <p class="lede">Hold at least <b><span data-min>1,000,000</span> <span data-token>$VANTAX</span></b> in a Solana wallet and get a Vantax API key with the post-quantum migration scanner. Prove the wallet is yours by signing a message. No transaction, no tokens moved.</p>
+      <dl class="terms" aria-label="What holders get">
+        <div><dt>Minimum holding</dt><dd><span data-min>1,000,000</span> <span data-token>$VANTAX</span></dd></div>
+        <div><dt>API calls a month</dt><dd data-quota>1,000</dd></div>
+        <div><dt>Quantum-risk scanner</dt><dd>Included</dd></div>
+        <div><dt>VantaxBot</dt><dd><a href="bot.html#buy">30% off</a></dd></div>
+      </dl>
     </div>
-    <p class="warn" id="error" role="alert" hidden></p>
-    <p class="mute" id="busy" role="status" hidden></p>
-  </div>
+  </section>
 
-  <div class="card" id="done" hidden>
-    <h2>Your API key <span class="mute">(holder)</span></h2>
-    <p class="ok" id="held"></p>
-    <div class="key"><code id="key"></code><button class="btn p" id="copy" type="button">Copy</button></div>
-    <p class="warn"><b>This is the only time the key is shown.</b> Store it in a password manager or secret store now. We keep only a hash of it. Lost it? Come back and sign again: you get a new key and the old one stops.</p>
-    <h2>Scan your code</h2>
-    <pre id="cli">export VANTAX_API_KEY=vtx_…
+  <section class="section" aria-labelledby="flow-title">
+    <div class="shell split wide-left">
+      <div>
+        <p class="notice warn" id="closed" hidden></p>
+
+        <div class="instrument" id="flow">
+          <div class="instrument-head"><b id="flow-title">Get your key</b><span>Signing is free and moves nothing</span></div>
+          <div class="flow-body">
+            <ol class="steps">
+              <li id="s1" class="now"><h3>Connect your wallet</h3><p>Phantom, Solflare or Backpack.</p></li>
+              <li id="s2"><h3>Sign a message</h3><p>Your wallet shows the text: a Vantax message naming your wallet, nothing else.</p></li>
+              <li id="s3"><h3>Get your API key</h3><p>Vantax reads your <span data-token>$VANTAX</span> balance, then shows your key once.</p></li>
+            </ol>
+            <div class="who" id="who" hidden></div>
+            <div class="cluster" id="wallets"></div>
+            <div class="cluster" id="actions" hidden>
+              <button class="btn p" id="sign" type="button">Sign and get my key</button>
+              <button class="btn" id="switch" type="button">Use another wallet</button>
+            </div>
+            <p class="notice bad" id="error" role="alert" hidden></p>
+            <p class="mute small" id="busy" role="status" hidden></p>
+          </div>
+        </div>
+
+        <div class="instrument" id="done" hidden>
+          <div class="instrument-head"><b>Your API key</b><span>Holder plan</span></div>
+          <div class="flow-body stack">
+            <p class="notice ok" id="held"></p>
+            <div class="copyline"><code id="key"></code><button id="copy" type="button">Copy</button></div>
+            <p class="notice warn"><b>This is the only time the key is shown.</b> Store it in a password manager or secret store now. We keep only a hash of it. Lost it? Come back and sign again: you get a new key and the old one stops working.</p>
+            <h3>Scan your code</h3>
+            <pre class="code" id="cli">export VANTAX_API_KEY=vtx_…
 vantax scan . --fail-on high</pre>
-    <p class="mute" id="terms"></p>
-    <div class="links">
-      <a class="btn" href="https://github.com/Vanta-Cybersecurity/Vantax#scanner-in-ci">Scanner in CI</a>
-      <a class="btn" href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/API.md">API docs</a>
+            <p class="mute small" id="terms"></p>
+            <div class="cluster">
+              <a class="btn" href="https://github.com/Vanta-Cybersecurity/Vantax#scanner-in-ci">Scanner in CI</a>
+              <a class="btn" href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/API.md">API reference</a>
+              <a class="btn" href="bot.html#buy">VantaxBot at the holder price</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack" style="--stack:28px">
+        <div class="panel strong">
+          <h3>Stay safe</h3>
+          <p class="small">This page only asks your wallet to <b>sign a text message</b>. If your wallet shows a transaction, an approval or a request to send anything, reject it: that isn't us.</p>
+          <p class="small" style="margin:0">Vantax will never ask for your seed phrase or private key, and never asks you to send tokens.</p>
+        </div>
+        <div class="prose small">
+          <h3 style="margin-bottom:10px">How it works</h3>
+          <p>Your key is on the Holder plan while the wallet holds the minimum. Vantax checks the balance again about every <span data-hours>6</span> hours; below the minimum the key moves to the Free plan, and it comes back once the wallet holds enough again. One key per wallet.</p>
+          <p>The same signature check gives the holder price on <a href="bot.html#buy">VantaxBot</a>, at checkout.</p>
+          <p>You don't need the token to use Vantax: anyone can subscribe to <a href="packages.html#api">Pro or Enterprise</a>. Holder access can change or end. This is not financial advice or an invitation to buy; cryptoassets are high risk.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="shell">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="index.html" aria-label="Vantax home"><svg viewBox="0 0 372.84 120" role="img" aria-label="Vantax" xmlns="http://www.w3.org/2000/svg"><path class="v-main" d="M34.64 120 L92.38 20 L80.83 0 L34.64 80 L11.55 40 L0 60 Z"/><path class="v-facet" d="M34.64 120 L5.77 50 L0 60 Z"/><path class="v-facet" d="M34.64 120 L86.6 10 L80.83 0 L34.64 80 Z"/><g class="wm"><path d="M116.38 39.6 L128.36 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M145.24 39.6 L157.22 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M149.97 94.8 L161.95 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M178.83 94.8 L190.81 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M197.99 39.6 L209.58 39.6 L209.58 94.8 L197.99 94.8 Z"/><path d="M228.35 39.6 L239.94 39.6 L239.94 94.8 L228.35 94.8 Z"/><path d="M197.99 39.6 L211.07 39.6 L239.94 94.8 L226.86 94.8 Z"/><path d="M247.12 39.6 L286.86 39.6 L286.86 51.19 L247.12 51.19 Z"/><path d="M261.19 39.6 L272.79 39.6 L272.79 94.8 L261.19 94.8 Z"/><path d="M282.87 94.8 L294.85 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M311.73 94.8 L323.71 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M330.89 39.6 L343.97 39.6 L372.84 94.8 L359.76 94.8 Z"/><path d="M359.76 39.6 L372.84 39.6 L343.97 94.8 L330.89 94.8 Z"/></g></svg></a>
+        <p>Post-quantum security, built to be verified.</p>
+        <p class="tiny">Written in Rust by one developer, with no outside funding. Nine of the twelve crates are open source.</p>
+      </div>
+      <div>
+        <h4>Products</h4>
+        <ul>
+          <li><a href="index.html#scanner">Quantum-risk scanner</a></li>
+          <li><a href="migrate.html">Migrate</a></li>
+          <li><a href="falcon.html">Falcon-512</a></li>
+          <li><a href="verify.html">Verify a bet</a></li>
+          <li><a href="launch.html">Vantax Chains</a></li>
+          <li><a href="bot.html">VantaxBot</a></li>
+          <li><a href="packages.html">Packages</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Check our work</h4>
+        <ul>
+          <li><a href="https://github.com/Vanta-Cybersecurity/Vantax">Source code</a></li>
+          <li><a href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/WHITEPAPER.md">Whitepaper</a></li>
+          <li><a href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/API.md">API reference</a></li>
+          <li><a href="https://api.vantax-cybersecurity.com/health">API health</a></li>
+          <li><a href="https://api.vantax-cybersecurity.com/api/v1/gateway/audit">Audit trail</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>$VANTAX</h4>
+        <ul>
+          <li><a href="index.html#token">Official address</a></li>
+          <li><a href="holders.html">Holder access</a></li>
+          <li><a href="burns.html">Buyback and burns</a></li>
+          <li><a href="https://x.com/VantaxFounder">@VantaxFounder on X</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-legal">
+      <span>© 2026 Vantax Cybersecurity</span>
+      <span>Cryptoassets are high risk and you can lose everything you put in. Nothing here is financial advice.</span>
     </div>
   </div>
-
-  <div class="safe">
-    <b>Stay safe.</b> This page only asks your wallet to <b>sign a text message</b>. If your wallet shows a transaction, an approval or a request to send anything, reject it: that isn't us. Vantax will never ask for your seed phrase or private key, and never asks you to send tokens.
-  </div>
-
-  <p class="small">How it works: your key is on the Holder plan while the wallet holds the minimum. Vantax checks the balance again about every <span data-hours>6</span> hours; below the minimum the key moves to the Free plan, and it comes back once the wallet holds enough again. One key per wallet. You don't need the token to use Vantax: anyone can subscribe to <a href="/#pricing">Pro or Enterprise</a>. Holder access can change or end. This is not financial advice or an invitation to buy; cryptoassets are high risk.</p>
-</main>
-<footer>
-  <span>Vantax. Post-quantum security, built to be verified.</span>
-  <span><a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub</a> &nbsp; <a href="/#token">Official CA</a></span>
 </footer>
-</div>
+
 <script>
 (function(){
   "use strict";
@@ -184,7 +238,7 @@ vantax scan . --fail-on high</pre>
     var mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     var here=location.href.split("#")[0];
     if(mobile){
-      var p=document.createElement("p");p.className="mute";p.style.margin="0 0 10px";
+      var p=document.createElement("p");p.className="mute small";p.style.margin="0";p.style.flexBasis="100%";
       p.textContent="Open this page inside your wallet app to connect:";
       box.appendChild(p);
       [["Open in Phantom","https://phantom.app/ul/browse/"+encodeURIComponent(here)+"?ref="+encodeURIComponent(location.origin)],
@@ -192,7 +246,7 @@ vantax scan . --fail-on high</pre>
         var a=document.createElement("a");a.className="btn p";a.href=l[1];a.textContent=l[0];box.appendChild(a);
       });
     }else{
-      var q=document.createElement("p");q.className="mute";q.style.margin="0";
+      var q=document.createElement("p");q.className="mute small";q.style.margin="0";
       q.textContent="No Solana wallet found in this browser. Install Phantom, Solflare or Backpack, then reload this page.";
       box.appendChild(q);
     }
@@ -293,11 +347,11 @@ vantax scan . --fail-on high</pre>
     if(!r.ok)throw new Error(r.status);return r.json();
   }).then(function(d){
     var h=d.holder||{};
-    if(!h.enabled){var c=$("closed");c.textContent="Holder keys are paused for a moment. Check back soon, or see ";var a=document.createElement("a");a.href="/#pricing";a.textContent="Pro and Enterprise";c.append(a,".");c.hidden=false;$("flow").hidden=true;return}
+    if(!h.enabled){var c=$("closed");c.textContent="Holder keys are paused for a moment. Check back soon, or see ";var a=document.createElement("a");a.href="packages.html#api";a.textContent="Pro and Enterprise";c.append(a,".");c.hidden=false;$("flow").hidden=true;return}
     state.info=h;
-    all("[data-min]").forEach(function(e){e.textContent=grouped(h.min_tokens)});
+    if(h.min_tokens!=null)all("[data-min]").forEach(function(e){e.textContent=grouped(h.min_tokens)});
     all("[data-token]").forEach(function(e){e.textContent=h.token||"$VANTAX"});
-    all("[data-quota]").forEach(function(e){e.textContent=grouped(h.monthly_quota)});
+    if(h.monthly_quota!=null)all("[data-quota]").forEach(function(e){e.textContent=grouped(h.monthly_quota)});
     all("[data-hours]").forEach(function(e){e.textContent=String(Math.round(h.recheck_hours||6))});
   }).catch(function(){});
 

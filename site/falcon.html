@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Base URL of the Vantax API (no trailing slash). Empty means this site's own
+     origin, for when the site and the API share a host (nginx proxies /api/). -->
+<meta name="vantax-api" content="https://api.vantax-cybersecurity.com">
+<!-- Where the VantaxBot store runs (see the bot's deploy guide). -->
+<meta name="vantax-store" content="https://store.vantax-cybersecurity.com">
+<meta name="theme-color" content="#2b3cff">
+<link rel="preload" href="assets/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/vantax.css">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<script>try{var t=localStorage.getItem("vantax-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script src="assets/vantax.js" defer></script>
+<title>Falcon-512: Vantax</title>
+<meta name="description" content="Falcon-512, the compact post-quantum signature Solana's on-chain work uses: make a key, sign and verify in your browser or with the vantax CLI. 897-byte keys, 666-byte signatures, NIST test vectors reproduced byte for byte.">
+<link rel="canonical" href="https://vantax-cybersecurity.com/falcon.html">
+<meta property="og:title" content="Falcon-512 on Vantax">
+<meta property="og:description" content="Make a Falcon-512 key, sign and verify in your browser. Same files as the vantax CLI.">
+<meta property="og:url" content="https://vantax-cybersecurity.com/falcon.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@VantaxFounder">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="shell">
+    <a class="brand" href="index.html" aria-label="Vantax home"><svg viewBox="0 0 372.84 120" role="img" aria-label="Vantax" xmlns="http://www.w3.org/2000/svg"><path class="v-main" d="M34.64 120 L92.38 20 L80.83 0 L34.64 80 L11.55 40 L0 60 Z"/><path class="v-facet" d="M34.64 120 L5.77 50 L0 60 Z"/><path class="v-facet" d="M34.64 120 L86.6 10 L80.83 0 L34.64 80 Z"/><g class="wm"><path d="M116.38 39.6 L128.36 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M145.24 39.6 L157.22 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M149.97 94.8 L161.95 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M178.83 94.8 L190.81 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M197.99 39.6 L209.58 39.6 L209.58 94.8 L197.99 94.8 Z"/><path d="M228.35 39.6 L239.94 39.6 L239.94 94.8 L228.35 94.8 Z"/><path d="M197.99 39.6 L211.07 39.6 L239.94 94.8 L226.86 94.8 Z"/><path d="M247.12 39.6 L286.86 39.6 L286.86 51.19 L247.12 51.19 Z"/><path d="M261.19 39.6 L272.79 39.6 L272.79 94.8 L261.19 94.8 Z"/><path d="M282.87 94.8 L294.85 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M311.73 94.8 L323.71 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M330.89 39.6 L343.97 39.6 L372.84 94.8 L359.76 94.8 Z"/><path d="M359.76 39.6 L372.84 39.6 L343.97 94.8 L330.89 94.8 Z"/></g></svg></a>
+    <nav class="nav" aria-label="Main">
+      <div class="menu-wrap">
+        <button type="button" data-menu aria-expanded="false" aria-controls="products-menu">Products <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3.2l4 3.6 4-3.6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+        <div class="menu" id="products-menu" hidden>
+          <a href="index.html#scanner"><b>Quantum-risk scanner</b><span>Find the keys and signatures a quantum computer breaks.</span></a>
+          <a href="migrate.html"><b>Migrate</b><span>Add ML-DSA-87 next to Ed25519 or ECDSA, then enforce it.</span></a>
+          <a href="falcon.html" aria-current="page"><b>Falcon-512</b><span>The post-quantum signature Solana's validator teams picked.</span></a>
+          <a href="verify.html"><b>Verify a bet</b><span>Check a casino's provably fair receipt in your browser.</span></a>
+          <a href="launch.html"><b>Vantax Chains</b><span>Your own post-quantum blockchain, on your own servers.</span></a>
+          <a href="bot.html"><b>VantaxBot</b><span>Signal trading that waits for the anti-rug scanner.</span></a>
+        </div>
+      </div>
+      <a href="packages.html">Packages</a>
+      <a href="holders.html">Holders</a>
+      <a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub</a>
+    </nav>
+    <div class="header-tools">
+      <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.25" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 2.75a7.25 7.25 0 0 1 0 14.5z" fill="currentColor"/></svg></button>
+      <a class="btn p sm header-cta" href="index.html#scanner">Scan your code</a>
+      <button class="icon-btn menu-btn" type="button" data-sheet aria-expanded="false" aria-controls="sheet" aria-label="Open menu"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7h14M3 13h14" stroke="currentColor" stroke-width="1.8"/></svg></button>
+    </div>
+  </div>
+</header>
+<nav class="sheet" id="sheet" hidden aria-label="Menu">
+  <a href="index.html#scanner">Quantum-risk scanner <span>Find what a quantum computer breaks</span></a>
+  <a href="migrate.html">Migrate <span>ML-DSA-87 next to your keys</span></a>
+  <a href="falcon.html">Falcon-512 <span>Solana's post-quantum signature</span></a>
+  <a href="verify.html">Verify a bet <span>Provably fair, checked by you</span></a>
+  <a href="launch.html">Vantax Chains <span>Your own post-quantum chain</span></a>
+  <a href="bot.html">VantaxBot <span>Signal trading with rug checks</span></a>
+  <a href="packages.html">Packages <span>Pay in any currency</span></a>
+  <a href="holders.html">Holder access <span>For $VANTAX holders</span></a>
+  <a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub <span>Read the code</span></a>
+  <a class="btn p" href="index.html#scanner">Scan your code</a>
+</nav>
+
+<main id="main">
+  <section class="field page-head" aria-labelledby="fn-title">
+    <div class="shell">
+      <a class="crumb" href="index.html#products">Vantax products</a>
+      <h1 id="fn-title">Falcon-512, working today.</h1>
+      <p class="lede">The compact lattice signature Solana's post-quantum work has settled on. Make a key, sign and verify right here, or with <code>vantax falcon</code> on your own machine. The files are the same either way.</p>
+      <div class="cluster" style="margin-top:28px">
+        <a class="btn p" href="#bench">Make a key in this tab</a>
+        <a class="btn" href="#cli">Use the command line</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="bench" aria-labelledby="bench-title">
+    <div class="shell">
+      <div class="section-head">
+        <h2 id="bench-title">Key, signature, check.</h2>
+        <p>Everything below runs in your browser from a 90 KB WebAssembly module. Nothing is sent anywhere, and the page keeps nothing once you close it.</p>
+      </div>
+
+      <div class="instrument bench" aria-live="off">
+        <div class="instrument-head">
+          <b>Falcon-512 workbench</b>
+          <span id="fb-engine">Loading Falcon-512…</span>
+        </div>
+        <ol class="bench-cols">
+          <li class="bench-col" aria-labelledby="fb-key-h">
+            <h3 id="fb-key-h">Make a key</h3>
+            <p class="small mute">A fresh key pair from 48 bytes of your browser's randomness.</p>
+            <div class="cluster">
+              <button class="btn p sm" type="button" id="fb-keygen" disabled>Make a key</button>
+              <label class="btn sm file-btn">Open a key file<input type="file" id="fb-keyfile" accept="application/json,.json"></label>
+            </div>
+            <dl class="kv bench-kv" id="fb-key-info" hidden>
+              <dt>Fingerprint</dt><dd id="fb-fp"></dd>
+              <dt>Public key</dt><dd id="fb-pk-size"></dd>
+            </dl>
+            <div class="cluster" id="fb-key-save" hidden>
+              <button class="btn sm" type="button" id="fb-save-pub">Save public key</button>
+              <button class="btn sm" type="button" id="fb-save-key">Save key pair</button>
+            </div>
+            <p class="notice warn small" id="fb-key-note" hidden>The key pair file holds the secret key. It exists only in this tab until you save it; keep it off shared drives.</p>
+          </li>
+
+          <li class="bench-col" aria-labelledby="fb-sign-h">
+            <h3 id="fb-sign-h">Sign</h3>
+            <div class="fld">
+              <label for="fb-msg">Message</label>
+              <textarea class="mono" id="fb-msg" rows="3" spellcheck="false">Built to be verified.</textarea>
+            </div>
+            <div class="cluster">
+              <button class="btn p sm" type="button" id="fb-sign" disabled>Sign</button>
+              <button class="btn sm" type="button" id="fb-save-sig" hidden>Save signature</button>
+            </div>
+            <pre class="sig-hex bench-hex" id="fb-sig" aria-label="The signature, in hexadecimal"></pre>
+            <p class="small mute" id="fb-sig-meta" hidden></p>
+          </li>
+
+          <li class="bench-col" aria-labelledby="fb-verify-h">
+            <h3 id="fb-verify-h">Check</h3>
+            <p class="small mute">Filled in from the first two steps. Paste or open files from the CLI to check those instead.</p>
+            <div class="fld">
+              <label for="fb-v-pub">Public key (.pub.json)</label>
+              <textarea class="mono" id="fb-v-pub" rows="3" spellcheck="false" placeholder='{ "algorithm": "Falcon-512", "public_key": "09…", "fingerprint": "…" }'></textarea>
+            </div>
+            <div class="fld">
+              <label for="fb-v-sig">Signature (.json)</label>
+              <textarea class="mono" id="fb-v-sig" rows="3" spellcheck="false" placeholder='{ "algorithm": "Falcon-512", "signature": "39…", … }'></textarea>
+            </div>
+            <div class="fld">
+              <label for="fb-v-msg">Message</label>
+              <textarea class="mono" id="fb-v-msg" rows="2" spellcheck="false"></textarea>
+            </div>
+            <div class="cluster">
+              <label class="btn sm file-btn">Open files<input type="file" id="fb-vfiles" accept="application/json,.json" multiple></label>
+            </div>
+            <p class="sig-state" id="fb-verdict" role="status"><b>Waiting for a signature</b></p>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="size" aria-labelledby="size-title">
+    <div class="shell split">
+      <div class="section-head">
+        <h2 id="size-title">Small enough to live on-chain.</h2>
+        <p>A Solana transaction is at most 1,232 bytes. An <span class="nowrap">ML-DSA-87</span> signature is almost four times that; a <span class="nowrap">Falcon-512</span> signature fits with room to spare. That is why Solana's post-quantum work builds on Falcon.</p>
+      </div>
+      <div>
+        <figure class="bars" aria-labelledby="bars-cap">
+          <figcaption id="bars-cap"><b>Signature size</b><span>bytes, one signature</span></figcaption>
+          <div class="bar-plot" style="--limit:.26627">
+          <span class="bar-ref" aria-hidden="true"><span>1,232-byte transaction limit</span></span>
+          <div class="bar-row" tabindex="0" data-tip="Ed25519: 64-byte signature. What Solana signs with today; broken by Shor's algorithm.">
+            <span class="bar-name">Ed25519</span>
+            <span class="bar-track"><span class="bar" style="--w:1.38%"></span><span class="bar-val">64</span></span>
+          </div>
+          <div class="bar-row on" tabindex="0" data-tip="Falcon-512: 666-byte padded signature. NIST security category 1.">
+            <span class="bar-name">Falcon-512</span>
+            <span class="bar-track"><span class="bar" style="--w:14.39%"></span><span class="bar-val">666</span></span>
+          </div>
+          <div class="bar-row" tabindex="0" data-tip="ML-DSA-87: 4,627-byte signature. NIST FIPS 204, security category 5.">
+            <span class="bar-name">ML-DSA-87</span>
+            <span class="bar-track"><span class="bar" style="--w:100%"></span><span class="bar-val">4,627</span></span>
+          </div>
+          </div>
+          <p class="sr-only">A whole Solana transaction can be at most 1,232 bytes: Falcon-512's signature fits inside that, ML-DSA-87's doesn't.</p>
+        </figure>
+
+        <div class="table-wrap">
+          <table class="spec">
+            <caption class="sr-only">Signature schemes compared</caption>
+            <thead>
+              <tr><th scope="col">Scheme</th><th scope="col" class="num">Public key</th><th scope="col" class="num">Signature</th><th scope="col">Security</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Ed25519</th><td class="num">32</td><td class="num">64</td><td>Broken by a large quantum computer</td></tr>
+              <tr class="on"><th scope="row">Falcon-512</th><td class="num">897</td><td class="num">666</td><td>NIST category 1</td></tr>
+              <tr><th scope="row">ML-DSA-87</th><td class="num">2,592</td><td class="num">4,627</td><td>NIST category 5, FIPS 204</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small mute" style="margin-top:14px">Sizes in bytes. Category 1 is the level of AES-128; category 5 is AES-256. Vantax signs its own records with ML-DSA-87 and uses Falcon-512 where every byte is paid for.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="solana" aria-labelledby="sol-title">
+    <div class="shell split">
+      <div class="section-head">
+        <h2 id="sol-title">Where Solana is with it.</h2>
+      </div>
+      <div class="prose">
+        <p class="kicker">Solana accounts still sign with Ed25519, and nothing here changes that. What changed in 2026 is that Falcon-512 became the post-quantum signature the ecosystem builds on.</p>
+        <p>Jump Crypto's proposal for verifying Falcon inside programs is SIMD-0416. Blueshift's Vector program already checks Falcon-512 signatures on-chain, for about 184,000 compute units each, and a Squads builder says he has used it on mainnet to let a Falcon key vote in a multisig.</p>
+        <p>The keys and signatures this page and <code>vantax falcon</code> make are standard Falcon-512 in the padded encoding those verifiers take: 897-byte public keys, 666-byte signatures, signed over the raw message. <code>vantax falcon export</code> prints the exact bytes.</p>
+        <p class="small mute">Vantax isn't affiliated with Solana, Jump, Blueshift or Squads. Check any on-chain verifier's own documentation before you rely on it.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="cli" aria-labelledby="cli-title">
+    <div class="shell split">
+      <div class="section-head">
+        <h2 id="cli-title">On your own machine.</h2>
+        <p>The <code>vantax</code> command does the same with your operating system's randomness, and writes key files owner-only.</p>
+        <div class="cluster"><a class="btn sm" href="https://github.com/Vanta-Cybersecurity/Vantax#falcon-512">Install the CLI</a></div>
+      </div>
+      <div>
+<pre class="code"><span class="c"># a key pair, plus a .pub.json to share</span>
+vantax falcon keygen -o hot.json
+
+<span class="c"># sign a message, a file or hex bytes</span>
+vantax falcon sign -k hot.json -m "Built to be verified." -o hot.sig.json
+
+<span class="c"># check it (exit code 1 if it doesn't verify)</span>
+vantax falcon verify -k hot.pub.json -s hot.sig.json -m "Built to be verified."
+
+<span class="c"># the raw bytes, in base64 and hex, for on-chain verifiers</span>
+vantax falcon export -k hot.pub.json -s hot.sig.json</pre>
+        <p class="small mute" style="margin-top:14px">Files from the CLI open in the workbench above, and keys made in the browser sign with the CLI.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band" id="proof" aria-labelledby="proof-title">
+    <div class="shell">
+      <h2 id="proof-title">How you can tell it's right.</h2>
+      <div class="proof">
+        <a href="https://github.com/Vanta-Cybersecurity/Vantax/tree/main/falcon">
+          <b>NIST test vectors, reproduced</b>
+          <span class="mute">The browser build reruns NIST's known-answer test. Its SHA-256 matches the reference.</span>
+          <code>91842d41138e7cfaf6e2e8f12a03c3b3411302255121e4d07d02f91a003c0395</code>
+        </a>
+        <a href="https://github.com/Vanta-Cybersecurity/Vantax/tree/main/falcon/vendor/pqclean">
+          <b>PQClean's implementation</b>
+          <span class="mute">Falcon-padded-512, the same C code the CLI runs through pqcrypto-falcon.</span>
+          <code>PQClean 36708dbf, 2025-03-05</code>
+        </a>
+        <a href="https://github.com/Vanta-Cybersecurity/Vantax/tree/main/falcon/tests/vectors">
+          <b>Browser and CLI agree</b>
+          <span class="mute">Every build checks a signature made by the other, both ways.</span>
+          <code>falcon/tests/vectors</code>
+        </a>
+      </div>
+      <p class="small" style="margin-top:28px">Not independently audited yet. Keys made in a browser live in page memory: use them for demos and keys that guard little, and keep valuable keys in the CLI, a hardware module or a vault.</p>
+    </div>
+  </section>
+
+  <section class="section" id="faq" aria-labelledby="faq-title">
+    <div class="shell split">
+      <div class="section-head"><h2 id="faq-title">Questions.</h2></div>
+      <div class="faq">
+        <details><summary>Is my key sent anywhere?</summary><div><p>No. Keys are made, used and checked inside this tab. The page makes no network requests for any of it, and nothing is stored once you close the tab.</p></div></details>
+        <details><summary>Can I make my Solana wallet post-quantum with this?</summary><div><p>Not on its own. A wallet's address is an Ed25519 key, and only a change to Solana itself can replace that. Today a Falcon key can authorise things through programs that verify Falcon-512 on-chain, and Vantax can bind a post-quantum key to your account and refuse actions that arrive without its signature.</p></div></details>
+        <details><summary>Falcon-512 or ML-DSA-87?</summary><div><p>Use ML-DSA-87 for keys that guard a lot and live off-chain: it is a published NIST standard at the highest security category. Use Falcon-512 where size matters, above all on-chain, where a 4,627-byte signature doesn't fit in a transaction.</p></div></details>
+        <details><summary>Why does a new signature look different every time?</summary><div><p>Falcon signs with fresh randomness each time, so two signatures over the same message differ. Both verify. Keys are the opposite: the same 48-byte seed always gives the same key.</p></div></details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="shell">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="index.html" aria-label="Vantax home"><svg viewBox="0 0 372.84 120" role="img" aria-label="Vantax" xmlns="http://www.w3.org/2000/svg"><path class="v-main" d="M34.64 120 L92.38 20 L80.83 0 L34.64 80 L11.55 40 L0 60 Z"/><path class="v-facet" d="M34.64 120 L5.77 50 L0 60 Z"/><path class="v-facet" d="M34.64 120 L86.6 10 L80.83 0 L34.64 80 Z"/><g class="wm"><path d="M116.38 39.6 L128.36 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M145.24 39.6 L157.22 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M149.97 94.8 L161.95 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M178.83 94.8 L190.81 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M197.99 39.6 L209.58 39.6 L209.58 94.8 L197.99 94.8 Z"/><path d="M228.35 39.6 L239.94 39.6 L239.94 94.8 L228.35 94.8 Z"/><path d="M197.99 39.6 L211.07 39.6 L239.94 94.8 L226.86 94.8 Z"/><path d="M247.12 39.6 L286.86 39.6 L286.86 51.19 L247.12 51.19 Z"/><path d="M261.19 39.6 L272.79 39.6 L272.79 94.8 L261.19 94.8 Z"/><path d="M282.87 94.8 L294.85 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M311.73 94.8 L323.71 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M330.89 39.6 L343.97 39.6 L372.84 94.8 L359.76 94.8 Z"/><path d="M359.76 39.6 L372.84 39.6 L343.97 94.8 L330.89 94.8 Z"/></g></svg></a>
+        <p>Post-quantum security, built to be verified.</p>
+        <p class="tiny">Written in Rust by one developer, with no outside funding. Nine of the twelve crates are open source.</p>
+      </div>
+      <div>
+        <h4>Products</h4>
+        <ul>
+          <li><a href="index.html#scanner">Quantum-risk scanner</a></li>
+          <li><a href="migrate.html">Migrate</a></li>
+          <li><a href="falcon.html">Falcon-512</a></li>
+          <li><a href="verify.html">Verify a bet</a></li>
+          <li><a href="launch.html">Vantax Chains</a></li>
+          <li><a href="bot.html">VantaxBot</a></li>
+          <li><a href="packages.html">Packages</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Check our work</h4>
+        <ul>
+          <li><a href="https://github.com/Vanta-Cybersecurity/Vantax">Source code</a></li>
+          <li><a href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/WHITEPAPER.md">Whitepaper</a></li>
+          <li><a href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/API.md">API reference</a></li>
+          <li><a href="https://api.vantax-cybersecurity.com/health">API health</a></li>
+          <li><a href="https://api.vantax-cybersecurity.com/api/v1/gateway/audit">Audit trail</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>$VANTAX</h4>
+        <ul>
+          <li><a href="index.html#token">Official address</a></li>
+          <li><a href="holders.html">Holder access</a></li>
+          <li><a href="burns.html">Buyback and burns</a></li>
+          <li><a href="https://x.com/VantaxFounder">@VantaxFounder on X</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-legal">
+      <span>© 2026 Vantax Cybersecurity</span>
+      <span>Cryptoassets are high risk and you can lose everything you put in. Nothing here is financial advice.</span>
+    </div>
+  </div>
+</footer>
+
+<script type="module">
+// The workbench. Falcon-512 from falcon512.wasm, fingerprints and message
+// hashes from the Vantax triple hash in vantax_wasm.wasm, nothing sent.
+import { loadVantax } from "./wasm/vantax.js";
+import { loadFalcon } from "./wasm/falcon.js";
+const $ = (id) => document.getElementById(id);
+const tick = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>';
+const cross = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="2.2"/></svg>';
+let fn, key = null, lastSig = null;
+
+function verdict(kind, title, detail) {
+  const v = $("fb-verdict");
+  v.className = "sig-state" + (kind ? " " + kind : "");
+  v.innerHTML = (kind === "ok" ? tick : kind === "bad" ? cross : "") + "<div><b></b><span></span></div>";
+  v.querySelector("b").textContent = title;
+  v.querySelector("span").textContent = detail || "";
+}
+
+function save(name, obj) {
+  const blob = new Blob([JSON.stringify(obj, null, 2) + "\n"], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function useKey(k, how) {
+  key = k;
+  $("fb-fp").textContent = k.fingerprint.slice(0, 24) + "…";
+  $("fb-fp").title = k.fingerprint;
+  $("fb-pk-size").textContent = (k.public_key.length / 2).toLocaleString("en-GB") + " bytes, " + how;
+  $("fb-key-info").hidden = false; $("fb-key-save").hidden = false; $("fb-key-note").hidden = false;
+  $("fb-sign").disabled = false;
+  $("fb-v-pub").value = JSON.stringify(fn.publicKey(k), null, 1);
+  sign();
+}
+
+function sign() {
+  if (!key) return;
+  const msg = $("fb-msg").value, t0 = performance.now();
+  lastSig = fn.sign(key, msg);
+  const ms = Math.max(1, Math.round(performance.now() - t0));
+  $("fb-sig").textContent = lastSig.signature;
+  $("fb-sig-meta").hidden = false;
+  $("fb-sig-meta").textContent = (lastSig.signature.length / 2) + " bytes, signed in " + ms + " ms.";
+  $("fb-save-sig").hidden = false;
+  $("fb-v-sig").value = JSON.stringify(lastSig, null, 1);
+  $("fb-v-msg").value = msg;
+  check();
+}
+
+function parse(id, what) {
+  const t = $(id).value.trim();
+  if (!t) return null;
+  try { return JSON.parse(t); } catch (e) { throw new Error(what + " isn't valid JSON."); }
+}
+
+function check() {
+  let pub, sig;
+  try { pub = parse("fb-v-pub", "The public key"); sig = parse("fb-v-sig", "The signature"); }
+  catch (e) { return verdict("bad", "Can't read that", e.message); }
+  if (!pub || !sig) return verdict("", "Waiting for a signature", "Make a key and sign, or paste a public key and a signature.");
+  try {
+    const r = fn.verify(pub, sig, $("fb-v-msg").value);
+    if (r.valid) verdict("ok", "Valid", "Signed by " + String(r.signer_fingerprint || "").slice(0, 16) + "… over exactly this message.");
+    else verdict("bad", "Doesn't verify", "This signature wasn't made by this key over this message.");
+  } catch (e) {
+    verdict("bad", "Can't check that", e.message.replace(/^./, (c) => c.toUpperCase()) + ".");
+  }
+}
+
+async function readFiles(files) {
+  for (const f of files) {
+    let obj;
+    try { obj = JSON.parse(await f.text()); } catch (e) { verdict("bad", "Can't read " + f.name, "Open the .json files the CLI wrote."); return; }
+    if (obj.signature) { $("fb-v-sig").value = JSON.stringify(obj, null, 1); }
+    else if (obj.public_key) {
+      const pubOnly = { algorithm: obj.algorithm, public_key: obj.public_key, fingerprint: obj.fingerprint };
+      $("fb-v-pub").value = JSON.stringify(pubOnly, null, 1);
+    }
+  }
+  check();
+}
+
+$("fb-keygen").addEventListener("click", () => useKey(fn.keygen(), "made in this tab"));
+$("fb-sign").addEventListener("click", sign);
+$("fb-msg").addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) sign(); });
+["fb-v-pub", "fb-v-sig", "fb-v-msg"].forEach((id) => $(id).addEventListener("input", check));
+$("fb-save-pub").addEventListener("click", () => save("falcon-key.pub.json", fn.publicKey(key)));
+$("fb-save-key").addEventListener("click", () => save("falcon-key.json", key));
+$("fb-save-sig").addEventListener("click", () => lastSig && save("falcon-signature.json", lastSig));
+$("fb-vfiles").addEventListener("change", (e) => { readFiles([...e.target.files]); e.target.value = ""; });
+$("fb-keyfile").addEventListener("change", async (e) => {
+  const f = e.target.files[0]; e.target.value = "";
+  if (!f) return;
+  try {
+    const k = JSON.parse(await f.text());
+    if (!k.secret_key) throw new Error("That file has no secret key. To check a signature, open it in the third step.");
+    const probe = fn.sign(k, "Vantax key check");
+    if (!fn.verify(fn.publicKey(k), probe, "Vantax key check").valid) throw new Error("The public and secret halves of that key don't match.");
+    useKey(k, "opened from " + f.name);
+  } catch (err) {
+    verdict("bad", "Can't use that key", err.message);
+  }
+});
+
+try {
+  const vx = await loadVantax(new URL("./wasm/vantax_wasm.wasm", import.meta.url));
+  fn = await loadFalcon(new URL("./wasm/falcon512.wasm", import.meta.url), { hash: vx.hash });
+  $("fb-engine").textContent = "PQClean Falcon-padded-512, running in this tab";
+  $("fb-keygen").disabled = false;
+  useKey(fn.keygen(), "made in this tab");
+} catch (e) {
+  $("fb-engine").textContent = "Couldn't start";
+  verdict("bad", "Your browser couldn't run Falcon-512", "It needs WebAssembly. The vantax CLI does the same on your machine.");
+}
+
+// Chart tooltips: the value and what it means, on hover and on focus.
+const tip = document.createElement("div"); tip.className = "bar-tip"; tip.hidden = true; tip.setAttribute("role", "tooltip");
+document.body.appendChild(tip);
+document.querySelectorAll(".bar-row").forEach((row) => {
+  const showTip = () => { tip.textContent = row.dataset.tip; tip.hidden = false; const r = row.querySelector(".bar").getBoundingClientRect();
+    tip.style.left = Math.min(window.innerWidth - tip.offsetWidth - 12, Math.max(12, r.right - tip.offsetWidth / 2)) + "px"; tip.style.top = (window.scrollY + r.top - tip.offsetHeight - 10) + "px"; };
+  const hideTip = () => { tip.hidden = true; };
+  row.addEventListener("mouseenter", showTip); row.addEventListener("mouseleave", hideTip);
+  row.addEventListener("focus", showTip); row.addEventListener("blur", hideTip);
+});
+</script>
+</body>
+</html>

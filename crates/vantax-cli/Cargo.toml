@@ -1,6 +1,6 @@
 [package]
 name = "vantax-cli"
-description = "The vantax command: ML-DSA-87 keys and signatures, PQ commitments, transaction intents, Shamir vaults, and a client for the Vantax quantum-risk scanner with CI exit codes."
+description = "The vantax command: ML-DSA-87 and Falcon-512 keys and signatures, PQ commitments, transaction intents, Shamir vaults, and a client for the Vantax quantum-risk scanner with CI exit codes."
 version.workspace = true
 edition.workspace = true
 license.workspace = true

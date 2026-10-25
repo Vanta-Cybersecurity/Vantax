@@ -3,207 +3,241 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Vantax Verifier: check any bet in your browser</title>
-<meta name="description" content="Check a provably fair bet yourself: the ML-DSA-87 signature, the seed commitment and the outcome, recomputed in WebAssembly. Nothing leaves your device.">
+<!-- Base URL of the Vantax API (no trailing slash). Empty means this site's own
+     origin, for when the site and the API share a host (nginx proxies /api/). -->
+<meta name="vantax-api" content="https://api.vantax-cybersecurity.com">
+<!-- Where the VantaxBot store runs (see the bot's deploy guide). -->
+<meta name="vantax-store" content="https://store.vantax-cybersecurity.com">
+<meta name="theme-color" content="#2b3cff">
+<link rel="preload" href="assets/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/vantax.css">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<script>try{var t=localStorage.getItem("vantax-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script src="assets/vantax.js" defer></script>
+<title>Verify a bet: Vantax</title>
+<meta name="description" content="Check a provably fair bet yourself: verify the operator's ML-DSA-87 signature on the receipt and recompute the outcome from the seeds, in your browser. Nothing you paste leaves your device.">
 <link rel="canonical" href="https://vantax-cybersecurity.com/verify.html">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://vantax-cybersecurity.com/verify.html">
 <meta property="og:title" content="Don't trust the casino. Check it.">
-<meta property="og:description" content="Post-quantum signed bet receipts, verified in your browser with WebAssembly. Nothing leaves your device.">
+<meta property="og:description" content="Verify a provably fair bet in your browser: the operator's post-quantum signature and the outcome, recomputed.">
+<meta property="og:url" content="https://vantax-cybersecurity.com/verify.html">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@VantaxFounder">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#eef1f6;--surface:#fff;--ink:#0b1b33;--mute:#56657f;--line:#cfd7e4;--flag:#c2255c;--flagbg:#fde8ef;--ok:#0b7a7c;--okbg:#e2f4f4;--accent:#2b3cff;--accbg:#e7e9ff;
---sans:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1020;--surface:#111a30;--ink:#e8edf7;--mute:#8fa0bf;--line:#243252;--flag:#ff6b9a;--flagbg:#3a1526;--ok:#4fd1d3;--okbg:#0f2f33;--accent:#8a96ff;--accbg:#1c2350}}
-:root[data-theme="dark"]{--bg:#0a1020;--surface:#111a30;--ink:#e8edf7;--mute:#8fa0bf;--line:#243252;--flag:#ff6b9a;--flagbg:#3a1526;--ok:#4fd1d3;--okbg:#0f2f33;--accent:#8a96ff;--accbg:#1c2350}
-*,*::before,*::after{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
-a{color:inherit}
-:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
-.wrap{max-width:1080px;margin:0 auto;padding:0 22px}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:20px 0}
-.logo{font-weight:800;font-size:22px;letter-spacing:-.02em;text-decoration:none}
-.logo b{color:var(--accent)}
-nav a{margin-left:20px;font-size:15px;color:var(--mute);text-decoration:none}
-nav a:first-child{margin-left:0}
-nav a:hover{color:var(--ink)}
-h1{font-size:clamp(36px,6.5vw,70px);line-height:1.02;letter-spacing:-.035em;font-weight:800;margin:40px 0 18px;max-width:16ch}
-.lede{font-size:clamp(18px,2.3vw,21px);color:var(--mute);max-width:60ch;margin:0 0 22px}
-.chip{display:inline-flex;align-items:center;gap:8px;font:500 13px var(--mono);border:1.5px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--surface);color:var(--mute)}
-.chip i{width:8px;height:8px;border-radius:50%;background:var(--mute);display:inline-block}
-.chip.ready{color:var(--ok);border-color:var(--ok)}.chip.ready i{background:var(--ok)}
-.chip.fail{color:var(--flag);border-color:var(--flag)}.chip.fail i{background:var(--flag)}
-section{padding:56px 0 0}
-h2{font-size:clamp(26px,4vw,38px);letter-spacing:-.03em;line-height:1.1;margin:0 0 10px}
-p.big{max-width:64ch;color:var(--mute);margin:0 0 18px}
-.card{background:var(--surface);border:1.5px solid var(--ink);border-radius:16px;overflow:hidden}
-.card-h{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 18px;border-bottom:1.5px solid var(--ink);font-weight:600;font-size:15px}
-.card-h span{color:var(--mute);font-weight:400}
-.cols{display:grid;grid-template-columns:1.1fr .9fr}
-@media(max-width:820px){.cols{grid-template-columns:1fr}}
-.in{padding:16px 18px;border-right:1.5px solid var(--line);display:grid;gap:12px;align-content:start}
-@media(max-width:820px){.in{border-right:0;border-bottom:1.5px solid var(--line)}}
-.out{padding:16px 18px;min-height:240px}
-label{display:block;font-weight:600;font-size:14px;margin:0 0 5px}
-label small{font-weight:400;color:var(--mute)}
-textarea,input,select{width:100%;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:400 13px/1.55 var(--mono);padding:10px 12px}
-textarea{min-height:120px;resize:vertical}
-textarea.tall{min-height:180px}
-select{font-family:var(--sans);font-size:15px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-@media(max-width:560px){.grid2,.grid3{grid-template-columns:1fr}}
-.btns{display:flex;flex-wrap:wrap;gap:10px}
-button,.btn{font:600 15px var(--sans);padding:11px 18px;border-radius:10px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;text-decoration:none;display:inline-block}
-button.p,.btn.p{background:var(--ink);color:var(--bg)}
-button:disabled{opacity:.5;cursor:not-allowed}
-button:not(:disabled):hover,.btn:hover{transform:translateY(-1px)}
-.verdict{font-weight:800;font-size:28px;letter-spacing:-.02em;margin:0 0 6px}
-.verdict.fair{color:var(--ok)}.verdict.pending{color:var(--accent)}.verdict.unfair,.verdict.invalid,.verdict.error{color:var(--flag)}
-.why{color:var(--mute);margin:0 0 14px;font-size:15.5px}
-.checks{list-style:none;padding:0;margin:0 0 12px;display:grid;gap:6px}
-.checks li{display:flex;gap:10px;align-items:baseline;font-size:15px}
-.checks li b{width:20px;flex:none;text-align:center}
-.checks .y b{color:var(--ok)}.checks .n b{color:var(--flag)}.checks .w b{color:var(--mute)}
-.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:14px;margin:0}
-.kv dt{color:var(--mute)}
-.kv dd{margin:0;font:500 13px var(--mono);word-break:break-all}
-.big-out{font-weight:800;font-size:40px;letter-spacing:-.03em;margin:4px 0 10px;word-break:break-word}
-.problems{margin:10px 0 0;padding:0;list-style:none}
-.problems li{border-left:4px solid var(--flag);background:var(--flagbg);padding:7px 11px;border-radius:0 8px 8px 0;margin:0 0 6px;font-size:14px}
-.hint{color:var(--mute);font-size:14.5px}
-.note{font-size:13.5px;color:var(--mute);margin:12px 4px 0}
-.ops{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:22px 0 0}
-@media(max-width:760px){.ops{grid-template-columns:1fr}}
-.op{background:var(--surface);border:1.5px solid var(--line);border-left:5px solid var(--ok);border-radius:10px;padding:14px 18px}
-.op b{display:block;font-size:18px;letter-spacing:-.01em}
-.op span{color:var(--mute);font-size:15.5px}
-.status{margin-top:64px;background:var(--ink);color:var(--bg);border-radius:16px;padding:28px 26px}
-.status h2{margin-bottom:8px}
-.status p{margin:0;max-width:64ch;opacity:.85}
-footer{padding:44px 0 56px;color:var(--mute);font-size:15px;display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
-.sr{position:absolute;left:-9999px}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}button:hover,.btn:hover{transform:none}}
-</style>
-<link rel="icon" href="/favicon.ico" sizes="48x48">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="manifest" href="/site.webmanifest">
 </head>
 <body>
-<div class="wrap">
-<header>
-  <a class="logo" href="index.html">Vantax<b>.</b></a>
-  <nav><a href="#verify">Verify a bet</a><a href="#recompute">Recompute</a><a href="#sign">Sign</a><a href="#operators">For operators</a><a href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/FAIRNESS.md">Spec</a></nav>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="shell">
+    <a class="brand" href="index.html" aria-label="Vantax home"><svg viewBox="0 0 372.84 120" role="img" aria-label="Vantax" xmlns="http://www.w3.org/2000/svg"><path class="v-main" d="M34.64 120 L92.38 20 L80.83 0 L34.64 80 L11.55 40 L0 60 Z"/><path class="v-facet" d="M34.64 120 L5.77 50 L0 60 Z"/><path class="v-facet" d="M34.64 120 L86.6 10 L80.83 0 L34.64 80 Z"/><g class="wm"><path d="M116.38 39.6 L128.36 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M145.24 39.6 L157.22 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M149.97 94.8 L161.95 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M178.83 94.8 L190.81 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M197.99 39.6 L209.58 39.6 L209.58 94.8 L197.99 94.8 Z"/><path d="M228.35 39.6 L239.94 39.6 L239.94 94.8 L228.35 94.8 Z"/><path d="M197.99 39.6 L211.07 39.6 L239.94 94.8 L226.86 94.8 Z"/><path d="M247.12 39.6 L286.86 39.6 L286.86 51.19 L247.12 51.19 Z"/><path d="M261.19 39.6 L272.79 39.6 L272.79 94.8 L261.19 94.8 Z"/><path d="M282.87 94.8 L294.85 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M311.73 94.8 L323.71 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M330.89 39.6 L343.97 39.6 L372.84 94.8 L359.76 94.8 Z"/><path d="M359.76 39.6 L372.84 39.6 L343.97 94.8 L330.89 94.8 Z"/></g></svg></a>
+    <nav class="nav" aria-label="Main">
+      <div class="menu-wrap">
+        <button type="button" data-menu aria-expanded="false" aria-controls="products-menu">Products <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3.2l4 3.6 4-3.6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+        <div class="menu" id="products-menu" hidden>
+          <a href="index.html#scanner"><b>Quantum-risk scanner</b><span>Find the keys and signatures a quantum computer breaks.</span></a>
+          <a href="migrate.html"><b>Migrate</b><span>Add ML-DSA-87 next to Ed25519 or ECDSA, then enforce it.</span></a>
+          <a href="falcon.html"><b>Falcon-512</b><span>The post-quantum signature Solana's validator teams picked.</span></a>
+          <a href="verify.html" aria-current="page"><b>Verify a bet</b><span>Check a casino's provably fair receipt in your browser.</span></a>
+          <a href="launch.html"><b>Vantax Chains</b><span>Your own post-quantum blockchain, on your own servers.</span></a>
+          <a href="bot.html"><b>VantaxBot</b><span>Signal trading that waits for the anti-rug scanner.</span></a>
+        </div>
+      </div>
+      <a href="packages.html">Packages</a>
+      <a href="holders.html">Holders</a>
+      <a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub</a>
+    </nav>
+    <div class="header-tools">
+      <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.25" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 2.75a7.25 7.25 0 0 1 0 14.5z" fill="currentColor"/></svg></button>
+      <a class="btn p sm header-cta" href="index.html#scanner">Scan your code</a>
+      <button class="icon-btn menu-btn" type="button" data-sheet aria-expanded="false" aria-controls="sheet" aria-label="Open menu"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7h14M3 13h14" stroke="currentColor" stroke-width="1.8"/></svg></button>
+    </div>
+  </div>
 </header>
-<main>
-  <h1>Don't trust the casino. Check it.</h1>
-  <p class="lede">Every bet settled with Vantax comes with a receipt the operator signs with ML-DSA-87, a post-quantum signature, before the server seed is revealed. Paste it here: this page checks the signature and recomputes the outcome itself, in WebAssembly. Nothing you paste leaves your device.</p>
-  <span class="chip" id="chip"><i></i><span id="chip-text">Loading the verifier…</span></span>
+<nav class="sheet" id="sheet" hidden aria-label="Menu">
+  <a href="index.html#scanner">Quantum-risk scanner <span>Find what a quantum computer breaks</span></a>
+  <a href="migrate.html">Migrate <span>ML-DSA-87 next to your keys</span></a>
+  <a href="falcon.html">Falcon-512 <span>Solana's post-quantum signature</span></a>
+  <a href="verify.html">Verify a bet <span>Provably fair, checked by you</span></a>
+  <a href="launch.html">Vantax Chains <span>Your own post-quantum chain</span></a>
+  <a href="bot.html">VantaxBot <span>Signal trading with rug checks</span></a>
+  <a href="packages.html">Packages <span>Pay in any currency</span></a>
+  <a href="holders.html">Holder access <span>For $VANTAX holders</span></a>
+  <a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub <span>Read the code</span></a>
+  <a class="btn p" href="index.html#scanner">Scan your code</a>
+</nav>
 
-  <section id="verify">
-    <h2>Verify a bet.</h2>
-    <p class="big">You need the receipt and the operator's public key. Add the server seed once the operator reveals it (when you rotate your seed), and the outcome is recomputed from scratch.</p>
-    <div class="card">
-      <div class="card-h">Receipt check <span>Signature, commitment and outcome</span></div>
-      <div class="cols">
-        <div class="in">
-          <div><label for="receipt">Receipt <small>(JSON from the operator)</small></label>
-            <textarea id="receipt" class="tall" spellcheck="false" placeholder='{"receipt":{"version":1,"operator":"…","game":{…},"outcome":{…},…},"signature":{…}}'></textarea></div>
-          <div><label for="opkey">Operator public key <small>(.pub.json)</small></label>
-            <textarea id="opkey" spellcheck="false" placeholder='{"algorithm":"ML-DSA-87","public_key":"…","fingerprint":"…"}'></textarea></div>
-          <div><label for="seed">Revealed server seed <small>(64 hex characters, or the signed reveal JSON; optional)</small></label>
-            <input id="seed" spellcheck="false" autocomplete="off" placeholder="leave empty until the seed is revealed"></div>
-          <div class="btns">
-            <button class="p" id="verify-btn" disabled>Verify</button>
-            <button id="demo-btn" disabled>Load a demo bet</button>
-            <button id="tamper-btn" disabled>Tamper with it</button>
+<main id="main">
+  <section class="field page-head" aria-labelledby="v-title">
+    <div class="shell">
+      <a class="crumb" href="index.html#products">Vantax products</a>
+      <h1 id="v-title">Don't trust the casino. Check it.</h1>
+      <p class="lede">Every bet settled with Vantax comes with a receipt the operator signs with ML-DSA-87, a post-quantum signature, before the server seed is revealed. Paste it here: this page checks the signature and recomputes the outcome itself, in WebAssembly. Nothing you paste leaves your device.</p>
+      <div class="cluster" style="margin-top:26px">
+        <a class="btn p" href="#verify">Verify a bet</a>
+        <span class="chip on-field" id="chip"><span id="chip-text">Loading the verifier…</span></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="verify" aria-labelledby="verify-title">
+    <div class="shell">
+      <div class="section-head">
+        <h2 id="verify-title">Verify a bet.</h2>
+        <p>You need the receipt and the operator's public key. Add the server seed once the operator reveals it (when you rotate your seed), and the outcome is recomputed from scratch.</p>
+      </div>
+      <div class="instrument">
+        <div class="instrument-head"><b>Receipt check</b><span>Signature, commitment and outcome</span></div>
+        <div class="instrument-cols">
+          <div class="flow-body in">
+            <div class="fld"><label for="receipt">Receipt <span class="mute">(JSON from the operator)</span></label>
+              <textarea class="mono tall" id="receipt" spellcheck="false" placeholder='{"receipt":{"version":1,"operator":"…","game":{…},"outcome":{…},…},"signature":{…}}'></textarea></div>
+            <div class="fld"><label for="opkey">Operator public key <span class="mute">(.pub.json)</span></label>
+              <textarea class="mono" id="opkey" spellcheck="false" placeholder='{"algorithm":"ML-DSA-87","public_key":"…","fingerprint":"…"}'></textarea></div>
+            <div class="fld"><label for="seed">Revealed server seed <span class="mute">(64 hex characters, or the signed reveal JSON; optional)</span></label>
+              <input class="mono" id="seed" spellcheck="false" autocomplete="off" placeholder="Leave empty until the seed is revealed"></div>
+            <div class="cluster">
+              <button class="btn p" id="verify-btn" type="button" disabled>Verify</button>
+              <button class="btn" id="demo-btn" type="button" disabled>Load a demo bet</button>
+              <button class="btn" id="tamper-btn" type="button" disabled>Tamper with it</button>
+            </div>
+            <p class="hint" id="demo-actions" hidden>Play the demo operator: <a href="#" id="reveal-seed">reveal the seed</a>, <a href="#" id="paste-reveal">paste the signed reveal</a>, or <a href="#" id="cheat">cheat by signing a lower crash point</a>.</p>
           </div>
-          <p class="hint" id="demo-actions" hidden>Demo operator: <a href="#" id="reveal-seed">reveal the seed</a> · <a href="#" id="paste-reveal">paste the signed reveal</a> · <a href="#" id="cheat">cheat (sign a lower crash point)</a></p>
-        </div>
-        <div class="out" id="verify-out" aria-live="polite">
-          <p class="hint">No receipt yet? <b>Load a demo bet</b>: this page plays the operator, signs a crash bet with a fresh ML-DSA-87 key and fills in the form. Verify it before and after adding the seed, then tamper with it and verify again.</p>
+          <div class="out" id="verify-out" aria-live="polite">
+            <p class="hint">No receipt yet? <b>Load a demo bet</b>: this page plays the operator, signs a crash bet with a fresh ML-DSA-87 key and fills in the form. Verify it before and after adding the seed, then tamper with it and verify again.</p>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section id="recompute">
-    <h2>Recompute any outcome.</h2>
-    <p class="big">The same integer-only algorithm the operator runs: a ChaCha20 stream keyed by the server seed, your client seed and the nonce, with rejection sampling so no result is more likely than another.</p>
-    <div class="card">
-      <div class="card-h">Outcome calculator <span>Nine games, one specification</span></div>
-      <div class="cols">
-        <div class="in">
-          <div class="grid2">
-            <div><label for="game">Game</label>
-              <select id="game">
-                <option value="crash">Crash</option><option value="dice">Dice</option><option value="coin">Coin flip</option>
-                <option value="range">Range</option><option value="wheel">Wheel</option><option value="plinko">Plinko</option>
-                <option value="mines">Mines</option><option value="keno">Keno</option><option value="shuffle">Card shuffle</option>
-              </select></div>
-            <div id="params"></div>
+  <section class="section" id="recompute" aria-labelledby="recompute-title">
+    <div class="shell">
+      <div class="section-head">
+        <h2 id="recompute-title">Recompute any outcome.</h2>
+        <p>The same integer-only algorithm the operator runs: a ChaCha20 stream keyed by the server seed, your client seed and the nonce, with rejection sampling so no result is more likely than another.</p>
+      </div>
+      <div class="instrument">
+        <div class="instrument-head"><b>Outcome calculator</b><span>Nine games, one specification</span></div>
+        <div class="instrument-cols">
+          <div class="flow-body in">
+            <div class="form-grid two">
+              <div class="fld"><label for="game">Game</label>
+                <select id="game">
+                  <option value="crash">Crash</option><option value="dice">Dice</option><option value="coin">Coin flip</option>
+                  <option value="range">Range</option><option value="wheel">Wheel</option><option value="plinko">Plinko</option>
+                  <option value="mines">Mines</option><option value="keno">Keno</option><option value="shuffle">Card shuffle</option>
+                </select></div>
+              <div class="params" id="params"></div>
+            </div>
+            <div class="fld"><label for="c-seed">Server seed <span class="mute">(hex)</span></label><input class="mono" id="c-seed" spellcheck="false" autocomplete="off"></div>
+            <div class="form-grid two">
+              <div class="fld"><label for="c-client">Client seed</label><input class="mono" id="c-client" value="my lucky seed" spellcheck="false"></div>
+              <div class="fld"><label for="c-nonce">Nonce</label><input id="c-nonce" type="number" min="0" step="1" value="0"></div>
+            </div>
+            <div class="cluster"><button class="btn p" id="calc-btn" type="button" disabled>Recompute</button><button class="btn" id="random-seed" type="button" disabled>Random seed</button></div>
           </div>
-          <div><label for="c-seed">Server seed <small>(hex)</small></label><input id="c-seed" spellcheck="false" autocomplete="off"></div>
-          <div class="grid2">
-            <div><label for="c-client">Client seed</label><input id="c-client" value="my lucky seed" spellcheck="false"></div>
-            <div><label for="c-nonce">Nonce</label><input id="c-nonce" type="number" min="0" step="1" value="0"></div>
-          </div>
-          <div class="btns"><button class="p" id="calc-btn" disabled>Recompute</button><button id="random-seed" disabled>Random seed</button></div>
+          <div class="out" id="calc-out" aria-live="polite"><p class="hint">Pick a game, give the seeds and the nonce, and press Recompute. Change the nonce to step through bets on the same seed.</p></div>
         </div>
-        <div class="out" id="calc-out" aria-live="polite"><p class="hint">Pick a game, give the seeds and the nonce, and press Recompute. Change the nonce to step through bets on the same seed.</p></div>
       </div>
     </div>
   </section>
 
-  <section id="sign">
-    <h2>Post-quantum signatures, in your browser.</h2>
-    <p class="big">The same ML-DSA-87 (NIST FIPS 204) keys and signatures as the <code>vantax</code> command line, compiled to WebAssembly. A key made here verifies with the CLI and back.</p>
-    <div class="card">
-      <div class="card-h">ML-DSA-87 playground <span>Keys stay in this tab</span></div>
-      <div class="cols">
-        <div class="in">
-          <div class="btns"><button class="p" id="keygen-btn" disabled>Generate a key</button><button id="download-btn" disabled>Download public key</button></div>
-          <div><label for="msg">Message</label><textarea id="msg" spellcheck="false">Pay 1 SOL to alice</textarea></div>
-          <div class="btns"><button id="sign-btn" disabled>Sign</button><button id="check-btn" disabled>Verify this message</button></div>
+  <section class="section" id="sign" aria-labelledby="sign-title">
+    <div class="shell">
+      <div class="section-head">
+        <h2 id="sign-title">Post-quantum signatures, in your browser.</h2>
+        <p>The same ML-DSA-87 (NIST FIPS 204) keys and signatures as the <code>vantax</code> command line, compiled to WebAssembly. A key made here verifies with the CLI and back. For the compact scheme, see <a href="falcon.html">Falcon-512</a>.</p>
+      </div>
+      <div class="instrument">
+        <div class="instrument-head"><b>ML-DSA-87 playground</b><span>Keys stay in this tab</span></div>
+        <div class="instrument-cols">
+          <div class="flow-body in">
+            <div class="cluster"><button class="btn p" id="keygen-btn" type="button" disabled>Generate a key</button><button class="btn" id="download-btn" type="button" disabled>Download public key</button></div>
+            <div class="fld"><label for="msg">Message</label><textarea class="mono" id="msg" spellcheck="false">Pay 1 SOL to alice</textarea></div>
+            <div class="cluster"><button class="btn" id="sign-btn" type="button" disabled>Sign</button><button class="btn" id="check-btn" type="button" disabled>Verify this message</button></div>
+          </div>
+          <div class="out" id="sign-out" aria-live="polite"><p class="hint">Generate a key, sign the message, then edit one character and verify again.</p></div>
         </div>
-        <div class="out" id="sign-out" aria-live="polite"><p class="hint">Generate a key, sign the message, then edit one character and verify again.</p></div>
+      </div>
+      <p class="small mute" style="margin-top:14px">For demonstrations: a key made in a web page lives in that page's memory. Keep keys that guard value in the CLI, a hardware module or a vault.</p>
+    </div>
+  </section>
+
+  <section class="section" id="operators" aria-labelledby="ops-title">
+    <div class="shell">
+      <div class="section-head">
+        <h2 id="ops-title">For operators.</h2>
+        <p>Casinos, sportsbooks, lotteries and game studios can settle every bet this way with the Vantax Fairness Engine, a licensed service that runs on your own servers.</p>
+      </div>
+      <div class="ways">
+        <div><h3>Signed receipts on every bet</h3><p>ML-DSA-87 signatures bind you to each outcome before the seed is revealed. Players verify with free tools, including this page.</p></div>
+        <div><h3>Seeds you can't lose or reuse</h3><p>Per-player committed seeds derived from one master secret, sealed with AES-256-GCM. Rotation publishes a signed reveal.</p></div>
+        <div><h3>An audit log that restarts you exactly</h3><p>Every state change is hash-chained and stored before the engine answers; replaying the log rebuilds its state after a crash.</p></div>
+        <div><h3>Round games and RNG reports</h3><p>Seed chains commit to millions of crash rounds with one hash. Signed, reproducible chi-square and RTP reports for every game.</p></div>
+      </div>
+      <div class="cluster" style="margin-top:28px">
+        <a class="btn p" href="https://x.com/VantaxFounder">Talk to us on X</a>
+        <a class="btn" href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/FAIRNESS.md">Read the specification</a>
       </div>
     </div>
-    <p class="note">For demonstrations: a key made in a web page lives in that page's memory. Keep keys that guard value in the CLI, an HSM or a vault.</p>
   </section>
 
-  <section id="operators">
-    <h2>For operators.</h2>
-    <p class="big">Casinos, sportsbooks, lotteries and game studios can settle every bet this way with the Vantax Fairness Engine, a licensed service that runs on your own servers.</p>
-    <div class="ops">
-      <div class="op"><b>Signed receipts on every bet</b><span>ML-DSA-87 signatures bind you to each outcome before the seed is revealed. Players verify with free tools, including this page.</span></div>
-      <div class="op"><b>Seeds you can't lose or reuse</b><span>Per-player committed seeds derived from one master secret, sealed with AES-256-GCM. Rotation publishes a signed reveal.</span></div>
-      <div class="op"><b>An audit log that restarts you exactly</b><span>Every state change is hash-chained and stored before the engine answers; replaying the log rebuilds its state after a crash.</span></div>
-      <div class="op"><b>Round games and RNG reports</b><span>Seed chains commit to millions of crash rounds with one hash. Signed, reproducible chi-square and RTP reports for every game.</span></div>
+  <section class="section band" aria-labelledby="open-title">
+    <div class="shell">
+      <h2 id="open-title">Open, specified and checkable.</h2>
+      <p class="measure" style="margin-top:16px">The fairness algorithm is specified in full, with test vectors, and four implementations check each other: Rust, this WebAssembly build, the CLI and a stand-alone Python script. None of it has had an independent third-party audit yet. A passing check proves the outcome followed the published rules; it says nothing about an operator's licence or solvency.</p>
     </div>
-    <div class="btns" style="margin-top:20px">
-      <a class="btn p" href="https://x.com/VantaxFounder">Talk to us on X</a>
-      <a class="btn" href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/FAIRNESS.md">Read the specification</a>
-    </div>
-  </section>
-
-  <section class="status">
-    <h2>Open, specified and checkable.</h2>
-    <p>The fairness algorithm is specified in full, with test vectors, and four implementations check each other (Rust, this WebAssembly build, the CLI and a stand-alone Python script). None of it has had an independent third-party audit yet. A passing check proves the outcome followed the published rules; it says nothing about an operator's licence or solvency.</p>
   </section>
 </main>
-<footer>
-  <span>Vantax. Post-quantum security, built to be verified.</span>
-  <span><a href="index.html">Home</a> &nbsp; <a href="migrate.html">Migrate</a> &nbsp; <a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub</a> &nbsp; <a href="index.html#token">Official CA</a> &nbsp; <a href="https://x.com/VantaxFounder">@VantaxFounder</a></span>
+
+<footer class="site-footer">
+  <div class="shell">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="index.html" aria-label="Vantax home"><svg viewBox="0 0 372.84 120" role="img" aria-label="Vantax" xmlns="http://www.w3.org/2000/svg"><path class="v-main" d="M34.64 120 L92.38 20 L80.83 0 L34.64 80 L11.55 40 L0 60 Z"/><path class="v-facet" d="M34.64 120 L5.77 50 L0 60 Z"/><path class="v-facet" d="M34.64 120 L86.6 10 L80.83 0 L34.64 80 Z"/><g class="wm"><path d="M116.38 39.6 L128.36 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M145.24 39.6 L157.22 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M149.97 94.8 L161.95 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M178.83 94.8 L190.81 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M197.99 39.6 L209.58 39.6 L209.58 94.8 L197.99 94.8 Z"/><path d="M228.35 39.6 L239.94 39.6 L239.94 94.8 L228.35 94.8 Z"/><path d="M197.99 39.6 L211.07 39.6 L239.94 94.8 L226.86 94.8 Z"/><path d="M247.12 39.6 L286.86 39.6 L286.86 51.19 L247.12 51.19 Z"/><path d="M261.19 39.6 L272.79 39.6 L272.79 94.8 L261.19 94.8 Z"/><path d="M282.87 94.8 L294.85 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M311.73 94.8 L323.71 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M330.89 39.6 L343.97 39.6 L372.84 94.8 L359.76 94.8 Z"/><path d="M359.76 39.6 L372.84 39.6 L343.97 94.8 L330.89 94.8 Z"/></g></svg></a>
+        <p>Post-quantum security, built to be verified.</p>
+        <p class="tiny">Written in Rust by one developer, with no outside funding. Nine of the twelve crates are open source.</p>
+      </div>
+      <div>
+        <h4>Products</h4>
+        <ul>
+          <li><a href="index.html#scanner">Quantum-risk scanner</a></li>
+          <li><a href="migrate.html">Migrate</a></li>
+          <li><a href="falcon.html">Falcon-512</a></li>
+          <li><a href="verify.html">Verify a bet</a></li>
+          <li><a href="launch.html">Vantax Chains</a></li>
+          <li><a href="bot.html">VantaxBot</a></li>
+          <li><a href="packages.html">Packages</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Check our work</h4>
+        <ul>
+          <li><a href="https://github.com/Vanta-Cybersecurity/Vantax">Source code</a></li>
+          <li><a href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/WHITEPAPER.md">Whitepaper</a></li>
+          <li><a href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/API.md">API reference</a></li>
+          <li><a href="https://api.vantax-cybersecurity.com/health">API health</a></li>
+          <li><a href="https://api.vantax-cybersecurity.com/api/v1/gateway/audit">Audit trail</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>$VANTAX</h4>
+        <ul>
+          <li><a href="index.html#token">Official address</a></li>
+          <li><a href="holders.html">Holder access</a></li>
+          <li><a href="burns.html">Buyback and burns</a></li>
+          <li><a href="https://x.com/VantaxFounder">@VantaxFounder on X</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-legal">
+      <span>© 2026 Vantax Cybersecurity</span>
+      <span>Cryptoassets are high risk and you can lose everything you put in. Nothing here is financial advice.</span>
+    </div>
+  </div>
 </footer>
-</div>
+
 <script type="module">
 import { loadVantax } from "./wasm/vantax.js";
 
@@ -220,7 +254,7 @@ function chip(state, text) {
 let vx;
 try {
   vx = await loadVantax(new URL("./wasm/vantax_wasm.wasm", import.meta.url));
-  chip("ready", vx.version() + " · ML-DSA-87 · running on your device");
+  chip("ready", "Verifier ready: " + vx.version() + ", ML-DSA-87, running on your device");
   document.querySelectorAll("button:disabled").forEach((b) => { if (b.id !== "tamper-btn" && b.id !== "download-btn" && b.id !== "sign-btn" && b.id !== "check-btn") b.disabled = false; });
 } catch (e) {
   chip("fail", "Verifier failed to load");
@@ -231,7 +265,7 @@ try {
 // ── Verify a bet ──────────────────────────────────────────────────────────────
 const VERDICTS = {
   fair: ["✓ Fair", "Signed by the operator, the seed opens its commitment, and the outcome recomputes exactly."],
-  pending: ["… Pending", "The signature is valid and binds the operator to this outcome. Add the server seed once it is revealed to recompute it."],
+  pending: ["Signed, seed not revealed yet", "The signature is valid and binds the operator to this outcome. Add the server seed once it is revealed to recompute it."],
   unfair: ["✗ Unfair", "The operator signed this receipt, but it does not match the revealed seed. Keep it: it is signed evidence."],
   invalid: ["✗ Invalid", "The signature does not verify under this key. The receipt proves nothing either way."],
 };
@@ -432,7 +466,7 @@ $("keygen-btn").addEventListener("click", () => {
 $("sign-btn").addEventListener("click", () => {
   mySig = vx.sign(myKey, $("msg").value);
   const kv = el("dl", "kv");
-  kv.append(el("dt", null, "Signature"), el("dd", null, mySig.signature.length / 2 + " bytes · " + short(mySig.signature, 12)));
+  kv.append(el("dt", null, "Signature"), el("dd", null, mySig.signature.length / 2 + " bytes, " + short(mySig.signature, 12)));
   kv.append(el("dt", null, "Message hash"), el("dd", null, short(mySig.message_hash, 16)));
   signOut(el("p", "verdict pending", "Signed"), el("p", "why", "Now verify, or change one character of the message first."), kv);
   $("check-btn").disabled = false;

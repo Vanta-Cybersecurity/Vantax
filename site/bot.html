@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Base URL of the Vantax API (no trailing slash). Empty means this site's own
+     origin, for when the site and the API share a host (nginx proxies /api/). -->
+<meta name="vantax-api" content="https://api.vantax-cybersecurity.com">
+<!-- Where the VantaxBot store runs (see the bot's deploy guide). -->
+<meta name="vantax-store" content="https://store.vantax-cybersecurity.com">
+<meta name="theme-color" content="#2b3cff">
+<link rel="preload" href="assets/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/vantax.css">
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<script>try{var t=localStorage.getItem("vantax-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script src="assets/vantax.js" defer></script>
+<title>VantaxBot: Solana signal trading that checks before it buys</title>
+<meta name="description" content="VantaxBot watches the X accounts and Telegram channels you choose, waits until several agree, runs the Vantax anti-rug scanner, and only then buys. Self-hosted, your keys, free in paper mode.">
+<link rel="canonical" href="https://vantax-cybersecurity.com/bot.html">
+<meta property="og:title" content="VantaxBot: Solana signal trading that checks before it buys">
+<meta property="og:description" content="Signals from X and Telegram, an anti-rug scan before every buy, and exits that fire when liquidity moves. Runs on your machine with your keys.">
+<meta property="og:url" content="https://vantax-cybersecurity.com/bot.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@VantaxFounder">
+<script src="assets/checkout.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="shell">
+    <a class="brand" href="index.html" aria-label="Vantax home"><svg viewBox="0 0 372.84 120" role="img" aria-label="Vantax" xmlns="http://www.w3.org/2000/svg"><path class="v-main" d="M34.64 120 L92.38 20 L80.83 0 L34.64 80 L11.55 40 L0 60 Z"/><path class="v-facet" d="M34.64 120 L5.77 50 L0 60 Z"/><path class="v-facet" d="M34.64 120 L86.6 10 L80.83 0 L34.64 80 Z"/><g class="wm"><path d="M116.38 39.6 L128.36 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M145.24 39.6 L157.22 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M149.97 94.8 L161.95 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M178.83 94.8 L190.81 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M197.99 39.6 L209.58 39.6 L209.58 94.8 L197.99 94.8 Z"/><path d="M228.35 39.6 L239.94 39.6 L239.94 94.8 L228.35 94.8 Z"/><path d="M197.99 39.6 L211.07 39.6 L239.94 94.8 L226.86 94.8 Z"/><path d="M247.12 39.6 L286.86 39.6 L286.86 51.19 L247.12 51.19 Z"/><path d="M261.19 39.6 L272.79 39.6 L272.79 94.8 L261.19 94.8 Z"/><path d="M282.87 94.8 L294.85 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M311.73 94.8 L323.71 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M330.89 39.6 L343.97 39.6 L372.84 94.8 L359.76 94.8 Z"/><path d="M359.76 39.6 L372.84 39.6 L343.97 94.8 L330.89 94.8 Z"/></g></svg></a>
+    <nav class="nav" aria-label="Main">
+      <div class="menu-wrap">
+        <button type="button" data-menu aria-expanded="false" aria-controls="products-menu">Products <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3.2l4 3.6 4-3.6" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+        <div class="menu" id="products-menu" hidden>
+          <a href="index.html#scanner"><b>Quantum-risk scanner</b><span>Find the keys and signatures a quantum computer breaks.</span></a>
+          <a href="migrate.html"><b>Migrate</b><span>Add ML-DSA-87 next to Ed25519 or ECDSA, then enforce it.</span></a>
+          <a href="falcon.html"><b>Falcon-512</b><span>The post-quantum signature Solana's validator teams picked.</span></a>
+          <a href="verify.html"><b>Verify a bet</b><span>Check a casino's provably fair receipt in your browser.</span></a>
+          <a href="launch.html"><b>Vantax Chains</b><span>Your own post-quantum blockchain, on your own servers.</span></a>
+          <a href="bot.html" aria-current="page"><b>VantaxBot</b><span>Signal trading that waits for the anti-rug scanner.</span></a>
+        </div>
+      </div>
+      <a href="packages.html">Packages</a>
+      <a href="holders.html">Holders</a>
+      <a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub</a>
+    </nav>
+    <div class="header-tools">
+      <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.25" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 2.75a7.25 7.25 0 0 1 0 14.5z" fill="currentColor"/></svg></button>
+      <a class="btn p sm header-cta" href="index.html#scanner">Scan your code</a>
+      <button class="icon-btn menu-btn" type="button" data-sheet aria-expanded="false" aria-controls="sheet" aria-label="Open menu"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7h14M3 13h14" stroke="currentColor" stroke-width="1.8"/></svg></button>
+    </div>
+  </div>
+</header>
+<nav class="sheet" id="sheet" hidden aria-label="Menu">
+  <a href="index.html#scanner">Quantum-risk scanner <span>Find what a quantum computer breaks</span></a>
+  <a href="migrate.html">Migrate <span>ML-DSA-87 next to your keys</span></a>
+  <a href="falcon.html">Falcon-512 <span>Solana's post-quantum signature</span></a>
+  <a href="verify.html">Verify a bet <span>Provably fair, checked by you</span></a>
+  <a href="launch.html">Vantax Chains <span>Your own post-quantum chain</span></a>
+  <a href="bot.html">VantaxBot <span>Signal trading with rug checks</span></a>
+  <a href="packages.html">Packages <span>Pay in any currency</span></a>
+  <a href="holders.html">Holder access <span>For $VANTAX holders</span></a>
+  <a href="https://github.com/Vanta-Cybersecurity/Vantax">GitHub <span>Read the code</span></a>
+  <a class="btn p" href="index.html#scanner">Scan your code</a>
+</nav>
+
+<main id="main">
+  <section class="field page-head" aria-labelledby="bot-title">
+    <div class="shell hero-grid">
+      <div>
+        <a class="crumb" href="index.html#products">Vantax products</a>
+        <h1 id="bot-title">A Solana trading bot that checks before it buys.</h1>
+        <p class="lede">VantaxBot watches the X accounts and Telegram channels you trust. When several of them call the same token, it checks the market, then runs the Vantax anti-rug scanner on the contract, the holders, the trading and the creator. Only a token that passes gets bought.</p>
+        <div class="cluster">
+          <a class="btn p" href="#buy">Buy a licence</a>
+          <a class="btn" href="#paper">Try it free in paper mode</a>
+        </div>
+        <p class="hero-note">Runs on your own machine with your own keys. No per-trade fee.</p>
+      </div>
+
+      <figure class="report" aria-label="What a scan report looks like">
+        <div class="report-head">
+          <div><b>EXAMPLE</b><span class="mono">7xKX…p9Qm</span></div>
+          <div class="score"><span class="num">82</span><small>/100</small></div>
+        </div>
+        <p class="report-verdict"><span class="dot ok"></span>Green: no critical flags</p>
+        <ul class="report-list">
+          <li class="pass"><b>Contract</b><span>Mint and freeze authority revoked. No transfer hook.</span></li>
+          <li class="pass"><b>Liquidity</b><span>LP burned, 100% of supply. $48,200 in the pool.</span></li>
+          <li class="warn"><b>Holders</b><span>Top 10 hold 31%. 6% bought in the launch block.</span></li>
+          <li class="pass"><b>Trading</b><span>Sell round-trip works. No wash ring found.</span></li>
+          <li class="pass"><b>Creator</b><span>Wallet 214 days old. No past rugs on record.</span></li>
+        </ul>
+        <figcaption>Illustration of the report layout. The bot shows the real report for every token it considers, in its dashboard and on Telegram.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section" id="how" aria-labelledby="how-title">
+    <div class="shell split">
+      <div class="section-head" style="margin:0">
+        <h2 id="how-title">How it decides.</h2>
+        <p>Six checks, in this order. A token has to clear every one before a single lamport moves.</p>
+      </div>
+      <ol class="steps">
+        <li><h3>Hears a call</h3><p>It reads every post and message from your sources, pulls out contract addresses and DexScreener, Photon or Axiom links, and confirms on-chain that each one is a real token.</p></li>
+        <li><h3>Waits for agreement</h3><p>Each source has a weight you choose. Calls add up and fade with a 10-minute half-life, and nothing triggers until at least two different sources agree and the score passes your threshold.</p></li>
+        <li><h3>Checks the market</h3><p>Liquidity, market cap, five-minute volume, how much of it is buying, and how old the pair is. A token that has already run too far is skipped.</p></li>
+        <li><h3>Runs the anti-rug scan</h3><p>Authorities, LP lock or burn, Token-2022 traps, holder concentration and launch bundling, wash trading, a sell round-trip test, and the creator's history. Any critical flag blocks the buy.</p></li>
+        <li><h3>Sizes and buys</h3><p>Within your per-trade size, open-position and total-exposure limits, through Jupiter or straight to the pump.fun curve, landed with a Jito bundle.</p></li>
+        <li><h3>Guards the position</h3><p>A take-profit ladder, a stop-loss and a trailing stop, plus an exit the moment liquidity is pulled, the developer dumps or the pool drains.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" id="control" aria-labelledby="control-title">
+    <div class="shell split even">
+      <div>
+        <div class="section-head">
+          <h2 id="control-title">You set the rules.</h2>
+          <p>One config file, read at start-up. Everything below has a safe default, so a fresh install trades nothing until you say so.</p>
+        </div>
+        <ul class="rules single">
+          <li><b>Telegram remote</b><span><code>/status</code>, <code>/positions</code>, <code>/sell</code>, <code>/scan</code>, <code>/kill</code> and <code>/resume</code> from your phone, answered only in the chats you allow.</span></li>
+          <li><b>Dashboard</b><span>Live positions, every signal and why it was taken or skipped, scan reports and P&amp;L, on your own machine.</span></li>
+          <li><b>Hard limits</b><span>A daily loss limit, a cap on trades per minute and a kill switch that stops new buys at once.</span></li>
+        </ul>
+      </div>
+      <pre class="code" aria-label="Part of the VantaxBot config file"><span class="c"># vantaxbot.toml (part)</span>
+[bot]
+mode = "paper"            <span class="c"># "live" needs a licence</span>
+
+[signals]
+min_sources = 2           <span class="c"># independent accounts or chats</span>
+min_conviction = 70       <span class="c"># 0-100</span>
+instant_weight = 8        <span class="c"># one source this trusted is enough</span>
+window = "30m"
+half_life = "10m"
+
+[[signals.x.accounts]]
+name = "a_caller_you_trust"
+weight = 7                <span class="c"># 1 (noise) to 10 (your best)</span>
+
+[[signals.telegram.chats]]
+id = -1001234567890
+name = "your alpha group"
+weight = 5
+
+[scanner]
+min_safe_score = 70       <span class="c"># critical flags always block</span>
+
+[trading]
+buy_sol_max = 0.25
+max_open_positions = 4
+max_exposure_sol = 1.0
+
+[trading.exits]
+stop_loss_pct = 30
+trailing_activate_pct = 40
+trailing_stop_pct = 20
+
+[risk]
+max_daily_loss_sol = 1.0</pre>
+    </div>
+  </section>
+
+  <section class="section" id="buy" aria-labelledby="buy-title">
+    <div class="shell">
+      <div class="section-head">
+        <h2 id="buy-title">Packages.</h2>
+        <p>Paper mode is free and does everything except send real trades. A licence switches on live trading for one wallet.</p>
+      </div>
+      <div class="cluster" style="justify-content:space-between;margin-bottom:18px">
+        <label class="currency">Show prices in <select data-currency-picker aria-label="Currency"></select></label>
+        <div class="pay-with"><span>Pay with</span><ul><li>Card</li><li>Apple Pay</li><li>Google Pay</li><li>SOL</li><li>USDC</li><li>USDT</li><li>$VANTAX</li><li>Any Solana token</li></ul></div>
+      </div>
+      <div class="tiers three">
+        <div class="tier" id="paper">
+          <p class="who">For trying it, and for tuning your sources</p>
+          <h3>Paper</h3>
+          <div class="price"><span class="amt">Free</span><span class="per">No licence needed</span><span class="alt">&nbsp;</span></div>
+          <ul class="ticks">
+            <li>Every feature, with simulated fills</li>
+            <li>Signals, scans, exits and the dashboard</li>
+            <li>See what it would have bought, and why</li>
+            <li class="no">No live trades</li>
+          </ul>
+          <a class="btn" href="#download">Download</a>
+        </div>
+        <div class="tier">
+          <p class="who">For a month of live trading</p>
+          <h3>Monthly</h3>
+          <div class="price"><span class="amt" data-fill="monthly-amt">0.5 SOL</span><span class="per">30 days, one wallet</span><span class="alt" data-money data-alt data-amount="0.5" data-base="SOL" data-fill-amount="monthly"></span></div>
+          <ul class="ticks">
+            <li>Live trading from your wallet</li>
+            <li>Buying again adds 30 days</li>
+            <li>Every update while it runs</li>
+            <li><span><span data-fill="monthly-holder">0.35 SOL</span> for $VANTAX holders</span></li>
+          </ul>
+          <a class="btn" href="#checkout" data-pick="monthly">Choose Monthly</a>
+        </div>
+        <div class="tier featured">
+          <p class="who">For running it for good</p>
+          <h3>Lifetime</h3>
+          <div class="price"><span class="amt" data-fill="lifetime-amt">3 SOL</span><span class="per">Once, one wallet</span><span class="alt" data-money data-alt data-amount="3" data-base="SOL" data-fill-amount="lifetime"></span></div>
+          <ul class="ticks">
+            <li>Live trading from your wallet, with no end date</li>
+            <li>Every 1.x update</li>
+            <li>Costs the same as six months</li>
+            <li><span><span data-fill="lifetime-holder">2.1 SOL</span> for $VANTAX holders</span></li>
+          </ul>
+          <a class="btn p" href="#checkout" data-pick="lifetime">Choose Lifetime</a>
+        </div>
+      </div>
+      <p class="tier-note">Prices are set in SOL. Paying by card or in another token, you pay the same amount at the rate when you check out. 5% of every sale goes to buying back and burning $VANTAX, <a class="link" href="burns.html">published here</a>.</p>
+
+      <div class="split checkout-wrap" id="checkout">
+        <div class="stack">
+          <h3>Buy a licence</h3>
+          <p class="mute">Choose a package, give the wallet the bot will trade from, and pay however suits you. Your licence and downloads appear on this page as soon as the payment confirms.</p>
+          <dl class="kv">
+            <dt>Card</dt><dd style="font-family:var(--sans);font-size:var(--t-sm)">In your own currency through Stripe: Visa, Mastercard, Amex, Apple Pay and Google Pay.</dd>
+            <dt>Solana</dt><dd style="font-family:var(--sans);font-size:var(--t-sm)">SOL, USDC, USDT or $VANTAX, straight from your wallet with Solana Pay.</dd>
+            <dt>Any token</dt><dd style="font-family:var(--sans);font-size:var(--t-sm)">Pay in JUP, BONK, WIF or whatever you hold. Jupiter swaps it in the same transaction.</dd>
+          </dl>
+          <p class="tiny mute">Your licence is signed with Vantax's ML-DSA-87 issuer key and names your wallet, so it can't be shared or forged. Keep the licence file; you can download it again from your order link.</p>
+        </div>
+        <div class="panel strong cut" id="checkout-panel" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="download" aria-labelledby="download-title">
+    <div class="shell split">
+      <div class="section-head" style="margin:0">
+        <h2 id="download-title">Download.</h2>
+        <p>The same program for paper and live trading. It starts in paper mode and stays there until a licence for your wallet is installed.</p>
+      </div>
+      <div class="stack">
+        <div class="pricelist" id="builds">
+          <a href="#" data-build="linux-x86_64"><b>Linux</b><span class="what">x86-64, glibc 2.31 or newer (Ubuntu 20.04+, Debian 11+)</span><span class="cost">Download</span></a>
+          <a href="#" data-build="macos-arm64"><b>macOS</b><span class="what">Apple silicon</span><span class="cost">Download</span></a>
+          <a href="#" data-build="windows-x86_64"><b>Windows</b><span class="what">64-bit, Windows 10 or newer</span><span class="cost">Download</span></a>
+        </div>
+        <p class="tiny mute" id="builds-note">Each build is listed with its SHA-256 by the store. Check it before you run anything that holds keys.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="requirements" aria-labelledby="req-title">
+    <div class="shell split">
+      <div class="section-head" style="margin:0">
+        <h2 id="req-title">What it needs.</h2>
+      </div>
+      <dl class="kv req">
+        <dt>A computer that stays on</dt><dd>Any small VPS works. 1 CPU and 1 GB of memory is enough.</dd>
+        <dt>A Solana RPC endpoint</dt><dd>A paid one from Helius, Triton or QuickNode. Public endpoints are too slow for trading.</dd>
+        <dt>A trading wallet</dt><dd>A fresh hot wallet with only what you're willing to trade. Never your main wallet.</dd>
+        <dt>A Jupiter API key</dt><dd>Free from portal.jup.ag, for routing and prices.</dd>
+        <dt>For X signals</dt><dd>An X API bearer token. X charges per post read; the bot keeps to a daily budget you set.</dd>
+        <dt>For Telegram signals</dt><dd>A Telegram bot added to the channels you follow, or the bundled reader for channels you've joined.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section" id="faq" aria-labelledby="faq-title">
+    <div class="shell split">
+      <div class="section-head" style="margin:0"><h2 id="faq-title">Questions.</h2></div>
+      <div class="faq">
+        <details><summary>Does Vantax ever hold my funds or keys?</summary><div><p>No. The bot runs on your machine, signs with your wallet's key on your machine, and talks to Solana directly. Vantax never sees your key, your balance or your trades.</p></div></details>
+        <details><summary>Will it make me money?</summary><div><p>Nobody can promise that, and we don't. Memecoins are extremely risky and most go to zero. The scanner lowers the chance of buying an outright rug; it can't remove market risk. Start in paper mode, and only trade what you can afford to lose.</p></div></details>
+        <details><summary>Which currencies can I pay in?</summary><div><p>Any card currency Stripe supports, through Visa, Mastercard, Amex, Apple Pay or Google Pay. On Solana: SOL, USDC, USDT, $VANTAX, or any token Jupiter can route, swapped to USDC in the same transaction.</p></div></details>
+        <details><summary>Can I move my licence to another wallet?</summary><div><p>Yes, once in a while. Message @VantaxFounder from the wallet's owner and we'll reissue it for the new address.</p></div></details>
+        <details><summary>What happens when a Monthly licence ends?</summary><div><p>The bot finishes managing open positions and stops opening new ones. Paper mode keeps working. Buying again adds 30 days to the end of your current licence.</p></div></details>
+        <details><summary>Refunds?</summary><div><p>Try it in paper mode first, it's free. Because the licence and download are delivered straight away, you agree at checkout to lose the 14-day cancellation right. If something is broken on our side, message @VantaxFounder and we'll put it right.</p></div></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="shell">
+      <p class="notice warn" style="max-width:90ch"><b>Trading risk.</b> VantaxBot is software that places trades you configure. Cryptoassets, and memecoins especially, are high risk and you can lose everything you trade. Nothing on this page is financial advice, and past results say nothing about future ones.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="shell">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="index.html" aria-label="Vantax home"><svg viewBox="0 0 372.84 120" role="img" aria-label="Vantax" xmlns="http://www.w3.org/2000/svg"><path class="v-main" d="M34.64 120 L92.38 20 L80.83 0 L34.64 80 L11.55 40 L0 60 Z"/><path class="v-facet" d="M34.64 120 L5.77 50 L0 60 Z"/><path class="v-facet" d="M34.64 120 L86.6 10 L80.83 0 L34.64 80 Z"/><g class="wm"><path d="M116.38 39.6 L128.36 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M145.24 39.6 L157.22 39.6 L142.79 94.8 L130.81 94.8 Z"/><path d="M149.97 94.8 L161.95 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M178.83 94.8 L190.81 94.8 L176.38 39.6 L164.4 39.6 Z"/><path d="M197.99 39.6 L209.58 39.6 L209.58 94.8 L197.99 94.8 Z"/><path d="M228.35 39.6 L239.94 39.6 L239.94 94.8 L228.35 94.8 Z"/><path d="M197.99 39.6 L211.07 39.6 L239.94 94.8 L226.86 94.8 Z"/><path d="M247.12 39.6 L286.86 39.6 L286.86 51.19 L247.12 51.19 Z"/><path d="M261.19 39.6 L272.79 39.6 L272.79 94.8 L261.19 94.8 Z"/><path d="M282.87 94.8 L294.85 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M311.73 94.8 L323.71 94.8 L309.28 39.6 L297.3 39.6 Z"/><path d="M330.89 39.6 L343.97 39.6 L372.84 94.8 L359.76 94.8 Z"/><path d="M359.76 39.6 L372.84 39.6 L343.97 94.8 L330.89 94.8 Z"/></g></svg></a>
+        <p>Post-quantum security, built to be verified.</p>
+        <p class="tiny">Written in Rust by one developer, with no outside funding. Nine of the twelve crates are open source.</p>
+      </div>
+      <div>
+        <h4>Products</h4>
+        <ul>
+          <li><a href="index.html#scanner">Quantum-risk scanner</a></li>
+          <li><a href="migrate.html">Migrate</a></li>
+          <li><a href="falcon.html">Falcon-512</a></li>
+          <li><a href="verify.html">Verify a bet</a></li>
+          <li><a href="launch.html">Vantax Chains</a></li>
+          <li><a href="bot.html">VantaxBot</a></li>
+          <li><a href="packages.html">Packages</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Check our work</h4>
+        <ul>
+          <li><a href="https://github.com/Vanta-Cybersecurity/Vantax">Source code</a></li>
+          <li><a href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/WHITEPAPER.md">Whitepaper</a></li>
+          <li><a href="https://github.com/Vanta-Cybersecurity/Vantax/blob/main/docs/API.md">API reference</a></li>
+          <li><a href="https://api.vantax-cybersecurity.com/health">API health</a></li>
+          <li><a href="https://api.vantax-cybersecurity.com/api/v1/gateway/audit">Audit trail</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>$VANTAX</h4>
+        <ul>
+          <li><a href="index.html#token">Official address</a></li>
+          <li><a href="holders.html">Holder access</a></li>
+          <li><a href="burns.html">Buyback and burns</a></li>
+          <li><a href="https://x.com/VantaxFounder">@VantaxFounder on X</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-legal">
+      <span>© 2026 Vantax Cybersecurity</span>
+      <span>Cryptoassets are high risk and you can lose everything you put in. Nothing here is financial advice.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var V=window.Vantax||{},store=(document.querySelector('meta[name="vantax-store"]')||{}).content||"";
+  function fill(n,t){document.querySelectorAll('[data-fill="'+n+'"]').forEach(function(e){e.textContent=t})}
+  function sol(n){return Number(n).toLocaleString(undefined,{maximumFractionDigits:3})+" SOL"}
+  function boot(){
+    // Package buttons preselect the package in the checkout.
+    var pick=null;
+    document.querySelectorAll("[data-pick]").forEach(function(a){a.addEventListener("click",function(){pick=a.getAttribute("data-pick");var r=document.querySelector('#checkout-panel input[name="pkg"][value="'+pick+'"]');if(r){r.checked=true;r.dispatchEvent(new Event("change"))}})});
+    if(window.VantaxCheckout)VantaxCheckout.mount(document.getElementById("checkout-panel"),{pkg:"lifetime"});
+    fetch(store.replace(/\/$/,"")+"/api/v1/bot",{headers:{Accept:"application/json"}}).then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(o){
+      (o.packages||[]).forEach(function(p){
+        if(p.id==="monthly"||p.id==="lifetime"){fill(p.id+"-amt",sol(p.price_sol));if(p.holder_price_sol!=null)fill(p.id+"-holder",sol(p.holder_price_sol));document.querySelectorAll('[data-fill-amount="'+p.id+'"]').forEach(function(e){e.setAttribute("data-amount",p.price_sol)})}
+      });
+      if(V.money)V.money.render();
+      var builds={};(o.releases||[]).forEach(function(b){builds[b.platform]=b});
+      document.querySelectorAll("[data-build]").forEach(function(a){
+        var b=builds[a.getAttribute("data-build")];
+        if(!b){a.querySelector(".cost").textContent="Coming soon";a.removeAttribute("href");a.setAttribute("aria-disabled","true");return}
+        a.href=store.replace(/\/$/,"")+b.path;a.setAttribute("download",b.file);
+        a.querySelector(".cost").textContent="Download "+(b.size_mb?b.size_mb+" MB":"");
+        a.title="SHA-256 "+b.sha256;
+      });
+      if(o.version)document.getElementById("builds-note").textContent="Version "+o.version+". Each build's SHA-256 is in its link title and in SHA256SUMS on the store. Check it before you run anything that holds keys.";
+    }).catch(function(){});
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot);else boot();
+})();
+</script>
+</body>
+</html>
