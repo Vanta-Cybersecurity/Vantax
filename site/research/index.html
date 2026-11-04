@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- CSP: same-origin scripts/styles only; no inline script or style. The
+     backend also sends this (plus frame-ancestors) as an HTTP header. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta name="referrer" content="no-referrer">
+<title>Advanced Research Division — VANTAX Cybersecurity</title>
+<meta name="description" content="VANTAX Advanced Research Division dashboard. Shows live data from the vantax-ard-backend API when signed in; otherwise clearly labelled demo values.">
+<link rel="icon" href="assets/img/logo-v.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+<!-- ===== VANTAX ARD ROOT: everything is scoped under .vantax-ard ===== -->
+<div class="vantax-ard" id="vantax-ard">
+
+  <!-- Shared SVG icon sprite (inline, no network) -->
+  <svg width="0" height="0" class="vx-sprite" aria-hidden="true">
+    <defs>
+      <linearGradient id="vx-grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5161ff"/><stop offset="1" stop-color="#7a5cff"/></linearGradient>
+    </defs>
+    <symbol id="i-dash" viewBox="0 0 24 24"><path d="M3 3h8v8H3zM13 3h8v5h-8zM13 10h8v11h-8zM3 13h8v8H3z" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-ops" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3 3" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-lab" viewBox="0 0 24 24"><path d="M9 2h6M10 2v6L4 20h16L14 8V2" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-tools" viewBox="0 0 24 24"><path d="M14 6a4 4 0 015 5l-9 9-4-4 9-9z" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-report" viewBox="0 0 24 24"><path d="M6 2h9l4 4v16H6zM9 12h7M9 16h7M9 8h3" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-atom" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2" fill="currentColor"/><ellipse cx="12" cy="12" rx="10" ry="4" fill="none" stroke="currentColor" stroke-width="1.4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)" fill="none" stroke="currentColor" stroke-width="1.4"/><ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+    <symbol id="i-cube" viewBox="0 0 24 24"><path d="M12 2l9 5v10l-9 5-9-5V7zM12 12l9-5M12 12v10M12 12L3 7" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+    <symbol id="i-chip" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-bin" viewBox="0 0 24 24"><path d="M8 4L3 12l5 8M16 4l5 8-5 8M14 4l-4 16" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-bug" viewBox="0 0 24 24"><ellipse cx="12" cy="13" rx="5" ry="7" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 6v14M3 9l4 2M21 9l-4 2M3 17l4-2M21 17l-4-2M9 4l1 2M15 4l-1 2" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 10V7a4 4 0 018 0v3" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 12h10M18 12v4M21 12v3" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-net" viewBox="0 0 24 24"><circle cx="12" cy="4" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="4" cy="19" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="20" cy="19" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="13" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 6v5M10.5 14.5l-5 3M13.5 14.5l5 3" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 16l5 5" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 0112 0v6l2 2H4zM10 21h4" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M14 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.8"/></symbol>
+  </svg>
+
+  <!-- ================= TOP NAV ================= -->
+  <header class="vx-topnav">
+    <button class="vx-menu-toggle" type="button" aria-label="Toggle sidebar" aria-expanded="false" data-vx-sidebar-toggle><svg><use href="#i-menu"/></svg></button>
+    <a class="vx-brand" href="#" data-vx-route="home">
+      <img src="assets/img/logo-v.svg" alt="" width="34" height="34">
+      <span class="vx-brand-text"><strong>VANTAX</strong><small>CYBERSECURITY</small></span>
+    </a>
+    <a class="vx-home-link" href="https://vantax-cybersecurity.com/">&larr; Vantax</a>
+    <nav class="vx-mainnav" aria-label="Primary">
+      <a href="https://vantax-cybersecurity.com/">Home</a>
+      <a href="#" data-vx-route="products">Products</a>
+      <a href="#" class="is-active" aria-current="page" data-vx-route="research">Research</a>
+      <a href="#" data-vx-route="solutions">Solutions</a>
+      <a href="#" data-vx-route="resources">Resources</a>
+      <a href="#" data-vx-route="about">About</a>
+    </nav>
+    <div class="vx-topactions">
+      <label class="vx-search"><svg><use href="#i-search"/></svg><input type="search" placeholder="Search research…" aria-label="Search"></label>
+      <select class="vx-division" aria-label="Division"><option>Research Division</option><option>Threat Intelligence</option><option>Security Operations</option></select>
+      <button class="vx-icon-btn" type="button" aria-label="Notifications"><svg><use href="#i-bell"/></svg><span class="vx-dot"></span></button>
+      <a class="vx-btn vx-btn-outline" href="#" data-vx-route="secureAccess" data-vx-secure-access aria-controls="vx-login" aria-expanded="false"><svg><use href="#i-lock"/></svg><span data-vx-access-label>Secure Access</span></a>
+    </div>
+  </header>
+
+  <div class="vx-layout">
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="vx-sidebar" aria-label="Section navigation">
+      <p class="vx-side-label">MAIN</p>
+      <ul class="vx-side-list">
+        <li><a href="#" class="is-active" data-vx-route="dashboard"><svg><use href="#i-dash"/></svg>Dashboard</a></li>
+        <li><a href="#" data-vx-route="threatIntel"><svg><use href="#i-shield"/></svg>Threat Intelligence</a></li>
+        <li><a href="#" data-vx-route="secOps"><svg><use href="#i-ops"/></svg>Security Operations</a></li>
+        <li><a href="#" data-vx-route="researchLab"><svg><use href="#i-lab"/></svg>Research Lab</a></li>
+        <li><a href="#" data-vx-route="tools"><svg><use href="#i-tools"/></svg>Tools &amp; Utilities</a></li>
+        <li><a href="#" data-vx-route="reports"><svg><use href="#i-report"/></svg>Reports</a></li>
+        <li><a href="#" data-vx-route="settings"><svg><use href="#i-gear"/></svg>Settings</a></li>
+      </ul>
+      <p class="vx-side-label">RESEARCH DIVISION</p>
+      <ul class="vx-side-list" data-vx-module-nav><!-- populated from MODULES config in app.js --></ul>
+    </aside>
+
+    <main class="vx-main">
+      <!-- ================= HERO ================= -->
+      <section class="vx-hero" aria-labelledby="vx-hero-title">
+        <div class="vx-hero-copy">
+          <p class="vx-eyebrow">VANTAX CYBERSECURITY</p>
+          <h1 id="vx-hero-title">ADVANCED<br>RESEARCH<br><span class="vx-grad-text">DIVISION</span></h1>
+          <p class="vx-tagline">Next-Generation Cybersecurity Research.<br>Real Threats. Deeper Analysis. Stronger Defenses.</p>
+          <div class="vx-pills">
+            <div class="vx-pill"><strong><span data-vx-count="6" data-vx-live="modules_total">6</span></strong><small>Research Modules</small></div>
+            <div class="vx-pill"><strong>Sandboxed</strong><small>Job Execution</small></div>
+            <div class="vx-pill"><strong>Defensive</strong><small>Research Only</small></div>
+          </div>
+          <a href="#vx-domains" class="vx-btn vx-btn-glow">EXPLORE RESEARCH <svg><use href="#i-arrow"/></svg></a>
+        </div>
+
+        <!-- Animated globe / atom -->
+        <div class="vx-orb" aria-hidden="true">
+          <svg class="vx-globe" viewBox="0 0 400 400">
+            <defs>
+              <radialGradient id="vx-core" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#8b5cf6" stop-opacity=".55"/><stop offset=".6" stop-color="#1e3a8a" stop-opacity=".25"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+            </defs>
+            <circle cx="200" cy="200" r="190" fill="url(#vx-core)"/>
+            <g class="vx-globe-grid" fill="none" stroke="#5161ff" stroke-opacity=".5" stroke-width="1">
+              <circle cx="200" cy="200" r="130"/>
+              <ellipse cx="200" cy="200" rx="130" ry="45"/><ellipse cx="200" cy="200" rx="130" ry="90"/>
+              <ellipse cx="200" cy="200" rx="45" ry="130"/><ellipse cx="200" cy="200" rx="90" ry="130"/>
+              <line x1="70" y1="200" x2="330" y2="200"/><line x1="200" y1="70" x2="200" y2="330"/>
+            </g>
+          </svg>
+          <div class="vx-ring vx-ring-1"></div>
+          <div class="vx-ring vx-ring-2"></div>
+          <div class="vx-ring vx-ring-3"></div>
+          <div class="vx-orb-logo"><img src="assets/img/logo-v.svg" alt=""></div>
+          <div class="vx-particles" data-vx-particles></div>
+          <ul class="vx-orb-words"><li>ANALYZE</li><li>REVERSE</li><li>RESEARCH</li><li>DEFEND</li><li>THE FUTURE</li></ul>
+        </div>
+      </section>
+
+      <!-- ================= RESEARCH DOMAINS ================= -->
+      <section class="vx-domains" id="vx-domains" aria-labelledby="vx-domains-title">
+        <div class="vx-section-head">
+          <h2 id="vx-domains-title"><span class="vx-accent">RESEARCH</span> DOMAINS</h2>
+          <a href="#" class="vx-link" data-vx-route="allModules">EXPLORE ALL MODULES <svg><use href="#i-arrow"/></svg></a>
+        </div>
+        <div class="vx-card-grid" data-vx-module-grid><!-- populated from MODULES config in app.js --></div>
+        <noscript><p class="vx-muted">Enable JavaScript to view the research module cards.</p></noscript>
+      </section>
+
+      <!-- ================= BOTTOM PANELS ================= -->
+      <section class="vx-bottom">
+        <article class="vx-panel vx-map-panel">
+          <h3>GLOBAL THREAT INTELLIGENCE <span class="vx-demo-tag">DEMO DATA</span></h3>
+          <div class="vx-map-wrap">
+            <svg class="vx-map" viewBox="0 0 360 180" aria-hidden="true">
+              <!-- stylised dotted continents -->
+              <g fill="#5161ff" fill-opacity=".55" data-vx-map-dots></g>
+              <g class="vx-map-arcs" fill="none" stroke="url(#vx-grad)" stroke-width="1.2">
+                <path d="M70 60 Q140 10 190 55"/><path d="M190 55 Q250 20 290 70"/><path d="M110 120 Q160 80 200 60"/><path d="M290 70 Q300 110 300 130"/>
+              </g>
+            </svg>
+            <ul class="vx-counters">
+              <li><i class="vx-c-purple"></i>Malware<b data-vx-count="12487">12,487</b></li>
+              <li><i class="vx-c-pink"></i>C2 Domains<b data-vx-count="6324">6,324</b></li>
+              <li><i class="vx-c-blue"></i>IP Reputation<b data-vx-count="4219">4,219</b></li>
+              <li><i class="vx-c-cyan"></i>Vulnerabilities<b data-vx-count="2126">2,126</b></li>
+              <li><i class="vx-c-amber"></i>Threat Actors<b data-vx-count="862">862</b></li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="vx-panel vx-quantum-panel">
+          <span class="vx-badge">NEW</span>
+          <svg class="vx-q-icon"><use href="#i-cube"/></svg>
+          <div>
+            <h3>QUANTUM COMPUTING</h3>
+            <p>The next frontier in cybersecurity research and defense.</p>
+            <a href="#" class="vx-btn vx-btn-outline vx-btn-sm" data-vx-route="quantum">LEARN MORE <svg><use href="#i-arrow"/></svg></a>
+          </div>
+        </article>
+
+        <article class="vx-panel vx-graph-panel">
+          <h3>REAL-TIME ANALYSIS <span class="vx-demo-tag">DEMO</span></h3>
+          <p class="vx-muted">Live threat monitoring, research activity and system performance.</p>
+          <svg class="vx-graph" viewBox="0 0 300 100" preserveAspectRatio="none" aria-hidden="true">
+            <defs><linearGradient id="vx-area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a5cff" stop-opacity=".5"/><stop offset="1" stop-color="#7a5cff" stop-opacity="0"/></linearGradient></defs>
+            <g stroke="#5161ff" stroke-opacity=".12"><line x1="0" y1="25" x2="300" y2="25"/><line x1="0" y1="50" x2="300" y2="50"/><line x1="0" y1="75" x2="300" y2="75"/></g>
+            <path data-vx-graph-area fill="url(#vx-area)"/>
+            <path data-vx-graph-line fill="none" stroke="url(#vx-grad)" stroke-width="2"/>
+          </svg>
+        </article>
+      </section>
+    </main>
+
+    <!-- ================= RIGHT PANEL ================= -->
+    <aside class="vx-right" aria-label="System status">
+      <section class="vx-panel">
+        <div class="vx-panel-head"><h3>SYSTEM STATUS <span class="vx-demo-tag" data-vx-status-tag>DEMO</span></h3><span class="vx-ok vx-ok-unknown" data-vx-ok><i></i><span data-vx-ok-text>NOT LIVE</span></span></div>
+        <ul class="vx-status">
+          <li><svg><use href="#i-atom"/></svg>RESEARCH MODULES<b data-vx-live="modules_present">6</b></li>
+          <li><svg><use href="#i-target"/></svg>ACTIVE JOBS<b data-vx-count="7" data-vx-live="active">7</b></li>
+          <li><svg><use href="#i-report"/></svg>TOTAL JOBS<b data-vx-count="1284" data-vx-live="total_jobs">1,284</b></li>
+          <li><svg><use href="#i-shield"/></svg>FAILED JOBS<b data-vx-count="3" data-vx-live="failed">3</b></li>
+        </ul>
+        <p class="vx-demo-note" data-vx-status-note>Demo placeholder values — not live telemetry.</p>
+        <p class="vx-api-status" data-vx-api-status>API: checking…</p>
+      </section>
+      <section class="vx-panel vx-login" id="vx-login" data-vx-login hidden>
+        <div class="vx-panel-head"><h3>SECURE ACCESS</h3></div>
+        <form data-vx-login-form autocomplete="on" novalidate>
+          <label>Username<input name="username" type="text" autocomplete="username" required maxlength="128"></label>
+          <label>Password<input name="password" type="password" autocomplete="current-password" required maxlength="1024"></label>
+          <button class="vx-btn vx-btn-outline vx-btn-sm" type="submit">SIGN IN</button>
+          <p class="vx-login-msg" data-vx-login-msg role="status"></p>
+        </form>
+        <div class="vx-session" data-vx-session hidden>
+          <p>Signed in. Live data from the API.</p>
+          <button class="vx-btn vx-btn-outline vx-btn-sm" type="button" data-vx-logout>SIGN OUT</button>
+        </div>
+      </section>
+      <section class="vx-panel" data-vx-pqc>
+        <div class="vx-panel-head"><h3>PQC READINESS <span class="vx-demo-tag" data-vx-pqc-tag>NO LOCAL REPORT</span></h3></div>
+        <ul class="vx-status">
+          <li><svg><use href="#i-shield"/></svg>READINESS<b data-vx-pqc-field="score">—</b></li>
+          <li><svg><use href="#i-target"/></svg>QUANTUM-VULNERABLE<b data-vx-pqc-field="vulnerable">—</b></li>
+          <li><svg><use href="#i-report"/></svg>HNDL-URGENT<b data-vx-pqc-field="hndl_urgent">—</b></li>
+          <li><svg><use href="#i-atom"/></svg>ITEMS<b data-vx-pqc-field="items">—</b></li>
+        </ul>
+        <p class="vx-demo-note" data-vx-pqc-note>Reads data/pqc-report.json produced locally by <code>vantax-pqc report</code> (scripts/refresh-local-data.sh). Nothing is shown if no report exists.</p>
+      </section>
+      <section class="vx-panel">
+        <div class="vx-panel-head"><h3>LIVE FEED</h3><span class="vx-demo-tag" data-vx-feed-tag>SIMULATED</span></div>
+        <ul class="vx-feed" data-vx-feed aria-live="polite"></ul>
+        <a href="#" class="vx-link vx-right-link" data-vx-route="feed">VIEW ALL <svg><use href="#i-arrow"/></svg></a>
+      </section>
+    </aside>
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="vx-footer">
+    <div class="vx-brand"><img src="assets/img/logo-v.svg" alt="" width="28" height="28"><span class="vx-brand-text"><strong>VANTAX</strong><small>CYBERSECURITY</small></span></div>
+    <p class="vx-footer-motto">RESEARCH <span>/</span> ANALYSE <span>/</span> DEFEND</p>
+    <div class="vx-footer-stats"><span><svg><use href="#i-atom"/></svg>6 Research Modules</span><span><svg><use href="#i-ops"/></svg>Self-hosted API</span></div>
+  </footer>
+</div>
+
+<!-- Optional: override routes with a data-vx-config JSON attribute on the
+     .vantax-ard root, e.g. data-vx-config='{"routes":{"malware":"/research/malware"}}'.
+     (An inline <script> setting window.VANTAX_ARD_CONFIG still works but needs
+     the CSP relaxed; prefer the attribute or a separate same-origin .js file.)
+     Route URLs are restricted to relative paths, #fragments, http(s) and mailto. -->
+<script src="assets/js/app.js" defer></script>
+</body>
+</html>

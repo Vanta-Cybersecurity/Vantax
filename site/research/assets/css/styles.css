@@ -1,0 +1,303 @@
+/* =====================================================================
+   VANTAX Advanced Research Division — front-end styles
+   ALL rules are scoped under .vantax-ard. No global resets leak out.
+   Theme via the CSS variables below.
+   ===================================================================== */
+/* Brand fonts, served same-origin so they satisfy the page CSP (font-src 'self') */
+@font-face{font-family:"Archivo";src:url("../fonts/archivo.woff2") format("woff2");font-weight:100 900;font-stretch:62% 125%;font-display:swap}
+@font-face{font-family:"Martian Mono";src:url("../fonts/martian-mono.woff2") format("woff2");font-weight:100 800;font-stretch:75% 112.5%;font-display:swap}
+
+.vantax-ard {
+  /* ---- Theme tokens — Vantax brand (dark) ---- */
+  --vx-bg: #070b17;
+  --vx-bg-2: #0a1020;
+  --vx-panel: rgba(14, 20, 39, .62);
+  --vx-panel-border: #1d2643;
+  --vx-text: #e7ebf7;
+  --vx-muted: #97a1bf;
+  --vx-blue: #5161ff;
+  --vx-cyan: #6a78ff;
+  --vx-purple: #7a5cff;
+  --vx-violet: #6a78ff;
+  --vx-pink: #ff5c8b;
+  --vx-green: #3cd3c4;
+  --vx-grad: linear-gradient(90deg, var(--vx-blue), var(--vx-purple));
+  --vx-glow: 0 0 16px rgba(81, 97, 255, .28);
+  --vx-radius: 8px;
+  --vx-font: "Archivo", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --vx-mono: "Martian Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --vx-sidebar-w: 230px;
+  --vx-right-w: 300px;
+
+  position: relative;
+  min-height: 100vh;
+  color: var(--vx-text);
+  font-family: var(--vx-font);
+  font-size: 14px;
+  line-height: 1.5;
+  background:
+    radial-gradient(1100px 560px at 12% -8%, rgba(81, 97, 255, .20), transparent 60%),
+    radial-gradient(760px 520px at 108% 118%, rgba(122, 92, 255, .12), transparent 58%),
+    var(--vx-bg);
+  overflow-x: hidden;
+}
+/* Scoped box-sizing only (no global reset) */
+.vantax-ard *, .vantax-ard *::before, .vantax-ard *::after { box-sizing: border-box; }
+.vantax-ard a { color: inherit; text-decoration: none; }
+.vantax-ard ul { list-style: none; margin: 0; padding: 0; }
+.vantax-ard h1, .vantax-ard h2, .vantax-ard h3, .vantax-ard p { margin: 0; }
+.vantax-ard svg { width: 18px; height: 18px; flex-shrink: 0; }
+.vantax-ard button, .vantax-ard input, .vantax-ard select { font: inherit; color: inherit; }
+.vantax-ard :focus-visible { outline: 2px solid var(--vx-blue); outline-offset: 2px; border-radius: 6px; }
+
+/* ---------- Shared bits ---------- */
+.vantax-ard .vx-panel {
+  background: var(--vx-panel);
+  border: 1px solid var(--vx-panel-border);
+  border-radius: var(--vx-radius);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: inset 0 0 30px rgba(76, 140, 255, .05), 0 10px 30px rgba(0, 0, 0, .35);
+  padding: 16px;
+}
+.vantax-ard .vx-panel h3 { font-size: 12px; letter-spacing: .14em; color: var(--vx-blue); font-weight: 700; }
+.vantax-ard .vx-muted { color: var(--vx-muted); font-size: 12px; }
+.vantax-ard .vx-grad-text { background: var(--vx-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.vantax-ard .vx-accent { color: var(--vx-blue); }
+.vantax-ard .vx-badge {
+  font-size: 9px; font-weight: 700; letter-spacing: .08em; padding: 2px 6px; border-radius: 6px;
+  color: #fff; background: linear-gradient(90deg, var(--vx-violet), var(--vx-purple)); box-shadow: var(--vx-glow);
+}
+.vantax-ard .vx-demo-tag { font-size: 9px; letter-spacing: .1em; color: var(--vx-muted); border: 1px solid var(--vx-panel-border); border-radius: 5px; padding: 1px 5px; margin-left: 6px; vertical-align: middle; }
+.vantax-ard .vx-demo-note { margin-top: 10px; font-size: 10px; color: var(--vx-muted); opacity: .7; }
+.vantax-ard .vx-link { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; letter-spacing: .1em; color: var(--vx-blue); transition: gap .2s, color .2s; }
+.vantax-ard .vx-link:hover { gap: 10px; color: #fff; }
+.vantax-ard .vx-link svg { width: 14px; height: 14px; }
+
+.vantax-ard .vx-btn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 10px;
+  font-weight: 600; font-size: 13px; letter-spacing: .04em; cursor: pointer; transition: all .2s; white-space: nowrap;
+}
+.vantax-ard .vx-btn svg { width: 16px; height: 16px; }
+.vantax-ard .vx-btn-outline { border: 1px solid rgba(76, 201, 255, .55); color: var(--vx-blue); background: rgba(76, 201, 255, .06); }
+.vantax-ard .vx-btn-outline:hover { background: rgba(76, 201, 255, .16); box-shadow: 0 0 16px rgba(76, 201, 255, .35); }
+.vantax-ard .vx-btn-glow {
+  margin-top: 26px; padding: 13px 24px; border: 1px solid rgba(76, 201, 255, .7); color: #fff;
+  background: linear-gradient(90deg, rgba(76, 201, 255, .15), rgba(168, 85, 247, .25));
+  box-shadow: 0 0 22px rgba(76, 201, 255, .35), inset 0 0 14px rgba(168, 85, 247, .3);
+}
+.vantax-ard .vx-btn-glow:hover { box-shadow: 0 0 34px rgba(76, 201, 255, .6), inset 0 0 18px rgba(168, 85, 247, .5); transform: translateY(-1px); }
+.vantax-ard .vx-btn-sm { padding: 6px 12px; font-size: 11px; margin-top: 10px; }
+
+/* ---------- Top nav ---------- */
+.vantax-ard .vx-topnav {
+  position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 24px;
+  padding: 12px 22px; background: rgba(3, 6, 15, .75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--vx-panel-border);
+}
+.vantax-ard .vx-brand { display: flex; align-items: center; gap: 10px; }
+.vantax-ard .vx-brand img { filter: drop-shadow(0 0 8px rgba(76, 201, 255, .6)); }
+.vantax-ard .vx-brand-text { display: flex; flex-direction: column; line-height: 1; }
+.vantax-ard .vx-brand-text strong { font-size: 20px; letter-spacing: .28em; font-weight: 700; }
+.vantax-ard .vx-brand-text small { font-size: 8.5px; letter-spacing: .42em; color: var(--vx-muted); margin-top: 4px; }
+.vantax-ard .vx-mainnav { display: flex; gap: 4px; margin: 0 auto; padding: 4px; border: 1px solid var(--vx-panel-border); border-radius: 12px; background: rgba(14, 22, 52, .4); }
+.vantax-ard .vx-mainnav a { padding: 7px 16px; border-radius: 8px; color: var(--vx-muted); font-size: 13px; transition: color .2s, background .2s; }
+.vantax-ard .vx-mainnav a:hover { color: #fff; }
+.vantax-ard .vx-mainnav a.is-active { color: #fff; background: rgba(76, 140, 255, .14); box-shadow: inset 0 -2px 0 var(--vx-blue), 0 0 14px rgba(76, 140, 255, .25); }
+.vantax-ard .vx-topactions { display: flex; align-items: center; gap: 12px; }
+.vantax-ard .vx-search { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border: 1px solid var(--vx-panel-border); border-radius: 9px; background: rgba(14, 22, 52, .4); color: var(--vx-muted); }
+.vantax-ard .vx-search svg { width: 15px; height: 15px; }
+.vantax-ard .vx-search input { background: none; border: 0; outline: 0; width: 130px; font-size: 12px; }
+.vantax-ard .vx-division { padding: 7px 10px; border-radius: 9px; border: 1px solid var(--vx-panel-border); background: rgba(14, 22, 52, .6); font-size: 12px; }
+.vantax-ard .vx-division option { background: var(--vx-bg-2); }
+.vantax-ard .vx-icon-btn { position: relative; background: none; border: 0; cursor: pointer; color: var(--vx-muted); padding: 4px; }
+.vantax-ard .vx-icon-btn:hover { color: #fff; }
+.vantax-ard .vx-dot { position: absolute; top: 3px; right: 3px; width: 7px; height: 7px; border-radius: 50%; background: var(--vx-pink); box-shadow: 0 0 8px var(--vx-pink); }
+.vantax-ard .vx-menu-toggle { display: none; background: none; border: 1px solid var(--vx-panel-border); border-radius: 8px; padding: 6px; cursor: pointer; }
+
+/* ---------- Layout ---------- */
+.vantax-ard .vx-layout {
+  display: grid; grid-template-columns: var(--vx-sidebar-w) minmax(0, 1fr) var(--vx-right-w);
+  gap: 20px; padding: 18px 20px; max-width: 1680px; margin: 0 auto;
+}
+
+/* ---------- Sidebar ---------- */
+.vantax-ard .vx-sidebar { position: sticky; top: 76px; align-self: start; max-height: calc(100vh - 92px); overflow-y: auto; padding-right: 6px; scrollbar-width: thin; }
+.vantax-ard .vx-side-label { font-size: 10px; letter-spacing: .2em; color: var(--vx-muted); margin: 6px 10px 8px; }
+.vantax-ard .vx-side-list { margin-bottom: 18px; }
+.vantax-ard .vx-side-list a {
+  display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 9px; font-size: 13px; color: #c3cbea;
+  border: 1px solid transparent; transition: all .2s;
+}
+.vantax-ard .vx-side-list a svg { width: 16px; height: 16px; color: var(--vx-blue); opacity: .85; }
+.vantax-ard .vx-side-list a:hover { background: rgba(76, 140, 255, .08); color: #fff; }
+.vantax-ard .vx-side-list a.is-active { background: linear-gradient(90deg, rgba(76, 140, 255, .2), rgba(168, 85, 247, .08)); border-color: rgba(76, 140, 255, .4); color: #fff; box-shadow: 0 0 14px rgba(76, 140, 255, .2); }
+.vantax-ard .vx-side-list .vx-badge { margin-left: auto; }
+
+/* ---------- Hero ---------- */
+.vantax-ard .vx-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); align-items: center; gap: 10px; min-height: 440px; }
+.vantax-ard .vx-eyebrow { font-size: 11px; letter-spacing: .3em; color: var(--vx-blue); margin-bottom: 12px; }
+.vantax-ard .vx-hero h1 { font-size: clamp(36px, 4.6vw, 64px); line-height: 1.02; font-weight: 800; letter-spacing: .02em; text-shadow: 0 0 30px rgba(110, 90, 255, .35); }
+.vantax-ard .vx-tagline { margin-top: 18px; color: #b8c2e8; font-size: 15px; }
+.vantax-ard .vx-pills { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.vantax-ard .vx-pill { padding: 10px 16px; border-radius: 12px; border: 1px solid var(--vx-panel-border); background: var(--vx-panel); backdrop-filter: blur(10px); text-align: center; min-width: 120px; }
+.vantax-ard .vx-pill strong { display: block; font-size: 16px; }
+.vantax-ard .vx-pill small { color: var(--vx-muted); font-size: 11px; }
+
+/* Orb / globe */
+.vantax-ard .vx-orb { position: relative; aspect-ratio: 1; width: 100%; max-width: 480px; justify-self: center; }
+.vantax-ard .vx-globe { position: absolute; inset: 0; width: 100%; height: 100%; }
+.vantax-ard .vx-globe-grid { transform-origin: 200px 200px; animation: vx-spin 40s linear infinite; filter: drop-shadow(0 0 4px #4cc9ff); }
+.vantax-ard .vx-ring { position: absolute; inset: 8%; border-radius: 50%; border: 2px solid transparent; }
+.vantax-ard .vx-ring-1 { border-top-color: var(--vx-blue); border-bottom-color: var(--vx-purple); transform: rotateX(70deg); animation: vx-ring1 9s linear infinite; box-shadow: 0 0 20px rgba(76, 201, 255, .4); }
+.vantax-ard .vx-ring-2 { inset: 2%; border-left-color: var(--vx-purple); border-right-color: var(--vx-cyan); animation: vx-ring2 12s linear infinite; }
+.vantax-ard .vx-ring-3 { inset: 14%; border-top-color: var(--vx-pink); border-left-color: var(--vx-blue); animation: vx-ring3 7s linear infinite reverse; }
+.vantax-ard .vx-orb-logo { position: absolute; inset: 38%; display: grid; place-items: center; border-radius: 50%; background: radial-gradient(circle, rgba(168, 85, 247, .5), transparent 70%); animation: vx-pulse 3s ease-in-out infinite; }
+.vantax-ard .vx-orb-logo img { width: 75%; filter: drop-shadow(0 0 14px #4cc9ff) drop-shadow(0 0 30px #a855f7); }
+.vantax-ard .vx-particles { position: absolute; inset: 0; }
+.vantax-ard .vx-particles span { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #fff; box-shadow: 0 0 6px var(--vx-blue), 0 0 12px var(--vx-purple); animation: vx-twinkle var(--d, 3s) ease-in-out infinite; animation-delay: var(--dl, 0s); }
+.vantax-ard .vx-orb-words { position: absolute; right: -4%; top: 30%; font-size: 10px; letter-spacing: .25em; color: var(--vx-blue); opacity: .75; line-height: 2; border-left: 1px solid var(--vx-panel-border); padding-left: 10px; }
+
+@keyframes vx-spin { to { transform: rotate(360deg); } }
+@keyframes vx-ring1 { from { transform: rotateX(70deg) rotateZ(0); } to { transform: rotateX(70deg) rotateZ(360deg); } }
+@keyframes vx-ring2 { from { transform: rotateY(65deg) rotateZ(0); } to { transform: rotateY(65deg) rotateZ(360deg); } }
+@keyframes vx-ring3 { from { transform: rotateX(55deg) rotateY(30deg) rotateZ(0); } to { transform: rotateX(55deg) rotateY(30deg) rotateZ(360deg); } }
+@keyframes vx-pulse { 50% { transform: scale(1.08); filter: brightness(1.25); } }
+@keyframes vx-twinkle { 50% { opacity: .15; transform: scale(.5); } }
+@keyframes vx-blink { 50% { opacity: .3; } }
+@keyframes vx-feed-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@keyframes vx-dash { to { stroke-dashoffset: -40; } }
+
+/* ---------- Research domains ---------- */
+.vantax-ard .vx-domains { margin-top: 18px; }
+.vantax-ard .vx-section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.vantax-ard .vx-section-head h2 { font-size: 14px; letter-spacing: .2em; font-weight: 700; }
+.vantax-ard .vx-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+.vantax-ard .vx-card {
+  position: relative; display: flex; flex-direction: column; gap: 6px; padding: 14px; min-height: 190px;
+  border-radius: var(--vx-radius); border: 1px solid var(--vx-panel-border); background: var(--vx-panel);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: transform .25s, border-color .25s, box-shadow .25s; overflow: hidden;
+}
+.vantax-ard .vx-card::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 0, rgba(109, 75, 255, .22), transparent 60%); pointer-events: none; }
+.vantax-ard .vx-card:hover { transform: translateY(-4px); border-color: rgba(76, 201, 255, .6); box-shadow: 0 0 24px rgba(76, 140, 255, .3); }
+.vantax-ard .vx-card .vx-badge { position: absolute; top: 10px; right: 10px; }
+.vantax-ard .vx-card-icon { display: grid; place-items: center; height: 64px; }
+.vantax-ard .vx-card-icon svg { width: 44px; height: 44px; color: var(--vx-blue); filter: drop-shadow(0 0 8px var(--vx-blue)) drop-shadow(0 0 16px var(--vx-purple)); }
+.vantax-ard .vx-card:nth-child(3n+2) .vx-card-icon svg { color: #c084fc; }
+.vantax-ard .vx-card h3 { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; font-weight: 700; }
+.vantax-ard .vx-card p { font-size: 12px; color: var(--vx-muted); flex: 1; }
+
+/* ---------- Bottom panels ---------- */
+.vantax-ard .vx-bottom { display: grid; grid-template-columns: 1.4fr 1fr 1.1fr; gap: 12px; margin-top: 16px; }
+.vantax-ard .vx-map-wrap { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; margin-top: 10px; }
+.vantax-ard .vx-map { width: 100%; height: auto; }
+.vantax-ard .vx-map-arcs path { stroke-dasharray: 4 4; animation: vx-dash 2s linear infinite; }
+.vantax-ard .vx-counters li { display: grid; grid-template-columns: 10px 1fr auto; gap: 8px; align-items: center; font-size: 11px; color: var(--vx-muted); padding: 3px 0; }
+.vantax-ard .vx-counters i { width: 8px; height: 8px; border-radius: 2px; background: var(--c); box-shadow: 0 0 6px var(--c); }
+.vantax-ard .vx-counters b { color: var(--vx-text); font-variant-numeric: tabular-nums; }
+.vantax-ard .vx-quantum-panel { position: relative; display: flex; gap: 14px; align-items: center; background: linear-gradient(135deg, rgba(109, 75, 255, .25), rgba(14, 22, 52, .55)); }
+.vantax-ard .vx-quantum-panel .vx-badge { position: absolute; top: 12px; right: 12px; }
+.vantax-ard .vx-quantum-panel p { color: var(--vx-muted); font-size: 12px; margin-top: 4px; }
+.vantax-ard .vx-q-icon { width: 76px !important; height: 76px !important; color: var(--vx-purple); filter: drop-shadow(0 0 12px var(--vx-purple)); animation: vx-pulse 4s ease-in-out infinite; }
+.vantax-ard .vx-graph { width: 100%; height: 110px; margin-top: 8px; }
+
+/* ---------- Right panel ---------- */
+.vantax-ard .vx-right { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 76px; align-self: start; }
+.vantax-ard .vx-panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; }
+.vantax-ard .vx-ok { font-size: 9px; letter-spacing: .08em; color: var(--vx-green); display: flex; align-items: center; gap: 5px; }
+.vantax-ard .vx-ok i { width: 7px; height: 7px; border-radius: 50%; background: var(--vx-green); box-shadow: 0 0 8px var(--vx-green); animation: vx-blink 2s infinite; }
+.vantax-ard .vx-status li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(76, 140, 255, .1); font-size: 11px; letter-spacing: .08em; color: #c3cbea; }
+.vantax-ard .vx-status li:last-child { border-bottom: 0; }
+.vantax-ard .vx-status svg { color: var(--vx-blue); width: 22px; height: 22px; padding: 3px; border: 1px solid var(--vx-panel-border); border-radius: 7px; }
+.vantax-ard .vx-status b { margin-left: auto; font-size: 17px; letter-spacing: 0; color: #fff; }
+.vantax-ard .vx-status li:last-child b { font-size: 12px; }
+.vantax-ard .vx-feed li { display: grid; grid-template-columns: 10px 1fr auto; gap: 8px; align-items: center; padding: 7px 0; font-size: 12px; border-bottom: 1px solid rgba(76, 140, 255, .08); animation: vx-feed-in .4s ease; }
+.vantax-ard .vx-feed i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); box-shadow: 0 0 7px var(--c); }
+.vantax-ard .vx-feed time { color: var(--vx-muted); font-size: 10px; white-space: nowrap; }
+.vantax-ard .vx-right-link { margin-top: 10px; float: right; }
+
+/* ---------- Footer ---------- */
+.vantax-ard .vx-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; padding: 18px 24px; border-top: 1px solid var(--vx-panel-border); background: rgba(3, 6, 15, .7); }
+.vantax-ard .vx-footer .vx-brand-text strong { font-size: 15px; }
+.vantax-ard .vx-footer-motto { letter-spacing: .3em; font-size: 12px; color: #c3cbea; }
+.vantax-ard .vx-footer-motto span { color: var(--vx-blue); margin: 0 10px; }
+.vantax-ard .vx-footer-stats { display: flex; gap: 22px; font-size: 12px; color: #c3cbea; }
+.vantax-ard .vx-footer-stats span { display: flex; align-items: center; gap: 6px; }
+.vantax-ard .vx-footer-stats svg { color: var(--vx-blue); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1360px) {
+  .vantax-ard .vx-layout { grid-template-columns: var(--vx-sidebar-w) minmax(0, 1fr); }
+  .vantax-ard .vx-right { grid-column: 2; position: static; display: grid; grid-template-columns: 1fr 1fr; }
+  .vantax-ard .vx-bottom { grid-template-columns: 1fr 1fr; }
+  .vantax-ard .vx-map-panel { grid-column: 1 / -1; }
+  .vantax-ard .vx-search input { width: 90px; }
+}
+@media (max-width: 1100px) {
+  .vantax-ard .vx-mainnav, .vantax-ard .vx-division { display: none; }
+  .vantax-ard .vx-topactions { margin-left: auto; }
+}
+@media (max-width: 900px) {
+  .vantax-ard .vx-menu-toggle { display: inline-grid; }
+  .vantax-ard .vx-layout { grid-template-columns: 1fr; padding: 14px; }
+  .vantax-ard .vx-sidebar { position: fixed; top: 60px; left: 0; bottom: 0; width: 260px; max-height: none; z-index: 60; padding: 14px; background: rgba(3, 6, 15, .96); border-right: 1px solid var(--vx-panel-border); transform: translateX(-100%); transition: transform .3s; }
+  .vantax-ard.vx-sidebar-open .vx-sidebar { transform: none; }
+  .vantax-ard .vx-right { grid-column: auto; grid-template-columns: 1fr; }
+  .vantax-ard .vx-hero { grid-template-columns: 1fr; text-align: center; }
+  .vantax-ard .vx-pills { justify-content: center; }
+  .vantax-ard .vx-orb { max-width: 340px; grid-row: 1; }
+  .vantax-ard .vx-orb-words { display: none; }
+  .vantax-ard .vx-bottom { grid-template-columns: 1fr; }
+  .vantax-ard .vx-footer { justify-content: center; text-align: center; }
+}
+@media (max-width: 560px) {
+  .vantax-ard .vx-search, .vantax-ard .vx-brand-text small { display: none; }
+  .vantax-ard .vx-topnav { gap: 10px; padding: 10px 12px; }
+  .vantax-ard .vx-topactions .vx-btn { padding: 7px 10px; font-size: 11px; }
+  .vantax-ard .vx-map-wrap { grid-template-columns: 1fr; }
+  .vantax-ard .vx-card-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vantax-ard *, .vantax-ard *::before, .vantax-ard *::after { animation: none !important; transition: none !important; }
+}
+
+/* ---- CSP hardening: replaces former inline style attributes ---- */
+.vantax-ard .vx-sprite { position: absolute; }
+.vantax-ard .vx-c-purple { --c: #a855f7; }
+.vantax-ard .vx-c-pink { --c: #ec4899; }
+.vantax-ard .vx-c-blue { --c: #4cc9ff; }
+.vantax-ard .vx-c-cyan { --c: #22d3ee; }
+.vantax-ard .vx-c-amber { --c: #facc15; }
+.vantax-ard .vx-c-green { --c: #22e39b; }
+
+/* ---- Live API wiring (login panel, live/demo state) ---- */
+.vantax-ard .vx-api-status { margin-top: 6px; font-size: 10px; color: var(--vx-muted); }
+.vantax-ard .vx-api-status.is-online { color: var(--vx-green); }
+.vantax-ard .vx-api-status.is-offline { color: #f87171; }
+.vantax-ard .vx-ok-unknown { color: var(--vx-muted); }
+.vantax-ard .vx-ok-unknown i { background: var(--vx-muted); box-shadow: none; animation: none; }
+.vantax-ard .vx-ok-bad { color: #f87171; }
+.vantax-ard .vx-ok-bad i { background: #f87171; box-shadow: 0 0 8px #f87171; }
+.vantax-ard .vx-live-tag { color: var(--vx-green); border-color: rgba(34, 227, 155, .5); }
+.vantax-ard .vx-login form { display: grid; gap: 8px; }
+.vantax-ard .vx-login label { display: grid; gap: 4px; font-size: 11px; color: var(--vx-muted); }
+.vantax-ard .vx-login input { background: rgba(14, 22, 52, .6); border: 1px solid var(--vx-panel-border); border-radius: 8px; color: inherit; padding: 7px 9px; font: inherit; font-size: 12px; }
+.vantax-ard .vx-login input:focus { outline: 2px solid rgba(76, 201, 255, .55); outline-offset: 1px; }
+.vantax-ard .vx-login-msg { font-size: 11px; min-height: 1em; color: #f87171; }
+.vantax-ard .vx-session p { font-size: 12px; color: var(--vx-green); }
+.vantax-ard .vx-card-meta { font-size: 10px; letter-spacing: .06em; color: var(--vx-muted); margin-top: 6px; }
+.vantax-ard .vx-card-meta.is-ok { color: var(--vx-green); }
+.vantax-ard .vx-card-meta.is-bad { color: #f87171; }
+.vantax-ard [hidden] { display: none !important; }
+
+/* ── Brand cohesion with vantax-cybersecurity.com ─────────────────────────── */
+/* Machine-made text (hashes, hex, code, signatures) in Martian Mono, like the main site */
+.vantax-ard code, .vantax-ard pre, .vantax-ard .vx-mono,
+.vantax-ard [class*="hash"], .vantax-ard [class*="hex"],
+.vantax-ard [class*="mono"], .vantax-ard [class*="addr"] { font-family: var(--vx-mono); font-stretch: 87.5%; }
+/* Wordmark cut to match the Archivo display weight on the main site */
+.vantax-ard .vx-brand-text strong { font-stretch: 118%; letter-spacing: .22em; }
+.vantax-ard h1, .vantax-ard .vx-hero-copy h1 { font-stretch: 118%; }
+/* Back-to-main-site link in the top nav */
+.vantax-ard .vx-home-link { display:inline-flex; align-items:center; gap:6px; font-size:12px; letter-spacing:.06em; color:var(--vx-muted); padding:7px 12px; border:1px solid var(--vx-panel-border); border-radius:8px; background:rgba(14,20,39,.4); transition:color .2s, border-color .2s; }
+.vantax-ard .vx-home-link:hover { color:#fff; border-color:var(--vx-blue); }
